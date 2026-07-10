@@ -1,31 +1,52 @@
 import type { SiteConfig } from './types'
 export type { SiteConfig, FeatureItem, NavItem } from './types'
 
-/** Marketing + shell config for Scholarship One. */
+/** Product copy for Scholarship One. */
 export const siteConfig: SiteConfig = {
   productId: 'scholarship-one',
   productName: 'Scholarship One',
-  kicker: 'Scholarship One · real programs, ranked for you',
-  tagline: 'Find real scholarships. Match smart. Apply with a plan.',
-  lede: 'Profile-aware ranking over a grounded catalog — deadlines, shortlist, and an assistant that cannot invent awards.',
+  kicker: 'Scholarship One',
+  tagline: 'Find scholarships that actually fit you.',
+  lede: 'Search by major, background, and need. Save programs you care about, track where you are in each application, and open the official site when you are ready to apply. We only list real awards with public links.',
   githubUrl: 'https://github.com/brianference/scholarship-one',
-  footerLine: 'Scholarship One · grounded matching ·',
-  stackStrip: 'Stack: TypeScript · React · Vite · Cloudflare Pages · OpenAI · GitHub',
-  finePrint: 'No invented awards. Official links only.',
+  footerLine: 'Scholarship One ·',
+  stackStrip: 'Built with TypeScript, React, Vite, and Cloudflare Pages.',
+  finePrint: 'Every award links to an official page. We do not invent scholarships.',
   nav: [
-    { to: '/', label: 'Home', end: true },
-    { to: '/app', label: 'App' },
-    { to: '/features', label: 'Features' },
+    { to: '/#results', label: 'Scholarships' },
+    { to: '/#digest', label: 'Deadlines' },
+    { to: '/#pipeline', label: 'Pipeline' },
+    { to: '/#my-list', label: 'Your path' },
+    { to: '/#activity', label: 'Activity' },
   ],
   features: [
-    { title: 'Grounded catalog', description: 'Only real programs with public URLs — the AI cannot invent awards.' },
-    { title: 'Profile-aware match', description: 'Major, state, and level re-rank the list with a transparent score.' },
-    { title: 'Deadline urgency', description: 'See overdue, due soon, or rolling so you know what to apply next.' },
-    { title: 'Shortlist', description: 'Save programs on-device — no account required.' },
-    { title: 'Essay coach chat', description: 'Answers stay tied to the catalog, not invented opportunities.' },
-    { title: 'Modular TypeScript app', description: 'Small files by feature; easy to extend without a monolith.' },
+    {
+      title: 'One search, full workspace',
+      description:
+        'A single search updates your profile, ranks the list, suggests programs, and opens the match panel together.',
+    },
+    {
+      title: 'State and regional awards',
+      description: 'Cal Grant, TEXAS Grant, Bright Futures, Excelsior, MAP, and more — ranked when you set your state.',
+    },
+    {
+      title: 'Weekly deadline digest',
+      description: 'See what is due this week, copy a digest, email it to yourself, or export a calendar file.',
+    },
+    {
+      title: 'Notes, checklist, compare',
+      description: 'Add notes, track application steps, and compare saved awards side by side.',
+    },
+    {
+      title: 'Backup and restore',
+      description: 'Download a JSON backup of your list, notes, and profile — restore anytime on this device.',
+    },
+    {
+      title: 'Official apply step',
+      description: 'Every card links to a public official URL. We never invent scholarships or deadlines.',
+    },
   ],
-  heroPoints: ['Match scores', 'Urgency chips', 'Shortlist', 'Light & dark'],
-  ctaPrimary: { to: '/app', label: 'Open matcher' },
-  ctaSecondary: { to: '/features', label: 'Features' },
+  heroPoints: ['Real awards', 'Instant local match', 'Save and track', 'Official links'],
+  ctaPrimary: { to: '#results', label: 'Browse scholarships' },
+  ctaSecondary: { to: '#how-it-works', label: 'How it works' },
 }

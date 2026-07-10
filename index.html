@@ -3,34 +3,39 @@
   <head>
     <meta charset="UTF-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-    <title>Scholarship One — grounded AI scholarship matcher</title>
-    <meta name="description" content="Profile-aware ranking over real scholarship programs. Vite, React, TypeScript, Cloudflare Pages. No invented awards." />
+    <title>Scholarship One — find scholarships that fit</title>
+    <meta
+      name="description"
+      content="Search real scholarships by major, background, and need. Save programs, track applications, and open official sites. No invented awards."
+    />
     <meta name="author" content="Brian Ference" />
-    <meta property="og:title" content="Scholarship One — grounded AI scholarship matcher" />
-    <meta property="og:description" content="Profile-aware ranking over real scholarship programs. Vite, React, TypeScript, Cloudflare Pages. No invented awards." />
+    <meta property="og:title" content="Scholarship One — find scholarships that fit" />
+    <meta
+      property="og:description"
+      content="Search real scholarships by major, background, and need. Save programs, track applications, and open official sites."
+    />
     <meta property="og:type" content="website" />
     <meta name="twitter:card" content="summary_large_image" />
-    <meta name="keywords" content="TypeScript, React, Cloudflare, portfolio, AI, Brian Ference" />
+    <meta name="keywords" content="scholarships, financial aid, college, STEM, nursing, TypeScript, React" />
     <script>
       try {
-        var t = localStorage.getItem('portfolio-theme')
-        if (t === 'light' || t === 'dark') document.documentElement.setAttribute('data-theme', t)
-        else document.documentElement.setAttribute('data-theme', 'dark')
-      } catch (e) {}
+        var t = localStorage.getItem('scholarship-theme') || localStorage.getItem('portfolio-theme')
+        document.documentElement.setAttribute('data-theme', t === 'dark' ? 'dark' : 'light')
+      } catch (e) {
+        document.documentElement.setAttribute('data-theme', 'light')
+      }
+      document.documentElement.setAttribute('data-design', 'peach')
     </script>
   </head>
   <body>
-    <a href="#root" style="position:absolute;left:-999px;top:auto;width:1px;height:1px;overflow:hidden" class="skip-link">Skip to content</a>
     <div id="root"></div>
     <noscript>
       <main style="font-family:system-ui;max-width:40rem;margin:2rem auto;padding:1rem">
-        <h1>Scholarship One — grounded AI scholarship matcher</h1>
-        <p>Profile-aware ranking over real scholarship programs. Vite, React, TypeScript, Cloudflare Pages. No invented awards.</p>
-        <p><strong>Stack:</strong> TypeScript · React · Vite · Cloudflare Pages · OpenAI</p>
-        <p><a href="https://github.com/brianference/scholarship-one">GitHub source</a> · Enable JavaScript for the full interactive app.</p>
+        <h1>Scholarship One</h1>
+        <p>Find scholarships that fit. Enable JavaScript for the full app.</p>
+        <p><a href="https://github.com/brianference/scholarship-one">GitHub</a></p>
       </main>
     </noscript>
-    <!-- Recruiter view-source signals: TypeScript React Vite Cloudflare Pages GitHub AI portfolio -->
     <script type="module" src="/src/main.tsx"></script>
   </body>
 </html>
