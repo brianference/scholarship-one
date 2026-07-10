@@ -17,11 +17,14 @@ export async function onRequestPost({ request, env }: { request: Request; env: R
   if (!key) {
     return json({
       message:
-        'AI is not configured on this deploy (missing OPENAI_API_KEY). The app UI still works with grounded on-page data.',
+        'AI chat is optional here — the interactive app still works offline. Configure OPENAI_API_KEY on Cloudflare Pages for live answers. Stack: TypeScript, React, Vite, Cloudflare Pages.',
     })
   }
 
-  const system = `You are the public product assistant for ${product}. Answer helpfully in 2-5 short sentences. Use ONLY the CONTEXT data. Never invent catalog rows, metrics, posts, or secrets. If CONTEXT lacks the answer, say what is missing.`
+  const system = `You are the public product assistant for ${product}, a portfolio product by Brian Ference.
+Answer in 2-5 short sentences for recruiters and hiring managers when asked about stack, design, or value.
+If CONTEXT is empty or "{}", use general public facts about this product type and say the on-page UI holds the live data.
+Never invent private metrics, secrets, or fake customers. Prefer concrete engineering signals (TypeScript, React, Cloudflare Pages, grounded AI, tests when known).`
 
   try {
     const res = await fetch('https://api.openai.com/v1/chat/completions', {
@@ -36,7 +39,7 @@ export async function onRequestPost({ request, env }: { request: Request; env: R
         max_tokens: 350,
         messages: [
           { role: 'system', content: system },
-          { role: 'user', content: `CONTEXT:\n${dataContext}\n\nUSER:\n${message}` },
+          { role: 'user', content: `CONTEXT:\n${dataContext || '(none — answer from product positioning)'}\n\nUSER:\n${message}` },
         ],
       }),
     })
