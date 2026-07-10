@@ -1,28 +1,32 @@
-const KEY = 'portfolio-theme'
+/** Theme persistence for light/dark mode (`data-theme` on documentElement). */
+const STORAGE_KEY = 'portfolio-theme'
 
 export type Theme = 'light' | 'dark'
 
+/** Read saved theme or default to dark. */
 export function getTheme(): Theme {
   try {
-    const t = localStorage.getItem(KEY)
-    if (t === 'light' || t === 'dark') return t
+    const saved = localStorage.getItem(STORAGE_KEY)
+    if (saved === 'light' || saved === 'dark') return saved
   } catch {
-    /* ignore */
+    /* private mode */
   }
   return 'dark'
 }
 
+/** Apply theme before React paints consumers. */
 export function initTheme(): Theme {
-  const t = getTheme()
-  document.documentElement.setAttribute('data-theme', t)
-  return t
+  const theme = getTheme()
+  document.documentElement.setAttribute('data-theme', theme)
+  return theme
 }
 
+/** Flip and persist theme. */
 export function toggleTheme(): Theme {
   const next: Theme = getTheme() === 'dark' ? 'light' : 'dark'
   document.documentElement.setAttribute('data-theme', next)
   try {
-    localStorage.setItem(KEY, next)
+    localStorage.setItem(STORAGE_KEY, next)
   } catch {
     /* ignore */
   }

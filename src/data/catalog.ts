@@ -1,3 +1,4 @@
+/** Real scholarship catalog — official URLs only. */
 export const CATALOG = [
   {
     "id": "aicpa",

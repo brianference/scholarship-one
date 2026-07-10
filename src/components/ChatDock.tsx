@@ -1,24 +1,27 @@
 import { useEffect, useRef, useState } from 'react'
 
-type Msg = { role: 'user' | 'assistant'; text: string }
+export type ChatMessage = { role: 'user' | 'assistant'; text: string }
 
+export type ChatDockProps = {
+  open: boolean
+  onOpenChange: (open: boolean) => void
+  context: string
+  product: string
+  greeting?: string
+}
+
+/**
+ * Floating grounded assistant.
+ * Networking is isolated here so pages never call fetch themselves.
+ */
 export function ChatDock({
   open,
   onOpenChange,
   context,
   product,
-}: {
-  open: boolean
-  onOpenChange: (v: boolean) => void
-  context: string
-  product: string
-}) {
-  const [messages, setMessages] = useState<Msg[]>([
-    {
-      role: 'assistant',
-      text: 'Hi — ask me anything about this product. I answer from the on-page data and docs, not invented facts.',
-    },
-  ])
+  greeting = 'Hi — ask about this product. I use on-page data and docs, not invented facts.',
+}: ChatDockProps) {
+  const [messages, setMessages] = useState<ChatMessage[]>([{ role: 'assistant', text: greeting }])
   const [draft, setDraft] = useState('')
   const [busy, setBusy] = useState(false)
   const [error, setError] = useState<string | null>(null)
@@ -32,7 +35,7 @@ export function ChatDock({
     const trimmed = text.trim()
     if (!trimmed || busy) return
     setError(null)
-    setMessages((m) => [...m, { role: 'user', text: trimmed }])
+    setMessages((prev) => [...prev, { role: 'user', text: trimmed }])
     setDraft('')
     setBusy(true)
     try {
@@ -41,17 +44,16 @@ export function ChatDock({
         headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify({ message: trimmed, context, product }),
       })
-      const body = await res.json()
+      const body = (await res.json()) as { message?: string; error?: string }
       if (!res.ok) throw new Error(body.error || 'Chat failed')
-      setMessages((m) => [...m, { role: 'assistant', text: body.message }])
-    } catch (e) {
-      const msg = e instanceof Error ? e.message : 'Chat failed'
-      setError(msg)
-      setMessages((m) => [
-        ...m,
+      setMessages((prev) => [...prev, { role: 'assistant', text: body.message || 'No response.' }])
+    } catch (err) {
+      setError(err instanceof Error ? err.message : 'Chat failed')
+      setMessages((prev) => [
+        ...prev,
         {
           role: 'assistant',
-          text: 'I could not reach the AI API just now. Browse the App tab — all core data is still available offline in the UI.',
+          text: 'I could not reach the AI API. The rest of the app still works with on-page data.',
         },
       ])
     } finally {
@@ -77,9 +79,9 @@ export function ChatDock({
           </button>
         </header>
         <div className="chat-log" role="log" aria-live="polite">
-          {messages.map((m, i) => (
-            <div key={i} className={`bubble bubble--${m.role}`}>
-              {m.text}
+          {messages.map((message, index) => (
+            <div key={`${message.role}-${index}`} className={`bubble bubble--${message.role}`}>
+              {message.text}
             </div>
           ))}
           {busy && <div className="bubble bubble--assistant">Thinking…</div>}
@@ -92,16 +94,16 @@ export function ChatDock({
         )}
         <form
           className="chat-form"
-          onSubmit={(e) => {
-            e.preventDefault()
+          onSubmit={(event) => {
+            event.preventDefault()
             void send(draft)
           }}
         >
           <textarea
             value={draft}
-            onChange={(e) => setDraft(e.target.value)}
+            onChange={(event) => setDraft(event.target.value)}
             rows={2}
-            placeholder="Ask about features, data, or next steps…"
+            placeholder="Ask about features, stack, or next steps…"
             disabled={busy}
           />
           <button type="submit" className="btn btn-primary" disabled={busy || !draft.trim()}>
