@@ -1,5 +1,6 @@
 import { useState } from 'react'
 import { loadDigestPrefs, saveDigestPrefs, type DigestPrefs } from '../lib/digestPrefs'
+import { recordDigestAttempt } from '../lib/digestActivity'
 import { track } from '../lib/analytics'
 
 export type DigestEmailItem = {
@@ -44,12 +45,18 @@ export function EmailDigestOptIn({ weekLabel, items }: EmailDigestOptInProps) {
         body: JSON.stringify({ email: trimmed, weekLabel, items }),
       })
       const body = (await res.json()) as { ok?: boolean; configured?: boolean; error?: string }
-      if (!res.ok || body.error) {
-        if (body.configured === false) {
-          setStatus(body.error || 'Server email not configured — use Copy digest or mailto instead')
-        } else {
-          setStatus(body.error || 'Could not send email')
-        }
+      if (!res.ok || body.error || body.ok === false) {
+        const err =
+          body.configured === false
+            ? body.error || 'Server email not configured — use Copy digest or mailto instead'
+            : body.error || 'Could not send email'
+        recordDigestAttempt({
+          email: trimmed,
+          ok: false,
+          configured: body.configured !== false,
+          error: err,
+        })
+        setStatus(err)
         return
       }
       persist({
@@ -58,9 +65,16 @@ export function EmailDigestOptIn({ weekLabel, items }: EmailDigestOptInProps) {
         lastSentAt: Date.now(),
         remindInApp: prefs.remindInApp,
       })
+      recordDigestAttempt({ email: trimmed, ok: true, configured: true })
       track({ type: 'digest_email', at: Date.now() })
-      setStatus('Digest emailed')
+      setStatus('Digest emailed — check Activity for last send status')
     } catch {
+      recordDigestAttempt({
+        email: email.trim().toLowerCase(),
+        ok: false,
+        configured: true,
+        error: 'Network error',
+      })
       setStatus('Network error — try again or use Copy digest')
     } finally {
       setBusy(false)

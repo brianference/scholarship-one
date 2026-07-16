@@ -8,7 +8,16 @@
     "build": "vite build",
     "preview": "vite preview",
     "qa": "node scripts/qa-full-pass.mjs",
-    "qa:match": "node scripts/match-scenarios.mjs"
+    "qa:match": "node scripts/match-scenarios.mjs",
+    "qa:onboarding": "node scripts/qa-onboarding.mjs",
+    "qa:hard": "node scripts/qa-onboarding.mjs && node scripts/match-scenarios.mjs && node scripts/qa-full-pass.mjs && node scripts/qa-onboarding.mjs",
+    "qa:cases": "node scripts/qa-cases-120.mjs",
+    "qa:visual": "node scripts/qa-visual.mjs",
+    "qa:sim50": "npx tsx scripts/sim-50-journeys.ts",
+    "qa:audit100": "npx tsx scripts/audit-100.ts",
+    "qa:visual-routes": "node scripts/qa-visual-routes.mjs",
+    "qa:prod": "node scripts/qa-prod-verify.mjs",
+    "qa:full": "npm run build && npm run qa:cases && npm run qa:hard && npm run qa:visual && npm run qa:sim50 && npm run qa:audit100 && npm run qa:prod"
   },
   "dependencies": {
     "react": "^18.3.1",
@@ -19,6 +28,7 @@
     "@types/react": "^18.3.12",
     "@types/react-dom": "^18.3.1",
     "@vitejs/plugin-react": "^4.3.4",
+    "playwright": "^1.61.1",
     "typescript": "^5.6.3",
     "vite": "^5.4.11"
   }

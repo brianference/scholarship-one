@@ -1,7 +1,12 @@
-import { useEffect, useState, type ReactNode } from 'react'
+/**
+ * App chrome: brand, search, horizontal nav, More menu, theme, chat.
+ * Primary nav stays ≤4 items so mobile stays one row.
+ */
+import { useEffect, useRef, useState, type ReactNode } from 'react'
 import { Link, NavLink } from 'react-router-dom'
 import { ChatDock } from './ChatDock'
 import { ThemeToggle } from './ThemeToggle'
+import { HeaderSearch } from './HeaderSearch'
 import type { SiteConfig } from '../config/site'
 import type { Profile } from '../lib/profile'
 
@@ -13,8 +18,12 @@ export type ShellProps = {
   chatPrompt?: string | null
   onChatPromptConsumed?: () => void
   onPinMatches?: (ids: string[], saveToList?: boolean) => void
-  /** Force-open match panel (e.g. after onboarding). */
   forceChatOpen?: boolean
+  onHeaderSearch?: (query: string) => void
+  headerSearchValue?: string
+  showWorkspaceNav?: boolean
+  /** Re-open welcome onboarding (level / major / background). */
+  onStartOver?: () => void
 }
 
 function preferChatOpen(): boolean {
@@ -29,9 +38,6 @@ function preferChatOpen(): boolean {
   return window.innerWidth > 900
 }
 
-/**
- * App chrome with collapsible Scholarship match panel.
- */
 export function Shell({
   config,
   children,
@@ -41,8 +47,14 @@ export function Shell({
   onChatPromptConsumed,
   onPinMatches,
   forceChatOpen = false,
+  onHeaderSearch,
+  headerSearchValue = '',
+  showWorkspaceNav = false,
+  onStartOver,
 }: ShellProps) {
   const [panelOpen, setPanelOpen] = useState(preferChatOpen)
+  const [moreOpen, setMoreOpen] = useState(false)
+  const moreRef = useRef<HTMLDivElement>(null)
 
   useEffect(() => {
     if (forceChatOpen) setPanelOpen(true)
@@ -51,6 +63,22 @@ export function Shell({
   useEffect(() => {
     if (chatPrompt) setPanelOpen(true)
   }, [chatPrompt])
+
+  useEffect(() => {
+    if (!moreOpen) return
+    function onDoc(e: MouseEvent) {
+      if (moreRef.current && !moreRef.current.contains(e.target as Node)) setMoreOpen(false)
+    }
+    function onKey(e: KeyboardEvent) {
+      if (e.key === 'Escape') setMoreOpen(false)
+    }
+    document.addEventListener('mousedown', onDoc)
+    document.addEventListener('keydown', onKey)
+    return () => {
+      document.removeEventListener('mousedown', onDoc)
+      document.removeEventListener('keydown', onKey)
+    }
+  }, [moreOpen])
 
   function handlePanelChange(open: boolean) {
     setPanelOpen(open)
@@ -61,37 +89,126 @@ export function Shell({
     }
   }
 
+  const moreNav = config.moreNav || []
+
   return (
     <div className={`shell shell--chat${panelOpen ? ' shell--chat-open' : ' shell--chat-collapsed'}`}>
-      <header className="topbar glass-bar">
-        <Link to="/" className="brand">
-          {config.productName}
-        </Link>
-        <nav className="nav" aria-label="Primary">
-          {config.nav.map((item) =>
-            item.to.includes('#') ? (
-              <a key={item.to} href={item.to.startsWith('/') ? item.to.slice(1) : item.to}>
-                {item.label}
-              </a>
-            ) : (
-              <NavLink key={item.to} to={item.to} end={item.end}>
-                {item.label}
+      <header className="topbar glass-bar topbar--search">
+        <div className="topbar__row topbar__row--primary">
+          <Link to="/" className="brand">
+            {config.productName}
+          </Link>
+
+          {onHeaderSearch ? (
+            <div className="topbar__search">
+              <HeaderSearch value={headerSearchValue} onSearch={onHeaderSearch} />
+            </div>
+          ) : (
+            <div className="topbar__search topbar__search--spacer" />
+          )}
+
+          <div className="topbar__actions">
+            <button
+              type="button"
+              className="btn btn-ghost topbar-match-btn"
+              onClick={() => handlePanelChange(!panelOpen)}
+              aria-expanded={panelOpen}
+              aria-controls="scholarship-match-panel"
+            >
+              {panelOpen ? 'Hide match' : 'Match'}
+            </button>
+            <ThemeToggle />
+          </div>
+        </div>
+
+        <nav className="topbar__nav" aria-label="Primary">
+          {showWorkspaceNav ? (
+            <>
+              {config.nav.map((item) => (
+                <NavLink key={item.to} to={item.to} end={item.end ?? item.to === '/'}>
+                  {item.label}
+                </NavLink>
+              ))}
+              {moreNav.length > 0 ? (
+                <div className="topbar__more" ref={moreRef}>
+                  <button
+                    type="button"
+                    className={`topbar__more-btn${moreOpen ? ' is-open' : ''}`}
+                    aria-expanded={moreOpen}
+                    aria-haspopup="menu"
+                    aria-controls="topbar-more-menu"
+                    onClick={() => setMoreOpen((v) => !v)}
+                  >
+                    More
+                  </button>
+                  {moreOpen ? (
+                    <ul id="topbar-more-menu" className="topbar__more-menu" role="menu">
+                      {moreNav.map((item) => (
+                        <li key={item.to} role="none">
+                          <NavLink
+                            role="menuitem"
+                            to={item.to}
+                            end={item.end}
+                            onClick={() => setMoreOpen(false)}
+                          >
+                            {item.label}
+                          </NavLink>
+                        </li>
+                      ))}
+                      {onStartOver ? (
+                        <li role="none">
+                          <button
+                            type="button"
+                            role="menuitem"
+                            className="topbar__more-action"
+                            onClick={() => {
+                              setMoreOpen(false)
+                              onStartOver()
+                            }}
+                          >
+                            Start over
+                          </button>
+                        </li>
+                      ) : null}
+                    </ul>
+                  ) : null}
+                </div>
+              ) : null}
+              {onStartOver ? (
+                <button
+                  type="button"
+                  className="topbar__start-over"
+                  onClick={onStartOver}
+                  title="Re-run welcome setup (school level, major, background)"
+                >
+                  Start over
+                </button>
+              ) : null}
+            </>
+          ) : (
+            <>
+              <NavLink to="/" end>
+                How it works
               </NavLink>
-            ),
+              {onStartOver ? (
+                <button
+                  type="button"
+                  className="topbar__start-over"
+                  onClick={onStartOver}
+                  title="Re-run welcome setup"
+                >
+                  Start over
+                </button>
+              ) : null}
+            </>
           )}
         </nav>
-        <button
-          type="button"
-          className="btn btn-ghost topbar-match-btn"
-          onClick={() => handlePanelChange(!panelOpen)}
-          aria-expanded={panelOpen}
-          aria-controls="scholarship-match-panel"
-        >
-          {panelOpen ? 'Hide match' : 'Match'}
-        </button>
-        <ThemeToggle />
       </header>
-      <main id="main-content">{children}</main>
+
+      <main id="main-content" tabIndex={-1}>
+        {children}
+      </main>
+
       <ChatDock
         alwaysVisible
         panelOpen={panelOpen}
@@ -103,6 +220,7 @@ export function Shell({
         onPendingConsumed={onChatPromptConsumed}
         onPinMatches={onPinMatches}
       />
+
       <footer className="footer">
         <p>
           {config.footerLine}{' '}

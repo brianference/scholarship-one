@@ -37,6 +37,24 @@ export type ScholarshipCardProps = {
   compareSelected?: boolean
   onToggleCompare?: () => void
   onOpenOfficial?: () => void
+  /** Opens Scholarship match with a grounded prompt about this award. */
+  onAskAi?: () => void
+}
+
+/** Prefer readable level/field chips; de-emphasize raw high-school when undergrad is also tagged. */
+function displayTags(tags: readonly string[]): string[] {
+  const list = [...tags]
+  // Put school-level tags in a clearer order for scanning
+  const priority = ['undergrad', 'grad', 'community-college', 'high-school', 'all-majors']
+  list.sort((a, b) => {
+    const ai = priority.indexOf(a)
+    const bi = priority.indexOf(b)
+    if (ai === -1 && bi === -1) return 0
+    if (ai === -1) return 1
+    if (bi === -1) return -1
+    return ai - bi
+  })
+  return list.slice(0, 3)
 }
 
 /** One ranked program row with notes, checklist, compare. */
@@ -54,6 +72,7 @@ export function ScholarshipCard({
   compareSelected = false,
   onToggleCompare,
   onOpenOfficial,
+  onAskAi,
 }: ScholarshipCardProps) {
   const [open, setOpen] = useState(false)
   const progress = checklistProgress(checklistDone)
@@ -65,7 +84,7 @@ export function ScholarshipCard({
           <span className={`chip ${item.urg.tone}`}>{item.urg.label}</span>
           {item.urg.kind === 'fixed' ? <span className="chip chip-ok">Fixed date</span> : null}
           {item.urg.confirmOfficial ? <span className="chip chip-muted">Confirm official</span> : null}
-          {item.tags.slice(0, 3).map((tag) => (
+          {displayTags(item.tags).map((tag) => (
             <span key={tag} className="chip">
               {tag}
             </span>
@@ -189,6 +208,11 @@ export function ScholarshipCard({
         {onAddToCalendar ? (
           <button type="button" className="btn btn-ghost" onClick={onAddToCalendar}>
             Add to calendar
+          </button>
+        ) : null}
+        {onAskAi ? (
+          <button type="button" className="btn btn-ghost" onClick={onAskAi}>
+            Ask AI about this
           </button>
         ) : null}
         <a

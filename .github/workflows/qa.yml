@@ -17,10 +17,8 @@ jobs:
           cache: npm
       - name: Install
         run: npm ci
-      - name: Match scenarios
-        run: npm run qa:match
-      - name: Full QA suite
-        run: npm run qa
+      - name: Hard QA gate (onboarding + match + full × re-run onboarding)
+        run: npm run qa:hard
       - name: Production build
         run: npm run build
       - name: Upload dist artifact

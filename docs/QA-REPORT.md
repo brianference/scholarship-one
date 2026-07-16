@@ -1,6 +1,6 @@
 # QA report — sequence pass
 
-Generated: 2026-07-10T22:16:06.132Z
+Generated: 2026-07-10T22:37:03.288Z
 Catalog: 69
 Failures: 0
 
@@ -18,17 +18,18 @@ Failures: 0
 - `[simulations] OK: pass 1/3 100/100`
 - `[simulations] OK: pass 2/3 100/100`
 - `[simulations] OK: pass 3/3 100/100`
-- `[simulations] OK: 300 runs 73ms`
+- `[simulations] OK: 300 runs 72ms`
 - `[simulations] OK: empty unexpected 0`
-- `[stress-load] OK: 10000 @ 0.121ms`
+- `[stress-load] OK: 10000 @ 0.120ms`
 - `[stress-load] OK: pathological ok`
 - `[edge] OK: 23 state-tagged`
 - `[edge] OK: top-5 states each have ≥2 awards`
 - `[edge] OK: pipeline filter`
 - `[edge] OK: status set size 4`
-- `[a11y] OK: onboarding/pipeline/analytics wired`
+- `[a11y] OK: multi-page layout + results wired`
 - `[a11y] OK: skiplink`
 - `[a11y] OK: onboard modal a11y`
+- `[a11y] OK: ScrollToTop present`
 - `[visual] OK: new UI surfaces styled`
 - `[security] OK: resend from env`
 - `[security] OK: html escape`

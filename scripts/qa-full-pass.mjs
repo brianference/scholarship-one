@@ -143,13 +143,14 @@ function smoke() {
     '.github/workflows/qa.yml',
     'functions/api/digest-send.ts',
     'src/components/OnboardingModal.tsx',
-    'src/components/PipelineBoard.tsx',
-    'src/components/AnalyticsPanel.tsx',
-    'src/components/EmailDigestOptIn.tsx',
-    'src/lib/analytics.ts',
-    'src/lib/scoring.ts',
-    'src/lib/urgency.ts',
-    'docs/CATALOG-AUDIT-TOP5.md',
+    'src/components/ScrollToTop.tsx',
+    'src/components/layout/AppLayout.tsx',
+    'src/state/ScholarshipContext.tsx',
+    'src/pages/LandingPage.tsx',
+    'src/pages/ResultsPage.tsx',
+    'src/lib/profileSearch.ts',
+    'src/lib/catalogQuery.ts',
+    'docs/TESTING.md',
   ]
   for (const f of files) if (!existsSync(join(root, f))) fail(s, `missing ${f}`)
   ok(s, 'sequence feature files present')
@@ -300,18 +301,22 @@ function edge() {
 // 6 a11y
 function a11y() {
   const s = 'a11y'
-  const home = readFileSync(join(root, 'src/pages/HomePage.tsx'), 'utf8')
+  const layout = readFileSync(join(root, 'src/components/layout/AppLayout.tsx'), 'utf8')
   const shell = readFileSync(join(root, 'src/components/Shell.tsx'), 'utf8')
-  if (!home.includes('OnboardingModal')) fail(s, 'onboarding missing')
-  if (!home.includes('PipelineBoard')) fail(s, 'pipeline missing')
-  if (!home.includes('AnalyticsPanel')) fail(s, 'analytics missing')
+  const results = readFileSync(join(root, 'src/pages/ResultsPage.tsx'), 'utf8')
+  if (!layout.includes('OnboardingModal')) fail(s, 'onboarding missing from layout')
+  if (!existsSync(join(root, 'src/pages/PipelinePage.tsx'))) fail(s, 'pipeline page missing')
+  if (!existsSync(join(root, 'src/pages/ActivityPage.tsx'))) fail(s, 'activity page missing')
+  if (!results.includes('ScholarshipCard')) fail(s, 'results list missing')
   if (!shell.includes('aria-expanded') && !shell.includes('panelOpen')) fail(s, 'chat collapse a11y')
-  ok(s, 'onboarding/pipeline/analytics wired')
+  ok(s, 'multi-page layout + results wired')
   if (!existsSync(join(root, 'src/components/SkipLink.tsx'))) fail(s, 'skiplink')
   else ok(s, 'skiplink')
   const onboard = readFileSync(join(root, 'src/components/OnboardingModal.tsx'), 'utf8')
   if (!onboard.includes('aria-modal')) fail(s, 'onboard modal a11y')
   else ok(s, 'onboard modal a11y')
+  if (!existsSync(join(root, 'src/components/ScrollToTop.tsx'))) fail(s, 'ScrollToTop missing')
+  else ok(s, 'ScrollToTop present')
 }
 
 // 7 visual

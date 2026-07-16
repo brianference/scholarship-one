@@ -66,7 +66,7 @@ export async function onRequestPost({ request, env }: { request: Request; env: R
     <p>${escapeHtml(weekLabel)}</p>
     ${rows}
     <p style="color:#555;font-size:13px">Always confirm deadlines on the official program site. Sent from Scholarship One.</p>
-    <p><a href="https://scholarship-one.pages.dev/#digest">Open Scholarship One</a></p>
+    <p><a href="https://scholarship-one.pages.dev/digest">Open Deadlines on Scholarship One</a></p>
   </body></html>`
 
   try {

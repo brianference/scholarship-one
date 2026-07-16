@@ -21,6 +21,8 @@ export type SiteConfig = {
   stackStrip: string
   finePrint?: string
   nav: NavItem[]
+  /** Secondary nav under Shell “More” menu (Path, Activity, Import). */
+  moreNav?: NavItem[]
   features: FeatureItem[]
   heroPoints: string[]
   ctaPrimary: { to: string; label: string }

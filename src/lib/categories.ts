@@ -74,14 +74,32 @@ export const BROWSE_CATEGORIES: BrowseCategory[] = [
   {
     id: 'business',
     label: 'Business',
-    tags: ['business', 'marketing', 'accounting'],
-    description: 'Business, marketing, accounting',
+    tags: ['business', 'marketing', 'accounting', 'finance', 'cpa'],
+    description: 'Business, marketing, accounting, finance',
+  },
+  {
+    id: 'accounting',
+    label: 'Accounting / CPA',
+    tags: ['accounting', 'cpa', 'audit', 'fraud'],
+    description: 'Accounting majors, CPA path, audit / fraud exam',
+  },
+  {
+    id: 'big4',
+    label: 'Big 4 / firms',
+    tags: ['big4', 'firm'],
+    description: 'Big 4 and national firm campus scholarships',
+  },
+  {
+    id: 'no-essay',
+    label: 'No essay / quick',
+    tags: ['no-essay', 'portal'],
+    description: 'Low-effort and marketplace quick applies',
   },
   {
     id: 'first-gen',
     label: 'First-gen',
-    tags: ['first-gen', 'need-based', 'all-majors'],
-    description: 'Often a good fit for first-generation students',
+    tags: ['first-gen'],
+    description: 'First-generation college student awards',
   },
   {
     id: 'state',

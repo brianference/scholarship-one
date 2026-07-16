@@ -7,3 +7,9 @@ dist/
 *.local
 .DS_Store
 dist-types/
+
+# Regenerable QA artifacts (produced by npm run qa:visual* / qa:sim50 / qa:audit100)
+docs/visual/
+docs/visual-audit/
+docs/visual-prod/
+docs/*-results.json

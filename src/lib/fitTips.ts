@@ -31,8 +31,16 @@ export function fitTips(tags: readonly string[], profile: Profile, score: number
   if (profile.need === 'any' && normalized.includes('need-based')) {
     tips.push('Set Aid needs to Need-based if you plan to file FAFSA / show need')
   }
-  if (profile.level === 'undergrad' && normalized.includes('high-school') && !normalized.includes('undergrad')) {
-    tips.push('This award prefers high school seniors — update School level if that is you')
+  if (
+    (profile.level === 'undergrad' || profile.level === 'community-college' || profile.level === 'grad') &&
+    normalized.includes('high-school') &&
+    !normalized.includes('state') &&
+    !normalized.includes('federal') &&
+    !normalized.includes('community-college') &&
+    !normalized.includes('transfer') &&
+    !(normalized.includes('undergrad') && normalized.includes('grad'))
+  ) {
+    tips.push('This award is typically for high school seniors — not a fit if you are already in college')
   }
 
   return tips.slice(0, 3)

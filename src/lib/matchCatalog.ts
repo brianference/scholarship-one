@@ -26,7 +26,9 @@ export function matchCatalog(query: string, limit = 5): MatchHit[] {
   const wantsMinority = wantsBlack || /\b(minority|of color|poc)\b/.test(q)
   const wantsWomen = /\b(girl|woman|women|female|ladies|latina|swe\b)\b/.test(q)
   const wantsMarketing = /\b(market(ing)?|comms?|advertis|pr\b|brand|ama\b)\b/.test(q)
-  const wantsBusiness = /\b(business|mgmt|management|finance|account|mba|cpa)\b/.test(q)
+  const wantsAccounting = /\b(account(ing|ant)?|cpa|aicpa)\b/.test(q)
+  const wantsBusiness =
+    wantsAccounting || /\b(business|mgmt|management|finance|mba)\b/.test(q)
   const wantsLeadership = /\b(leader|leadership|community service)\b/.test(q)
   const wantsGoogle = /\b(google|lime)\b/.test(q)
   const wantsMath = /\b(math|mathematics|calculus|algebra|statistics|stat\b)\b/.test(q)
@@ -105,7 +107,13 @@ export function matchCatalog(query: string, limit = 5): MatchHit[] {
 
     if (wantsMarketing && tags.includes('marketing')) score += 32
     else if (wantsMarketing && (tags.includes('business') || tags.includes('all-majors'))) score += 22
-    if (wantsBusiness && tags.some((t) => ['business', 'marketing', 'accounting'].includes(t))) score += 12
+    if (wantsAccounting && tags.includes('accounting')) score += 44
+    else if (wantsAccounting && tags.includes('business') && !tags.includes('marketing')) score += 18
+    else if (wantsBusiness && !wantsAccounting && tags.some((t) => ['business', 'marketing', 'accounting'].includes(t))) {
+      score += 18
+    }
+    // Marketing-primary is not an accounting pin
+    if (wantsAccounting && tags.includes('marketing') && !tags.includes('accounting')) score -= 38
     if (wantsMath && tags.includes('math')) score += 40
     else if (wantsStem && tags.some((t) => ['stem', 'engineering', 'computer-science', 'science', 'math'].includes(t))) {
       score += 36
@@ -121,6 +129,22 @@ export function matchCatalog(query: string, limit = 5): MatchHit[] {
       score -= 20
     }
     if (wantsSports && tags.includes('nursing') && !tags.includes('sports')) score -= 15
+    // Field focus: do not pin sports-only awards for accounting/business queries
+    if (
+      (wantsBusiness || wantsAccounting || wantsMarketing) &&
+      !wantsSports &&
+      tags.some((t) => ['sports', 'athletics', 'athlete', 'ncaa'].includes(t)) &&
+      !tags.some((t) => ['business', 'marketing', 'accounting', 'all-majors'].includes(t))
+    ) {
+      score -= 40
+    }
+    if (
+      wantsAccounting &&
+      !tags.some((t) => ['accounting', 'business', 'all-majors'].includes(t)) &&
+      tags.some((t) => ['nursing', 'healthcare', 'sports', 'athletics', 'stem', 'engineering'].includes(t))
+    ) {
+      score -= 25
+    }
     if (wantsDisability && !tags.some((t) => ['disability', 'disabled', 'accessibility', 'blind', 'deaf'].includes(t))) {
       // Keep partial STEM/sports fits, but rank true disability awards higher
       score -= 8
@@ -133,7 +157,20 @@ export function matchCatalog(query: string, limit = 5): MatchHit[] {
     }
 
     if (wantsHs && tags.includes('high-school')) score += 15
-    if (wantsUndergrad && (tags.includes('undergrad') || tags.includes('all-majors'))) score += 10
+    // Dual-tagged "undergrad" often means pays for college — detect senior-entry programs
+    const hsSeniorEntry =
+      tags.includes('high-school') &&
+      !(tags.includes('undergrad') && tags.includes('grad')) &&
+      !tags.includes('state') &&
+      !tags.includes('federal') &&
+      !tags.includes('community-college') &&
+      !tags.includes('transfer') &&
+      !(
+        tags.some((t) => ['disability', 'disabled', 'accessibility', 'blind', 'deaf'].includes(t)) &&
+        tags.includes('undergrad')
+      )
+    if (wantsUndergrad && tags.includes('undergrad') && !hsSeniorEntry) score += 10
+    else if (wantsUndergrad && tags.includes('all-majors') && !tags.includes('high-school')) score += 8
     if (wantsNeed && tags.some((t) => ['need-based', 'pell-eligible', 'federal'].includes(t))) score += 12
 
     for (const token of q.split(/[^a-z0-9+]+/).filter((t) => t.length > 2)) {
@@ -143,8 +180,34 @@ export function matchCatalog(query: string, limit = 5): MatchHit[] {
     if (wantsMarketing && tags.includes('accounting') && !tags.includes('marketing') && !tags.includes('business')) {
       score -= 12
     }
-    if (wantsUndergrad && tags.includes('high-school') && !tags.includes('undergrad') && !tags.includes('all-majors')) {
-      score -= 18
+    // Undergrad / college queries must not promote high-school senior entry awards
+    if ((wantsUndergrad || /\b(graduate|professional)\b/.test(q)) && !wantsHs && hsSeniorEntry) {
+      score -= 50
+    }
+
+    // Identity-locked awards: demote when the query never asked for a matching identity.
+    // Multi-tag awards (DACA + Hispanic) keep score if ANY requested identity matches.
+    const blackPrimary = tags.some((t) => ['black', 'african-american'].includes(t))
+    const hispanicPrimary = tags.some((t) => ['hispanic', 'latino', 'latina', 'mexican'].includes(t))
+    const undocPrimary = tags.some((t) => ['undocumented', 'daca', 'immigrant'].includes(t))
+    const disabilityPrimary = tags.some((t) =>
+      ['disability', 'disabled', 'accessibility', 'blind', 'deaf'].includes(t),
+    )
+    const lgbtqPrimary = tags.includes('lgbtq')
+    const matchedIdentity =
+      (blackPrimary && (wantsBlack || wantsMinority)) ||
+      (hispanicPrimary && (wantsHispanic || wantsMinority)) ||
+      (undocPrimary && wantsDaca) ||
+      (disabilityPrimary && wantsDisability) ||
+      (lgbtqPrimary && wantsLgbtq)
+    const hasIdentityLock =
+      blackPrimary || hispanicPrimary || undocPrimary || disabilityPrimary || lgbtqPrimary
+    if (hasIdentityLock && !matchedIdentity) {
+      if (blackPrimary && !wantsBlack && !wantsMinority) score -= 45
+      else if (undocPrimary && !wantsDaca) score -= 45
+      else if (hispanicPrimary && !wantsHispanic && !wantsMinority) score -= 45
+      else if (disabilityPrimary && !wantsDisability) score -= 40
+      else if (lgbtqPrimary && !wantsLgbtq) score -= 45
     }
 
     const parsed = Date.parse(item.deadline)
@@ -154,6 +217,8 @@ export function matchCatalog(query: string, limit = 5): MatchHit[] {
       wantsBlack,
       wantsWomen,
       wantsMarketing,
+      wantsAccounting,
+      wantsBusiness,
       wantsNeed,
       wantsMinority,
       wantsStem,
@@ -165,7 +230,7 @@ export function matchCatalog(query: string, limit = 5): MatchHit[] {
     })
     return { id: item.id, reason, score }
   })
-    .filter((h) => h.score > 10)
+    .filter((h) => h.score > 12)
     .sort((a, b) => b.score - a.score)
     .slice(0, limit)
 
@@ -178,6 +243,8 @@ function buildReason(
     wantsBlack: boolean
     wantsWomen: boolean
     wantsMarketing: boolean
+    wantsAccounting: boolean
+    wantsBusiness: boolean
     wantsNeed: boolean
     wantsMinority: boolean
     wantsStem: boolean
@@ -209,9 +276,13 @@ function buildReason(
   if (flags.wantsSports && item.tags.some((t) => ['sports', 'athletics', 'athlete', 'ncaa'].includes(t))) {
     bits.push('sports / athletics pathway')
   }
+  if (flags.wantsAccounting && item.tags.includes('accounting')) bits.push('accounting / CPA path')
+  else if (flags.wantsAccounting && item.tags.includes('business')) bits.push('business path related to accounting')
   if (flags.wantsMarketing && item.tags.includes('marketing')) bits.push('marketing focus')
   else if (flags.wantsMarketing && item.tags.some((t) => ['business', 'all-majors'].includes(t))) {
     bits.push('open to marketing / business paths')
+  } else if (flags.wantsBusiness && !flags.wantsAccounting && item.tags.some((t) => ['business', 'marketing', 'accounting'].includes(t))) {
+    bits.push('business-related award')
   }
   if (flags.wantsMath && item.tags.includes('math')) bits.push('math / quantitative STEM pathway')
   else if (flags.wantsStem && item.tags.some((t) => ['stem', 'engineering', 'computer-science', 'science', 'math'].includes(t))) {

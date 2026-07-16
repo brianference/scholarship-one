@@ -1,0 +1,161 @@
+# 120+ test case report
+
+Generated: 2026-07-10T22:40:43.225Z
+Total: 147
+Passed: 147
+Failed: 0
+Duration: 16ms
+
+## Failures
+
+_None_
+
+## All cases
+
+- PASS #1 LandingPage exists
+- PASS #2 ResultsPage exists
+- PASS #3 DigestPage exists
+- PASS #4 PipelinePage exists
+- PASS #5 PathPage exists
+- PASS #6 ActivityPage exists
+- PASS #7 HomePage monolith removed
+- PASS #8 ScholarshipContext exists
+- PASS #9 AppLayout exists
+- PASS #10 ScrollToTop exists
+- PASS #11 profileSearch exists
+- PASS #12 catalogQuery exists
+- PASS #13 HeaderSearch exists
+- PASS #14 OnboardingModal exists
+- PASS #15 TESTING.md exists
+- PASS #16 Route registered landing
+- PASS #17 Route registered /results
+- PASS #18 Route registered /digest
+- PASS #19 Route registered /pipeline
+- PASS #20 Route registered /path
+- PASS #21 Route registered /activity
+- PASS #22 ScrollToTop mounted in App
+- PASS #23 ScholarshipProvider wraps routes
+- PASS #24 Legacy /app redirects to /results
+- PASS #25 No HomePage import in App
+- PASS #26 Nav Results is /results
+- PASS #27 Nav Deadlines is /digest
+- PASS #28 Nav Pipeline is /pipeline
+- PASS #29 Nav Path is /path
+- PASS #30 Nav Activity is /activity
+- PASS #31 Nav does not use #results scroll
+- PASS #32 Shell uses NavLink for workspace nav
+- PASS #33 Onboard has Show my matches
+- PASS #34 Onboard calls onComplete(draft)
+- PASS #35 completeOnboarding closes modal
+- PASS #36 applyProfileSearch navigates /results
+- PASS #37 applyProfileSearch uses buildProfileSearchPlan
+- PASS #38 applyProfileSearch scrolls to top rAF
+- PASS #39 profileSearch keeps category all
+- PASS #40 profileSearch has fallbacks
+- PASS #41 No setCategoryId state in applyProfileSearch
+- PASS #42 Results banner Your results
+- PASS #43 Results shows ranked cards
+- PASS #44 Onboard modal aria-modal
+- PASS #45 Layout wires completeOnboarding
+- PASS #46 Catalog size >= 60
+- PASS #47 All IDs unique
+- PASS #48 All URLs https
+- PASS #49 Has cal-grant
+- PASS #50 Has texas-grant
+- PASS #51 Has google-lime
+- PASS #52 Has nurse-corps
+- PASS #53 Has pell
+- PASS #54 Has dream-us
+- PASS #55 Has ny-tap
+- PASS #56 Has bright-futures-fl
+- PASS #57 Has illinois-map
+- PASS #58 CA has >=2 awards
+- PASS #59 State-tagged >= 15
+- PASS #60 Every item has tags
+- PASS #61 Match: nursing student
+- PASS #62 Match: California Cal Grant
+- PASS #63 Match: Texas need
+- PASS #64 Match: Florida Bright Futures
+- PASS #65 Match: New York TAP
+- PASS #66 Match: Illinois MAP
+- PASS #67 Match: handicapped student track math
+- PASS #68 Match: Black student marketing
+- PASS #69 Match: Latina sports
+- PASS #70 Match: DACA undocumented
+- PASS #71 Match: LGBTQ student
+- PASS #72 Match: military spouse
+- PASS #73 Match: need-based FAFSA Pell
+- PASS #74 Match: community college transfer
+- PASS #75 Match: first-generation high school
+- PASS #76 Match: women engineering SWE
+- PASS #77 Match: computer science Google
+- PASS #78 Match: blind student
+- PASS #79 Match: Undergraduate Nursing California
+- PASS #80 Match: High school senior Texas engineering
+- PASS #81 Empty query yields no false high scores
+- PASS #82 Garbage query no throw
+- PASS #83 Whitespace-only no hits
+- PASS #84 Fixed deadlines exist
+- PASS #85 Cycle deadlines exist
+- PASS #86 Mobile chat dock media query
+- PASS #87 Primary topbar row class
+- PASS #88 Horizontal topbar nav class
+- PASS #89 Desktop header search
+- PASS #90 Onboard overlay fixed
+- PASS #91 Chat FAB for collapsed
+- PASS #92 Chat collapsed hidden
+- PASS #93 shell--chat-open padding
+- PASS #94 shell--chat-collapsed padding
+- PASS #95 Print styles hide chrome
+- PASS #96 List first section styles
+- PASS #97 Touch-friendly min heights
+- PASS #98 Header search input min-height
+- PASS #99 sr-only utility
+- PASS #100 Topbar nav is row flex
+- PASS #101 SPA redirect present
+- PASS #102 X-Frame-Options DENY
+- PASS #103 X-Content-Type-Options nosniff
+- PASS #104 CSP present
+- PASS #105 Chat uses env OPENAI key
+- PASS #106 Digest uses RESEND_API_KEY
+- PASS #107 Digest escapes HTML
+- PASS #108 No sk- hardcoded in src App
+- PASS #109 Profile storage key namespaced
+- PASS #110 Onboarding key namespaced
+- PASS #111 Analytics key namespaced
+- PASS #112 Notes key namespaced
+- PASS #113 LandingPage small file
+- PASS #114 DigestPage no Results list
+- PASS #115 PipelinePage uses PipelineBoard
+- PASS #116 ActivityPage uses AnalyticsPanel
+- PASS #117 PathPage has navigate to results
+- PASS #118 ResultsPage does not embed HowItWorks
+- PASS #119 Profile has Save & rank button
+- PASS #120 Profile has Save profile only
+- PASS #121 Profile tracks dirty/unsaved
+- PASS #122 Profile apply calls onApply
+- PASS #123 Shell has topbar__nav row
+- PASS #124 Shell header search callback
+- PASS #125 Chat collapse button
+- PASS #126 Chat FAB when collapsed
+- PASS #127 Chat scroll top on empty
+- PASS #128 Chat show more options
+- PASS #146 Results list before About you
+- PASS #147 Results tools collapsed by default state
+- PASS #129 DataTools backup
+- PASS #130 exportTools CSV
+- PASS #131 exportTools ICS
+- PASS #132 dataBackup parse version 1
+- PASS #133 Onboard plan pins: undergrad/california/nursing
+- PASS #134 Onboard plan pins: high-school/texas/engineering
+- PASS #135 Onboard plan pins: undergrad/florida/business
+- PASS #136 Onboard plan pins: grad/new-york/computer-science
+- PASS #137 Onboard plan pins: undergrad/illinois/math
+- PASS #138 Onboard plan pins: community-college/any/nursing
+- PASS #139 Onboard plan pins: undergrad/california/sports
+- PASS #140 Onboard plan pins: high-school/any/any
+- PASS #141 qa:hard script exists
+- PASS #142 qa:onboarding script exists
+- PASS #143 qa script exists
+- PASS #144 build script exists
+- PASS #145 CI uses qa:hard

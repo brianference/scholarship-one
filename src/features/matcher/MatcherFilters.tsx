@@ -6,6 +6,7 @@ export type UrgencyFilter = 'all' | 'soon' | 'rolling' | 'passed'
 export type EssayFilter = 'all' | 'no-essay'
 
 export type MatcherFiltersProps = {
+  /** Optional list-name filter (main search lives in the header). */
   query: string
   onQueryChange: (value: string) => void
   categoryId: string
@@ -26,7 +27,7 @@ export type MatcherFiltersProps = {
   onSaveSearch: () => void
 }
 
-/** Catalog search, category, amount, essay, urgency, sort. */
+/** Filters for the results list (keyword search is in the top header). */
 export function MatcherFilters(props: MatcherFiltersProps) {
   const {
     query,
@@ -55,8 +56,8 @@ export function MatcherFilters(props: MatcherFiltersProps) {
         <input
           value={query}
           onChange={(e) => onQueryChange(e.target.value)}
-          placeholder="Search by name or keyword…"
-          aria-label="Search scholarships"
+          placeholder="Filter list by name…"
+          aria-label="Filter list by scholarship name"
           className="filters__search"
         />
         <select value={categoryId} onChange={(e) => onCategoryChange(e.target.value)} aria-label="Category">

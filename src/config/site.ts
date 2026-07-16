@@ -12,12 +12,18 @@ export const siteConfig: SiteConfig = {
   footerLine: 'Scholarship One ·',
   stackStrip: 'Built with TypeScript, React, Vite, and Cloudflare Pages.',
   finePrint: 'Every award links to an official page. We do not invent scholarships.',
+  /** Primary nav — keep ≤4 for mobile single-row (Path/Activity live under More). */
   nav: [
-    { to: '/#results', label: 'Scholarships' },
-    { to: '/#digest', label: 'Deadlines' },
-    { to: '/#pipeline', label: 'Pipeline' },
-    { to: '/#my-list', label: 'Your path' },
-    { to: '/#activity', label: 'Activity' },
+    { to: '/matches', label: 'Matches', end: true },
+    { to: '/results', label: 'Results' },
+    { to: '/digest', label: 'Deadlines' },
+    { to: '/tracker', label: 'Tracker' },
+  ],
+  /** Secondary destinations — Shell "More" menu */
+  moreNav: [
+    { to: '/path', label: 'Path' },
+    { to: '/activity', label: 'Activity' },
+    { to: '/import', label: 'Import share link' },
   ],
   features: [
     {
@@ -47,6 +53,6 @@ export const siteConfig: SiteConfig = {
     },
   ],
   heroPoints: ['Real awards', 'Instant local match', 'Save and track', 'Official links'],
-  ctaPrimary: { to: '#results', label: 'Browse scholarships' },
-  ctaSecondary: { to: '#how-it-works', label: 'How it works' },
+  ctaPrimary: { to: '/matches', label: 'See my matches' },
+  ctaSecondary: { to: '/results', label: 'Browse catalog' },
 }

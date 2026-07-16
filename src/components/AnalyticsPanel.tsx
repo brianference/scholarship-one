@@ -5,8 +5,8 @@ import { CATALOG } from '../data/catalog'
 /**
  * Privacy-light activity insights (stored only on this device).
  */
-export function AnalyticsPanel() {
-  const [open, setOpen] = useState(false)
+export function AnalyticsPanel({ defaultOpen = true }: { defaultOpen?: boolean }) {
+  const [open, setOpen] = useState(defaultOpen)
   const summary = useMemo(() => getAnalyticsSummary(), [open])
 
   const nameById = useMemo(() => {
