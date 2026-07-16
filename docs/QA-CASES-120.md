@@ -1,10 +1,10 @@
 # 120+ test case report
 
-Generated: 2026-07-10T22:40:43.225Z
+Generated: 2026-07-16T06:54:02.398Z
 Total: 147
 Passed: 147
 Failed: 0
-Duration: 16ms
+Duration: 33ms
 
 ## Failures
 
@@ -39,7 +39,7 @@ _None_
 - PASS #25 No HomePage import in App
 - PASS #26 Nav Results is /results
 - PASS #27 Nav Deadlines is /digest
-- PASS #28 Nav Pipeline is /pipeline
+- PASS #28 Nav Tracker is /tracker
 - PASS #29 Nav Path is /path
 - PASS #30 Nav Activity is /activity
 - PASS #31 Nav does not use #results scroll
@@ -47,7 +47,7 @@ _None_
 - PASS #33 Onboard has Show my matches
 - PASS #34 Onboard calls onComplete(draft)
 - PASS #35 completeOnboarding closes modal
-- PASS #36 applyProfileSearch navigates /results
+- PASS #36 applyProfileSearch navigates (to option, default /matches)
 - PASS #37 applyProfileSearch uses buildProfileSearchPlan
 - PASS #38 applyProfileSearch scrolls to top rAF
 - PASS #39 profileSearch keeps category all
@@ -126,7 +126,7 @@ _None_
 - PASS #112 Notes key namespaced
 - PASS #113 LandingPage small file
 - PASS #114 DigestPage no Results list
-- PASS #115 PipelinePage uses PipelineBoard
+- PASS #115 TrackerPage uses TrackerBoard
 - PASS #116 ActivityPage uses AnalyticsPanel
 - PASS #117 PathPage has navigate to results
 - PASS #118 ResultsPage does not embed HowItWorks

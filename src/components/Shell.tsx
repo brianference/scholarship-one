@@ -10,6 +10,49 @@ import { HeaderSearch } from './HeaderSearch'
 import type { SiteConfig } from '../config/site'
 import type { Profile } from '../lib/profile'
 
+/** Compact line icons for the mobile bottom tab bar. */
+function TabIcon({ name }: { name: 'match' | 'deadlines' | 'pipeline' | 'path' }) {
+  const common = {
+    width: 22,
+    height: 22,
+    viewBox: '0 0 24 24',
+    fill: 'none',
+    stroke: 'currentColor',
+    strokeWidth: 1.8,
+    strokeLinecap: 'round' as const,
+    strokeLinejoin: 'round' as const,
+    'aria-hidden': true,
+  }
+  if (name === 'match')
+    return (
+      <svg {...common}>
+        <circle cx="12" cy="12" r="8.5" />
+        <circle cx="12" cy="12" r="3" />
+      </svg>
+    )
+  if (name === 'deadlines')
+    return (
+      <svg {...common}>
+        <rect x="3.5" y="4.5" width="17" height="16" rx="2.5" />
+        <path d="M3.5 9h17M8 3v3M16 3v3" />
+      </svg>
+    )
+  if (name === 'pipeline')
+    return (
+      <svg {...common}>
+        <rect x="3.5" y="4" width="5" height="16" rx="1.5" />
+        <rect x="10" y="4" width="5" height="11" rx="1.5" />
+        <rect x="16.5" y="4" width="4" height="8" rx="1.5" />
+      </svg>
+    )
+  return (
+    <svg {...common}>
+      <path d="M4 7h10M4 12h16M4 17h7" />
+      <circle cx="18.5" cy="7" r="1.6" fill="currentColor" stroke="none" />
+    </svg>
+  )
+}
+
 export type ShellProps = {
   config: SiteConfig
   children: ReactNode
@@ -231,6 +274,32 @@ export function Shell({
         <p className="recruiter-strip">{config.stackStrip}</p>
         {config.finePrint ? <p className="fine">{config.finePrint}</p> : null}
       </footer>
+
+      {/* Mobile bottom tab bar. Match opens the assistant sheet; the rest route to sections. */}
+      <nav className="tabbar" aria-label="Primary (mobile)">
+        <button
+          type="button"
+          className={`tabbar__item${panelOpen ? ' is-active' : ''}`}
+          onClick={() => handlePanelChange(true)}
+          aria-controls="scholarship-match-panel"
+          aria-expanded={panelOpen}
+        >
+          <TabIcon name="match" />
+          <span>Match</span>
+        </button>
+        <NavLink className="tabbar__item" to="/digest">
+          <TabIcon name="deadlines" />
+          <span>Deadlines</span>
+        </NavLink>
+        <NavLink className="tabbar__item" to="/tracker">
+          <TabIcon name="pipeline" />
+          <span>Pipeline</span>
+        </NavLink>
+        <NavLink className="tabbar__item" to="/path">
+          <TabIcon name="path" />
+          <span>Your path</span>
+        </NavLink>
+      </nav>
     </div>
   )
 }

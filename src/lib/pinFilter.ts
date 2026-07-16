@@ -56,7 +56,7 @@ export function pinAllowedForProfile(item: CatalogItem, profile: Profile): boole
  * When state is open, de-prioritize state-tagged grants.
  */
 export function filterPinsForProfile(hits: MatchHit[], profile: Profile, limit = 8): MatchHit[] {
-  const byId = new Map(CATALOG.map((c) => [c.id, c]))
+  const byId = new Map<string, CatalogItem>(CATALOG.map((c) => [c.id, c]))
   let pins = hits.filter((hit) => {
     const item = byId.get(hit.id)
     if (!item) return false

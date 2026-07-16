@@ -112,7 +112,7 @@ export function OnboardingModal({ profile, onComplete, onSkip }: OnboardingModal
             </button>
           ) : (
             <button type="button" className="btn btn-primary" onClick={finish}>
-              Show Matches
+              Show my matches
             </button>
           )}
         </div>

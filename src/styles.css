@@ -1806,3 +1806,160 @@ a { color: var(--accent); }
   margin-top: 12px;
   padding-top: 12px;
 }
+
+/* ============================================================
+   Linen Focus — native components on the warm palette
+   Match rings, card lead rows, segmented sort, bottom tab bar
+   ============================================================ */
+
+/* Match-score conic ring (card lead) */
+.match-ring {
+  --p: 80%;
+  flex: none;
+  width: 46px;
+  height: 46px;
+  border-radius: 999px;
+  display: grid;
+  place-items: center;
+  background: conic-gradient(var(--accent) var(--p), color-mix(in srgb, var(--accent) 14%, transparent) 0);
+}
+.match-ring i {
+  width: 37px;
+  height: 37px;
+  border-radius: 999px;
+  background: var(--bg-solid);
+  display: grid;
+  place-items: center;
+  font-style: normal;
+  font-size: 12px;
+  font-weight: 800;
+  color: var(--accent);
+}
+
+/* Card lead row: icon tile + title/amount + match ring */
+.card-lead {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  margin-bottom: 10px;
+}
+.card-lead__tile {
+  flex: none;
+  width: 46px;
+  height: 46px;
+  border-radius: 14px;
+  display: grid;
+  place-items: center;
+  font-size: 22px;
+  background: var(--accent-soft);
+  border: 1px solid var(--border-strong);
+}
+.card-lead__title {
+  flex: 1;
+  min-width: 0;
+}
+.card-lead__title h3 {
+  margin: 0;
+}
+.card-lead__amt {
+  margin: 2px 0 0;
+  font-size: 13px;
+  font-weight: 700;
+  color: var(--accent);
+}
+
+/* Segmented control (sort) */
+.segmented {
+  display: inline-flex;
+  gap: 2px;
+  padding: 3px;
+  border-radius: 12px;
+  border: 1px solid var(--border-strong);
+  background: color-mix(in srgb, var(--accent) 7%, var(--bg-solid));
+}
+.segmented__btn {
+  border: none;
+  background: transparent;
+  color: var(--muted);
+  font: inherit;
+  font-size: 13px;
+  font-weight: 600;
+  padding: 8px 14px;
+  min-height: 40px;
+  border-radius: 9px;
+  cursor: pointer;
+  transition: background var(--transition), color var(--transition);
+}
+.segmented__btn.is-on {
+  background: var(--accent);
+  color: #fff;
+  box-shadow: 0 2px 8px color-mix(in srgb, var(--accent) 30%, transparent);
+}
+
+/* Bottom tab bar — mobile only. Match opens the assistant sheet. */
+.tabbar {
+  display: none;
+}
+@media (max-width: 760px) {
+  .tabbar {
+    display: flex;
+    position: fixed;
+    left: 0;
+    right: 0;
+    bottom: 0;
+    z-index: 60;
+    justify-content: space-around;
+    align-items: stretch;
+    padding: 8px 6px calc(8px + env(safe-area-inset-bottom, 0px));
+    background: color-mix(in srgb, var(--bg-solid) 86%, transparent);
+    -webkit-backdrop-filter: blur(18px) saturate(180%);
+    backdrop-filter: blur(18px) saturate(180%);
+    border-top: 1px solid var(--border-strong);
+  }
+  .tabbar__item {
+    flex: 1;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    gap: 3px;
+    padding: 6px 4px;
+    min-height: 52px;
+    border: none;
+    background: transparent;
+    color: var(--muted);
+    font: inherit;
+    font-size: 10.5px;
+    font-weight: 600;
+    text-decoration: none;
+    border-radius: 12px;
+    cursor: pointer;
+  }
+  .tabbar__item span {
+    line-height: 1;
+  }
+  .tabbar__item.is-active,
+  .tabbar__item.active {
+    color: var(--accent);
+  }
+  .tabbar__item:active {
+    background: color-mix(in srgb, var(--accent) 12%, transparent);
+  }
+
+  /* The bottom bar is the mobile Match/chat opener: hide the inline Match button + FAB */
+  .topbar-match-btn {
+    display: none;
+  }
+  .chat-fab {
+    display: none !important;
+  }
+
+  /* When the assistant sheet is open it owns the bottom; hide the tab bar */
+  .shell--chat-open .tabbar {
+    display: none;
+  }
+
+  /* Reserve room so content clears the fixed tab bar */
+  .shell--chat-collapsed {
+    padding-bottom: calc(80px + env(safe-area-inset-bottom, 0px));
+  }
+}

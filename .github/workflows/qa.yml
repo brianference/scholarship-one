@@ -17,8 +17,12 @@ jobs:
           cache: npm
       - name: Install
         run: npm ci
+      - name: Typecheck (strict)
+        run: npm run typecheck
       - name: Hard QA gate (onboarding + match + full × re-run onboarding)
         run: npm run qa:hard
+      - name: Case matrix (120 assertions)
+        run: npm run qa:cases
       - name: Production build
         run: npm run build
       - name: Upload dist artifact

@@ -16,22 +16,17 @@ export type SharePackV1 = {
 
 const PREFIX = 's1.'
 
+// btoa/atob are global in browsers and in Node 18+ (the QA scripts run on Node 22),
+// so no Node Buffer fallback is needed.
 function toBase64Url(json: string): string {
-  if (typeof btoa === 'function') {
-    const b64 = btoa(unescape(encodeURIComponent(json)))
-    return b64.replace(/\+/g, '-').replace(/\//g, '_').replace(/=+$/, '')
-  }
-  // Node
-  return Buffer.from(json, 'utf8').toString('base64url')
+  const b64 = btoa(unescape(encodeURIComponent(json)))
+  return b64.replace(/\+/g, '-').replace(/\//g, '_').replace(/=+$/, '')
 }
 
 function fromBase64Url(raw: string): string {
   const b64 = raw.replace(/-/g, '+').replace(/_/g, '/')
   const pad = b64.length % 4 === 0 ? '' : '='.repeat(4 - (b64.length % 4))
-  if (typeof atob === 'function') {
-    return decodeURIComponent(escape(atob(b64 + pad)))
-  }
-  return Buffer.from(b64 + pad, 'base64').toString('utf8')
+  return decodeURIComponent(escape(atob(b64 + pad)))
 }
 
 /** Build a compact share pack from workspace state. */

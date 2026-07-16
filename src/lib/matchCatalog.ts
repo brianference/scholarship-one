@@ -299,7 +299,7 @@ function buildReason(
 }
 
 export function catalogByIds(ids: string[]): CatalogItem[] {
-  const map = new Map(CATALOG.map((item) => [item.id, item]))
+  const map = new Map<string, CatalogItem>(CATALOG.map((item) => [item.id, item]))
   const out: CatalogItem[] = []
   for (const id of ids) {
     const item = map.get(id)

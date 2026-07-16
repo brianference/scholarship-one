@@ -5,10 +5,13 @@
 import { useMemo, useState } from 'react'
 import { Link } from 'react-router-dom'
 import { PageAiActions } from '../components/PageAiActions'
-import { ComparePanel } from '../components/ComparePanel'
+import { ComparePanel, type CompareRow } from '../components/ComparePanel'
 import { ScholarshipCard } from '../features/matcher/ScholarshipCard'
-import { downloadIcs, type ExportRow } from '../lib/exportTools'
+import { downloadIcs } from '../lib/exportTools'
 import { selectTopMatches } from '../lib/matchRanking'
+import { urgency } from '../lib/urgency'
+import { checklistProgress } from '../lib/checklist'
+import { APPLY_STATUS_LABEL } from '../lib/applyStatus'
 import { profileSummary } from '../lib/profile'
 import { buildSharePack, buildShareUrl } from '../lib/sharePack'
 import { useScholarship } from '../state/ScholarshipContext'
@@ -19,20 +22,24 @@ export function MatchesPage() {
 
   const matches = useMemo(() => selectTopMatches(s.ranked, s.profile, 12), [s.ranked, s.profile])
 
-  const compareRows = useMemo(() => {
+  const compareRows = useMemo<CompareRow[]>(() => {
     return s.compareIds
       .map((id) => matches.find((m) => m.id === id) || s.ranked.find((m) => m.id === id))
-      .filter(Boolean)
+      .filter((item): item is NonNullable<typeof item> => Boolean(item))
       .map((item) => ({
-        id: item!.id,
-        name: item!.name,
-        amount: item!.amount,
-        deadline: item!.deadline,
-        url: item!.url,
-        score: item!.score,
-        tags: item!.tags,
-      })) as ExportRow[]
-  }, [s.compareIds, matches, s.ranked])
+        id: item.id,
+        name: item.name,
+        amount: item.amount,
+        deadline: item.deadline,
+        url: item.url,
+        score: item.score,
+        tags: item.tags,
+        urgLabel: urgency(item.deadline).label,
+        status: APPLY_STATUS_LABEL[s.applyMap[item.id] || 'none'],
+        checklistPercent: checklistProgress(s.checklist[item.id]).percent,
+        note: s.notes[item.id] || undefined,
+      }))
+  }, [s.compareIds, matches, s.ranked, s.applyMap, s.checklist, s.notes])
 
   const topNames = matches
     .slice(0, 5)

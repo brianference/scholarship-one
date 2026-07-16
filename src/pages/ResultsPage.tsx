@@ -149,7 +149,7 @@ export function ResultsPage() {
     <>
       <div className="results-workspace-banner" role="status" aria-live="polite">
         <p className="meta">
-          <strong>Full catalog</strong>
+          <strong>Your results</strong>
           {s.lastSearchLabel ? ` · “${s.lastSearchLabel}”` : ''}
           {pinnedCount > 0 ? ` · ${pinnedCount} suggested` : ''}
           {` · ${s.ranked.length} shown`}

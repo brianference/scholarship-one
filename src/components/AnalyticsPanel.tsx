@@ -10,7 +10,7 @@ export function AnalyticsPanel({ defaultOpen = true }: { defaultOpen?: boolean }
   const summary = useMemo(() => getAnalyticsSummary(), [open])
 
   const nameById = useMemo(() => {
-    const m = new Map(CATALOG.map((c) => [c.id, c.name]))
+    const m = new Map<string, string>(CATALOG.map((c) => [c.id, c.name]))
     return m
   }, [])
 

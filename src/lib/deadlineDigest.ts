@@ -98,7 +98,7 @@ export function buildWeeklyDigest(
   const end = new Date(Date.now() + windowDays * 86400000)
   const weekLabel = `${start.toLocaleDateString(undefined, { month: 'short', day: 'numeric' })} – ${end.toLocaleDateString(undefined, { month: 'short', day: 'numeric' })}`
 
-  const byId = new Map(catalog.map((c) => [c.id, c]))
+  const byId = new Map<string, CatalogItem>(catalog.map((c) => [c.id, c]))
 
   // Always surface every saved award
   const savedItems = savedIds

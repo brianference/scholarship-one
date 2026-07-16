@@ -1941,4 +1941,12 @@ export const CATALOG = [
   },
 ] as const
 
-export type CatalogItem = (typeof CATALOG)[number]
+/**
+ * Catalog row. `id` and `tags` are widened from the `as const` literals so
+ * consumers can look items up by arbitrary string id and test membership with
+ * `tags.includes(...)`/`tags.some(...)` without literal-union narrowing errors.
+ */
+export type CatalogItem = Omit<(typeof CATALOG)[number], 'id' | 'tags'> & {
+  id: string
+  tags: readonly string[]
+}

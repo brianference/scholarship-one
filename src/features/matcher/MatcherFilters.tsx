@@ -96,11 +96,25 @@ export function MatcherFilters(props: MatcherFiltersProps) {
           <option value="rolling">Rolling deadline</option>
           <option value="passed">Deadline passed</option>
         </select>
-        <select value={sort} onChange={(e) => onSortChange(e.target.value as SortMode)} aria-label="Sort by">
-          <option value="match">Best fit first</option>
-          <option value="deadline">Soonest deadline</option>
-          <option value="name">Name A–Z</option>
-        </select>
+        <div className="segmented" role="group" aria-label="Sort by">
+          {(
+            [
+              ['match', 'Best fit'],
+              ['deadline', 'Deadline'],
+              ['name', 'A–Z'],
+            ] as [SortMode, string][]
+          ).map(([value, label]) => (
+            <button
+              key={value}
+              type="button"
+              className={`segmented__btn${sort === value ? ' is-on' : ''}`}
+              aria-pressed={sort === value}
+              onClick={() => onSortChange(value)}
+            >
+              {label}
+            </button>
+          ))}
+        </div>
         <label className="check-inline">
           <input type="checkbox" checked={onlyShort} onChange={(e) => onOnlyShortChange(e.target.checked)} />
           Saved only ({shortlistCount})

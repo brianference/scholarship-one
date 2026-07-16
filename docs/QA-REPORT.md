@@ -1,28 +1,28 @@
 # QA report — sequence pass
 
-Generated: 2026-07-10T22:37:03.288Z
-Catalog: 69
+Generated: 2026-07-16T06:51:25.102Z
+Catalog: 209
 Failures: 0
 
 ## Log
 
-- `[smoke] OK: catalog 69`
+- `[smoke] OK: catalog 209`
 - `[smoke] OK: top-5 audit awards present`
 - `[smoke] OK: https urls`
 - `[smoke] OK: sequence feature files present`
 - `[integration] OK: CA audit search`
 - `[integration] OK: NY TAP/Excelsior`
 - `[integration] OK: disability search`
-- `[integration] OK: 38 fixed / 30 cycle deadlines`
+- `[integration] OK: 98 fixed / 110 cycle deadlines`
 - `[integration] OK: score breakdown base constant`
 - `[simulations] OK: pass 1/3 100/100`
 - `[simulations] OK: pass 2/3 100/100`
 - `[simulations] OK: pass 3/3 100/100`
-- `[simulations] OK: 300 runs 72ms`
+- `[simulations] OK: 300 runs 189ms`
 - `[simulations] OK: empty unexpected 0`
-- `[stress-load] OK: 10000 @ 0.120ms`
+- `[stress-load] OK: 10000 @ 0.367ms`
 - `[stress-load] OK: pathological ok`
-- `[edge] OK: 23 state-tagged`
+- `[edge] OK: 28 state-tagged`
 - `[edge] OK: top-5 states each have ≥2 awards`
 - `[edge] OK: pipeline filter`
 - `[edge] OK: status set size 4`
