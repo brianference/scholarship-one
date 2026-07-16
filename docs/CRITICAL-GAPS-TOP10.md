@@ -1,8 +1,9 @@
 # Critical gaps & top 10 impacts — implementation status
 
-**Updated:** 2026-07-14  
-**Prod:** `index-DwryPoY8.js` · https://scholarship-one.pages.dev  
-**Prod verify:** ALL OK (desktop + mobile)
+**Updated:** 2026-07-16 (v3.0.0 "Linen Focus")  
+**Prod:** `index-Bp2G8H5Y.js` · https://scholarship-one.pages.dev  
+**Prod verify:** ALL OK (desktop + mobile + dark) · 4 tab items, 209 match rings, 0 console errors  
+**Design:** Linen Focus shipped — bottom tab bar, match-score ring cards, segmented sort. See [RELEASE-v3.0.0.md](./RELEASE-v3.0.0.md).
 
 ---
 
