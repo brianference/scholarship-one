@@ -1,5 +1,34 @@
 # Changelog
 
+## 3.1.0 — 2026-07-16 — "Linen Focus: Matches"
+
+Rebuilds the Matches page to match the Linen Focus mockup (the 3.0.0 release applied
+the card/tab-bar patch but left the page scaffolding on the old verbose layout).
+
+### Matches page
+
+- **Serif display title** + subtitle count ("N real programs ranked for your profile").
+- **Segmented sort** at the top — Best fit / Deadline / Amount (amount uses a
+  best-effort numeric rank; "full ride"/varies handled).
+- **4-up stat strip** with real counts: Matched (ranked) / Saved / Due soon (fixed
+  deadline ≤45d) / Applied (started or submitted). No fabricated numbers.
+- **Compact Top-matches rows** — icon tile + name + subtitle (amount · due) + match
+  ring + chevron — that expand in place to the full action card (Save / Compare /
+  Notes / Checklist / Status / Calendar / Official). Nothing hidden, one tap away.
+- Prominent full-width "Save top 3 to my list" CTA.
+
+### Fixed
+
+- Horizontal overflow on narrow screens: `.page-stack` is a grid, and its `auto`
+  column expanded to a `nowrap` child's max-content. Pinned the column to
+  `minmax(0, 1fr)` so content clips/ellipses instead of widening the page.
+- Extracted the icon glyph + match ring into `cardVisuals` (shared by the full card
+  and the compact rows) to avoid duplication; `ScholarshipCard` gained a `hideLead`
+  prop so the expanded card doesn't repeat the row's tile/title/ring.
+
+Verified: typecheck 0, qa:hard 0 fail, qa:cases 147/0, no horizontal scroll at 390px,
+mobile + desktop screenshots, 0 console errors.
+
 ## 3.0.0 — 2026-07-16 — "Linen Focus"
 
 Major release: mobile-native design system on the modular workspace architecture,

@@ -2,35 +2,7 @@ import { useState } from 'react'
 import type { ApplyStatus } from '../../lib/applyStatus'
 import { APPLY_STATUS_LABEL } from '../../lib/applyStatus'
 import { DEFAULT_CHECKLIST, checklistProgress } from '../../lib/checklist'
-
-/** Pick a warm category glyph from an award's tags. */
-function iconForTags(tags: readonly string[]): string {
-  const t = tags.join(' ').toLowerCase()
-  if (/nurs|health|medic|nbna|aacn/.test(t)) return '🩺'
-  if (/stem|engineer|math|science|swe|nsbe|shpe|tech|comput/.test(t)) return '🔬'
-  if (/business|market|account|finance|mba|deloitte/.test(t)) return '📈'
-  if (/sport|athlet|ncaa|track/.test(t)) return '🏅'
-  if (/disab|accessib|lime|krause/.test(t)) return '♿'
-  if (/women|latina|female|aauw/.test(t)) return '🌸'
-  if (/state|regional|grant|cal|texas|florida|excelsior/.test(t)) return '📍'
-  if (/art|design|music|creative/.test(t)) return '🎨'
-  return '🎓'
-}
-
-/** Circular match-score indicator (conic ring). */
-function MatchRing({ score }: { score: number }) {
-  const pct = Math.min(100, Math.max(0, Math.round(score)))
-  return (
-    <div
-      className="match-ring"
-      style={{ ['--p' as string]: `${pct}%` }}
-      role="img"
-      aria-label={`Match score ${pct} of 100`}
-    >
-      <i>{pct}</i>
-    </div>
-  )
-}
+import { iconForTags, MatchRing } from './cardVisuals'
 
 export type RankedScholarship = {
   id: string
@@ -68,6 +40,8 @@ export type ScholarshipCardProps = {
   onOpenOfficial?: () => void
   /** Opens Scholarship match with a grounded prompt about this award. */
   onAskAi?: () => void
+  /** Suppress the icon-tile/title/ring lead row (when a compact row already shows it). */
+  hideLead?: boolean
 }
 
 /** Prefer readable level/field chips; de-emphasize raw high-school when undergrad is also tagged. */
@@ -102,6 +76,7 @@ export function ScholarshipCard({
   onToggleCompare,
   onOpenOfficial,
   onAskAi,
+  hideLead = false,
 }: ScholarshipCardProps) {
   const [open, setOpen] = useState(false)
   const progress = checklistProgress(checklistDone)
@@ -109,16 +84,18 @@ export function ScholarshipCard({
   return (
     <article className="card row-card">
       <div className="grow">
-        <div className="card-lead">
-          <span className="card-lead__tile" aria-hidden="true">
-            {iconForTags(item.tags)}
-          </span>
-          <div className="card-lead__title">
-            <h3>{item.name}</h3>
-            <p className="card-lead__amt">{item.amount}</p>
+        {hideLead ? null : (
+          <div className="card-lead">
+            <span className="card-lead__tile" aria-hidden="true">
+              {iconForTags(item.tags)}
+            </span>
+            <div className="card-lead__title">
+              <h3>{item.name}</h3>
+              <p className="card-lead__amt">{item.amount}</p>
+            </div>
+            <MatchRing score={item.score} />
           </div>
-          <MatchRing score={item.score} />
-        </div>
+        )}
         <div className="chips">
           <span className={`chip ${item.urg.tone}`}>{item.urg.label}</span>
           {item.urg.kind === 'fixed' ? <span className="chip chip-ok">Fixed date</span> : null}

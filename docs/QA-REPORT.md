@@ -1,6 +1,6 @@
 # QA report — sequence pass
 
-Generated: 2026-07-16T06:51:25.102Z
+Generated: 2026-07-17T03:29:26.731Z
 Catalog: 209
 Failures: 0
 
@@ -18,9 +18,9 @@ Failures: 0
 - `[simulations] OK: pass 1/3 100/100`
 - `[simulations] OK: pass 2/3 100/100`
 - `[simulations] OK: pass 3/3 100/100`
-- `[simulations] OK: 300 runs 189ms`
+- `[simulations] OK: 300 runs 181ms`
 - `[simulations] OK: empty unexpected 0`
-- `[stress-load] OK: 10000 @ 0.367ms`
+- `[stress-load] OK: 10000 @ 0.379ms`
 - `[stress-load] OK: pathological ok`
 - `[edge] OK: 28 state-tagged`
 - `[edge] OK: top-5 states each have ≥2 awards`

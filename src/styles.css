@@ -320,6 +320,7 @@ a { color: var(--accent); }
 }
 .page-stack {
   display: grid;
+  grid-template-columns: minmax(0, 1fr);
   gap: 14px;
 }
 .page-crumb a {
@@ -1962,4 +1963,196 @@ a { color: var(--accent); }
   .shell--chat-collapsed {
     padding-bottom: calc(80px + env(safe-area-inset-bottom, 0px));
   }
+}
+
+/* ============================================================
+   Linen Focus — Matches page (serif title, stat strip, compact rows)
+   ============================================================ */
+
+/* Serif display heading — the warmth from direction A */
+.display-title {
+  font-family: Georgia, 'Times New Roman', 'Iowan Old Style', serif;
+  font-size: clamp(2rem, 7vw, 2.7rem);
+  font-weight: 700;
+  letter-spacing: -0.02em;
+  line-height: 1.05;
+  margin: 2px 0 0;
+}
+.matches-hero__head {
+  display: flex;
+  align-items: flex-start;
+  justify-content: space-between;
+  gap: 12px;
+}
+.matches-subcount {
+  margin: 6px 0 0;
+  color: var(--muted);
+  font-size: 0.95rem;
+}
+.segmented--wide {
+  display: flex;
+  width: 100%;
+  margin-top: 14px;
+}
+.segmented--wide .segmented__btn {
+  flex: 1;
+  text-align: center;
+}
+
+/* 4-up stat strip */
+.stat-strip {
+  display: grid;
+  grid-template-columns: repeat(4, 1fr);
+  gap: 8px;
+  margin-top: 14px;
+}
+.stat {
+  text-align: center;
+  padding: 12px 6px;
+  border-radius: 15px;
+  border: 1px solid var(--border-strong);
+  background: color-mix(in srgb, var(--bg-solid) 92%, transparent);
+}
+.stat b {
+  display: block;
+  font-family: Georgia, 'Times New Roman', serif;
+  font-size: 1.55rem;
+  line-height: 1;
+  letter-spacing: -0.01em;
+}
+.stat span {
+  display: block;
+  margin-top: 4px;
+  font-size: 0.72rem;
+  font-weight: 600;
+  color: var(--muted);
+}
+.stat--accent b {
+  color: var(--accent);
+}
+.stat--good b {
+  color: #6f8f4e;
+}
+.stat--warn b {
+  color: var(--accent);
+}
+
+/* Full-width primary CTA */
+.btn-block {
+  display: flex;
+  width: 100%;
+  margin-top: 16px;
+  padding: 14px;
+  font-size: 1rem;
+  justify-content: center;
+}
+
+.matches-hero__actions {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 8px;
+  margin-top: 12px;
+}
+
+/* Section head with "See all" */
+.list-section__head {
+  display: flex;
+  align-items: baseline;
+  justify-content: space-between;
+  gap: 12px;
+  margin: 20px 0 10px;
+}
+.list-section__link {
+  font-size: 0.85rem;
+  font-weight: 700;
+  color: var(--accent);
+  text-decoration: none;
+  white-space: nowrap;
+}
+.list-section__link:hover {
+  text-decoration: underline;
+}
+
+/* Compact grouped match rows */
+.match-list {
+  display: flex;
+  flex-direction: column;
+  border-radius: 18px;
+  border: 1px solid var(--border-strong);
+  background: var(--bg-elev);
+  overflow: hidden;
+  box-shadow: var(--shadow);
+}
+.match-row + .match-row {
+  border-top: 1px solid var(--border-strong);
+}
+.match-row--pinned .match-row__lead {
+  background: color-mix(in srgb, var(--accent) 6%, transparent);
+}
+.match-row__lead {
+  display: flex;
+  align-items: center;
+  gap: 13px;
+  width: 100%;
+  padding: 14px 14px;
+  border: none;
+  background: transparent;
+  font: inherit;
+  text-align: left;
+  cursor: pointer;
+  color: var(--text);
+  transition: background var(--transition);
+}
+.match-row__lead:hover {
+  background: color-mix(in srgb, var(--accent) 7%, transparent);
+}
+.match-row__body {
+  flex: 1;
+  min-width: 0;
+  display: flex;
+  flex-direction: column;
+  gap: 3px;
+}
+.match-row__name {
+  font-weight: 700;
+  letter-spacing: -0.01em;
+  line-height: 1.2;
+}
+.match-row__pin {
+  display: inline-block;
+  margin-right: 6px;
+  padding: 1px 7px;
+  border-radius: 999px;
+  font-size: 0.62rem;
+  font-weight: 700;
+  text-transform: uppercase;
+  letter-spacing: 0.04em;
+  color: var(--accent);
+  background: color-mix(in srgb, var(--accent) 14%, transparent);
+  vertical-align: middle;
+}
+.match-row__sub {
+  font-size: 0.8rem;
+  color: var(--muted);
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+}
+.match-row__chev {
+  flex: none;
+  font-size: 1.1rem;
+  color: var(--muted);
+  transition: transform var(--transition);
+}
+.match-row__chev.is-open {
+  transform: rotate(180deg);
+}
+.match-row__detail {
+  padding: 0 12px 14px;
+}
+.match-row__detail .card.row-card {
+  border: none;
+  box-shadow: none;
+  background: transparent;
+  padding: 0;
 }
