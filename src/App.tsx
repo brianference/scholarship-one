@@ -5,8 +5,10 @@ import { useEffect } from 'react'
 import { BrowserRouter, Navigate, Routes, Route } from 'react-router-dom'
 import { initTheme } from './theme'
 import { ScholarshipProvider } from './state/ScholarshipContext'
+import { AccountProvider } from './state/account'
 import { AppLayout } from './components/layout/AppLayout'
 import { ScrollToTop } from './components/ScrollToTop'
+import { AuthCallbackPage } from './pages/AuthCallbackPage'
 import { LandingPage } from './pages/LandingPage'
 import { ResultsPage } from './pages/ResultsPage'
 import { MatchesPage } from './pages/MatchesPage'
@@ -23,11 +25,13 @@ export default function App() {
 
   return (
     <BrowserRouter>
-      <ScholarshipProvider>
-        <ScrollToTop />
-        <Routes>
-          <Route element={<AppLayout />}>
-            <Route path="/" element={<LandingPage />} />
+      <AccountProvider>
+        <ScholarshipProvider>
+          <ScrollToTop />
+          <Routes>
+            <Route path="/auth" element={<AuthCallbackPage />} />
+            <Route element={<AppLayout />}>
+              <Route path="/" element={<LandingPage />} />
             <Route path="/matches" element={<MatchesPage />} />
             <Route path="/results" element={<ResultsPage />} />
             <Route path="/digest" element={<DigestPage />} />
@@ -42,8 +46,9 @@ export default function App() {
           <Route path="/features" element={<Navigate to="/" replace />} />
           <Route path="/matcher" element={<Navigate to="/matches" replace />} />
           <Route path="*" element={<Navigate to="/" replace />} />
-        </Routes>
-      </ScholarshipProvider>
+          </Routes>
+        </ScholarshipProvider>
+      </AccountProvider>
     </BrowserRouter>
   )
 }

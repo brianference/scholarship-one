@@ -4,6 +4,7 @@
 import { Outlet, useLocation } from 'react-router-dom'
 import { Shell } from '../Shell'
 import { OnboardingModal } from '../OnboardingModal'
+import { AccountSync } from '../AccountSync'
 import { useScholarship } from '../../state/ScholarshipContext'
 import { siteConfig } from '../../config/site'
 
@@ -27,6 +28,7 @@ export function AppLayout() {
       showWorkspaceNav={!isLanding}
       onStartOver={store.restartOnboarding}
     >
+      <AccountSync />
       {store.showOnboarding ? (
         <OnboardingModal
           profile={store.profile}

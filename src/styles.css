@@ -1506,6 +1506,18 @@ a { color: var(--accent); }
   border-radius: 12px;
   border: 1px dashed var(--border-strong);
 }
+.topbar__account-email {
+  display: block;
+  padding: 6px 12px 8px;
+  font-size: 12px;
+  color: var(--muted);
+  border-bottom: 1px solid var(--border-strong);
+  margin-bottom: 4px;
+  max-width: 220px;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
 /* Prefer single-row primary nav on narrow screens */
 @media (max-width: 700px) {
   .topbar__nav {

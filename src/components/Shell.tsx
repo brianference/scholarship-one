@@ -7,6 +7,7 @@ import { Link, NavLink } from 'react-router-dom'
 import { ChatDock } from './ChatDock'
 import { ThemeToggle } from './ThemeToggle'
 import { HeaderSearch } from './HeaderSearch'
+import { AccountButton } from './AccountButton'
 import type { SiteConfig } from '../config/site'
 import type { Profile } from '../lib/profile'
 
@@ -160,6 +161,7 @@ export function Shell({
             >
               {panelOpen ? 'Hide match' : 'Match'}
             </button>
+            <AccountButton />
             <ThemeToggle />
           </div>
         </div>
