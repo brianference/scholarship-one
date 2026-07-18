@@ -1,5 +1,30 @@
 # Changelog
 
+## 4.0.0 — 2026-07-18 — "Accounts milestone"
+
+Major release. Promotes the email-accounts work (shipped as 3.2.0) to the 4.0
+milestone: Scholarship One goes from a local-only tool to an optional-account product
+with cross-device sync and deadline reminders, on a serverless Cloudflare stack.
+
+Headline capabilities in 4.0:
+
+- **Email magic-link accounts** — passwordless sign-in; single-use hashed tokens;
+  httpOnly sessions; server-side access control.
+- **Cross-device workspace sync** — saved scholarships + notes + checklist + status
+  persist to Cloudflare D1; local saves merge up on first sign-in. Signed out is
+  unchanged (localStorage only).
+- **Deadline reminder emails** — daily GitHub Actions cron emails 7 days and 1 day
+  before a saved award's fixed due date, idempotent per row.
+- Built on the **Linen Focus** UI (3.0–3.1): serif Matches page, match-score rings,
+  bottom tab bar, segmented sort.
+
+Stack: Cloudflare D1 (no Supabase — it pauses) + custom auth in Pages Functions +
+Brevo email. See docs/RELEASE-v4.0.0.md.
+
+Verified in production: magic-link delivery, sign-in live, reminder dry-run selecting
+7d/1d correctly, access control, single-use tokens, merge + mirror; typecheck 0,
+qa:hard 0, qa:cases 147/0, 0 console errors, CI green.
+
 ## 3.2.0 — 2026-07-18 — "Email accounts + deadline reminders"
 
 Optional email accounts so saved scholarships sync across devices and users get
