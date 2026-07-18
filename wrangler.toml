@@ -1,0 +1,13 @@
+name = "scholarship-one"
+compatibility_date = "2026-07-01"
+pages_build_output_dir = "dist"
+
+# Cloudflare D1 (edge SQLite) — accounts + saved scholarships.
+# database_id is filled in after `wrangler d1 create scholarship-one-db`
+# (needs a token with Account · D1 · Edit). Local dev uses a local SQLite
+# regardless of the id, so the whole feature is buildable/testable offline.
+[[d1_databases]]
+binding = "DB"
+database_name = "scholarship-one-db"
+database_id = "PLACEHOLDER_SET_AFTER_D1_CREATE"
+migrations_dir = "migrations"
