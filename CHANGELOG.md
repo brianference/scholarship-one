@@ -1,5 +1,39 @@
 # Changelog
 
+## 3.2.0 — 2026-07-18 — "Email accounts + deadline reminders"
+
+Optional email accounts so saved scholarships sync across devices and users get
+reminder emails before due dates. Backend is **Cloudflare D1** (not Supabase — its
+free tier pauses); email is **Brevo**.
+
+### Added
+
+- **Magic-link accounts** — sign in with email, no password. One-click link; single-use
+  hashed tokens; httpOnly session cookie. `functions/api/auth/{request,verify,session,signout}`.
+- **Workspace sync** — signed in, saved scholarships plus notes, checklist, and status
+  mirror to D1 (debounced), merge local saves up on first sign-in, and hydrate on load.
+  `functions/api/saves` (session-scoped; server-side access control). Signed out is
+  unchanged (localStorage only).
+- **Deadline reminders** — a daily GitHub Actions cron emails each user 7 days and 1 day
+  before a saved award's fixed deadline (rolling/varies excluded), idempotent via
+  per-row marks. `scripts/send-reminders.ts` + `reminderSelect.ts` (unit-tested).
+- Sign-in modal + account menu in the top bar; `/auth` callback route.
+- Feature flag: the account UI stays hidden until email delivery is configured, so the
+  infra can ship before the email key.
+
+### Infrastructure
+
+- Cloudflare D1 database `scholarship-one-db` + `wrangler.toml` binding + migration.
+- Brevo for transactional email (magic links + reminders); secrets set on Pages and
+  mirrored to GitHub Actions.
+
+### Verified
+
+- Prod: magic-link email sends; sign-in button live; `/api/auth/session` enabled:true.
+- Reminder dry-run against live D1 selected 7d + 1d awards correctly.
+- Access control (401 without session), single-use tokens (replay 400), merge + mirror,
+  reminder date math (9/9). typecheck 0, qa:hard 0, qa:cases 147/0, 0 console errors.
+
 ## 3.1.0 — 2026-07-16 — "Linen Focus: Matches"
 
 Rebuilds the Matches page to match the Linen Focus mockup (the 3.0.0 release applied
