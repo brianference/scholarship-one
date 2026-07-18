@@ -55,7 +55,10 @@ export function MatchesPage() {
 
   const matches = useMemo(() => {
     const list = [...baseMatches]
-    if (sort === 'deadline') {
+    if (sort === 'match') {
+      // Highest match score first (e.g. 90 then 78).
+      list.sort((a, b) => b.score - a.score)
+    } else if (sort === 'deadline') {
       list.sort((a, b) => {
         const ad = a.urg.kind === 'fixed' && a.urg.daysLeft != null ? a.urg.daysLeft : Number.MAX_SAFE_INTEGER
         const bd = b.urg.kind === 'fixed' && b.urg.daysLeft != null ? b.urg.daysLeft : Number.MAX_SAFE_INTEGER

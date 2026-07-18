@@ -5,6 +5,7 @@ import { Outlet, useLocation } from 'react-router-dom'
 import { Shell } from '../Shell'
 import { OnboardingModal } from '../OnboardingModal'
 import { AccountSync } from '../AccountSync'
+import { AccountNudge } from '../AccountNudge'
 import { useScholarship } from '../../state/ScholarshipContext'
 import { siteConfig } from '../../config/site'
 
@@ -29,6 +30,7 @@ export function AppLayout() {
       onStartOver={store.restartOnboarding}
     >
       <AccountSync />
+      {!isLanding ? <AccountNudge /> : null}
       {store.showOnboarding ? (
         <OnboardingModal
           profile={store.profile}

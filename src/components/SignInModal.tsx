@@ -1,5 +1,6 @@
-/** Email sign-in (magic link). Enter email → we send a one-click link. */
+/** Create an account / sign in with an email magic link (no password). */
 import { useState } from 'react'
+import { createPortal } from 'react-dom'
 import { useAccount } from '../state/account'
 
 export function SignInModal({ onClose }: { onClose: () => void }) {
@@ -7,7 +8,6 @@ export function SignInModal({ onClose }: { onClose: () => void }) {
   const [email, setEmail] = useState('')
   const [busy, setBusy] = useState(false)
   const [sent, setSent] = useState(false)
-  const [devLink, setDevLink] = useState<string | null>(null)
   const [error, setError] = useState<string | null>(null)
 
   async function submit(e: React.FormEvent) {
@@ -15,9 +15,8 @@ export function SignInModal({ onClose }: { onClose: () => void }) {
     setBusy(true)
     setError(null)
     try {
-      const r = await account.requestLink(email.trim())
+      await account.requestLink(email.trim())
       setSent(true)
-      setDevLink(r.devLink || null)
     } catch {
       setError('Could not send the link. Check the address and try again.')
     } finally {
@@ -25,22 +24,24 @@ export function SignInModal({ onClose }: { onClose: () => void }) {
     }
   }
 
-  return (
-    <div className="onboard-overlay" role="dialog" aria-modal="true" aria-labelledby="signin-title" onClick={onClose}>
-      <div className="onboard-modal card" onClick={(e) => e.stopPropagation()}>
-        <h2 id="signin-title">Save to your account</h2>
+  return createPortal(
+    <div className="modal-overlay" role="dialog" aria-modal="true" aria-labelledby="signin-title" onClick={onClose}>
+      <div className="account-modal" onClick={(e) => e.stopPropagation()}>
+        <button type="button" className="account-modal__close" aria-label="Close" onClick={onClose}>
+          ×
+        </button>
         {sent ? (
           <>
+            <h2 id="signin-title">Check your email</h2>
             <p className="lede">
-              Check <strong>{email}</strong> for a sign-in link. Open it on this device to sync your saved
-              scholarships and turn on deadline reminders.
+              We sent a one-click sign-in link to <strong>{email}</strong>. Open it on this device to sync your
+              saved scholarships and turn on deadline reminders.
             </p>
-            {devLink ? (
-              <p className="meta">
-                Dev link: <a href={devLink}>{devLink}</a>
-              </p>
-            ) : null}
-            <div className="onboard-actions">
+            <p className="meta account-modal__spam">
+              Don't see it in a minute? Check your <strong>spam / junk</strong> folder and mark it "not spam" so
+              future reminders reach your inbox.
+            </p>
+            <div className="account-modal__actions">
               <button type="button" className="btn btn-primary" onClick={onClose}>
                 Done
               </button>
@@ -48,9 +49,11 @@ export function SignInModal({ onClose }: { onClose: () => void }) {
           </>
         ) : (
           <form onSubmit={submit}>
+            <h2 id="signin-title">Create your account</h2>
             <p className="lede">
-              Sign in with your email — no password. We send a one-click link. Your saved awards, notes, and
-              deadlines follow you across devices, and you can get email reminders before due dates.
+              Enter your email — <strong>no password</strong>. We send a one-click link: if you're new it creates
+              your account, if you're back it signs you in. Your saved awards, notes, and deadlines sync across
+              devices, and you get email reminders before due dates.
             </p>
             <label className="field">
               <span>Email</span>
@@ -69,17 +72,18 @@ export function SignInModal({ onClose }: { onClose: () => void }) {
                 {error}
               </p>
             ) : null}
-            <div className="onboard-actions">
+            <div className="account-modal__actions">
               <button type="button" className="btn btn-ghost" onClick={onClose}>
                 Not now
               </button>
               <button type="submit" className="btn btn-primary" disabled={busy}>
-                {busy ? 'Sending…' : 'Send sign-in link'}
+                {busy ? 'Sending…' : 'Email me a sign-in link'}
               </button>
             </div>
           </form>
         )}
       </div>
-    </div>
+    </div>,
+    document.body,
   )
 }

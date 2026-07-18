@@ -103,11 +103,11 @@ export function selectTopMatches(ranked: RankedRow[], profile: Profile, limit = 
     .map((row) => ({ row, key: matchRankScore(row, profile) }))
     .filter((x) => x.key >= MIN_MATCH_DISPLAY_SCORE)
     .sort((a, b) => {
-      // Prefer true major hits over pins of weak fit
-      if (a.row.pinned !== b.row.pinned && a.row.score >= 50 && b.row.score >= 50) {
-        return a.row.pinned ? -1 : 1
-      }
-      return b.key - a.key
+      // Primary: the displayed match score, high to low (e.g. 90 then 78).
+      if (b.row.score !== a.row.score) return b.row.score - a.row.score
+      // Ties: composite relevance (urgency / major / state), then suggested pins.
+      if (b.key !== a.key) return b.key - a.key
+      return a.row.pinned === b.row.pinned ? 0 : a.row.pinned ? -1 : 1
     })
 
   const out: RankedRow[] = []

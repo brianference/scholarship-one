@@ -1,5 +1,19 @@
 # Changelog
 
+## 4.0.1 — 2026-07-18
+
+### Fixed
+
+- **Match ordering** — Matches now sort strictly by displayed match score (90 → 78 …).
+  Previously ordered by a composite key (score + urgency/major boosts), so the shown
+  numbers weren't monotonic. Results was already score-descending.
+- **Sign-in modal** — was clipped at the top and semi-transparent because it rendered
+  inside the backdrop-filtered top bar, which traps `position: fixed`. Now portaled to
+  `document.body`: solid card, centered, full-screen dimmed backdrop. Reframed as
+  "Create your account" (magic link creates or signs in) with a check-your-spam note.
+- **Create-account prompt** — after saving a scholarship while signed out, a dismissible
+  banner invites you to create a free account to sync and get reminders.
+
 ## 4.0.0 — 2026-07-18 — "Accounts milestone"
 
 Major release. Promotes the email-accounts work (shipped as 3.2.0) to the 4.0
