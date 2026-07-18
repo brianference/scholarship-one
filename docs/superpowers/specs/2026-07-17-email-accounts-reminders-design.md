@@ -2,205 +2,194 @@
 
 **Date:** 2026-07-17
 **Project:** scholarship-one
-**Status:** approved (decisions confirmed), pending spec review
+**Status:** approved direction (Cloudflare D1 stack), pending spec review
 
 ## Goal
 
-Let a user sign in with their email, save scholarships to an account backed by
-Supabase, and receive email reminders before each saved award's due date. Today the
-app is localStorage-only with no accounts; the existing `digest-send.ts` sends
-deadline email but is manual (client supplies email + items each time) and stores
-nothing.
+Let a user sign in with their email, save scholarships to an account, and receive
+email reminders before each saved award's due date. Today the app is localStorage-only
+with no accounts.
+
+## Stack decision — Cloudflare D1 (not Supabase)
+
+Supabase free tier pauses projects after ~7 days of inactivity (the env's `swordtruth`
+project was found paused). A new Supabase project would do the same. So the backend
+moves to **Cloudflare D1**, which the app's existing Cloudflare Pages deployment
+supports natively:
+
+- **D1** (edge SQLite) never pauses; free tier is 5M row-reads/day, 100k writes/day,
+  5GB — far beyond a portfolio app's needs. It binds directly to Pages Functions.
+- **Auth** is a custom magic-link flow implemented in Pages Functions + D1 (no
+  third-party auth service, nothing that can pause).
+- **Email** (the only external dependency) is sent via **Brevo** (300/day free, no card,
+  no domain — verify a single sender address). Resend is a drop-in alternative if a
+  domain is added later; the send call is isolated behind one module.
 
 ## Confirmed decisions
 
-1. **Auth:** magic link (passwordless email OTP). No passwords.
-2. **Access model:** optional. Signed out, the app works exactly as today (local
-   only). Signing in backs the workspace up to the account, enables reminders, and
-   merges existing local saves up (union) on first sign-in.
-3. **Sync scope:** full workspace — saved scholarships plus notes, checklist, and
-   apply status.
+1. **Auth:** magic link (passwordless), custom, in Pages Functions. Email is the identity.
+2. **Access model:** optional. Signed out, the app works exactly as today (local only).
+   Signing in backs the workspace up, enables reminders, and merges local saves up on
+   first sign-in.
+3. **Sync scope:** full workspace — saved scholarships plus notes, checklist, apply status.
 4. **Reminders:** per saved award with a real fixed due date, email 7 days before and
-   1 day before. Rolling / cycle / "varies" deadlines are excluded (no real date).
-5. **Infra:** reuse the existing Supabase project (`SUPABASE_URL`,
-   `SUPABASE_ANON_KEY` for the client; `SUPABASE_SERVICE_ROLE_KEY_TPUSA` for the
-   server-side cron). Data is isolated in a new `saved_scholarships` table with RLS.
-   The reminder job runs as a daily GitHub Actions cron and sends via Resend.
-
-   Reality check (probed 2026-07-17): `SUPABASE_URL` resolves to the **swordtruth**
-   project (ref `jvkrdrboermwmpzblwlx`), which is currently **paused (INACTIVE)** — its
-   data/auth API does not respond until it is resumed. The Management API token still
-   works. Two consequences:
-   - The project must be **resumed** (Supabase dashboard → Restore project) before the
-     client or cron can reach it. Once live, the daily reminder cron keeps it warm so
-     it will not re-pause.
-   - Reusing a shared project means scholarship-one's auth users live in that project's
-     `auth.users` pool alongside other apps. Data stays isolated (own table + RLS), but
-     the identity pool is shared. Acceptable for a portfolio app; a dedicated project
-     would isolate it fully if preferred later.
+   1 day before. Rolling / cycle / "varies" deadlines are excluded.
+5. **Infra:** Cloudflare D1 (database) + Pages Functions (auth + API) + Brevo (email) +
+   a daily GitHub Actions cron for reminders.
 
 ## Non-goals
 
-- No password auth, no social login.
+- No passwords, no social login.
 - No server-side copy of the scholarship catalog — it stays in the app (static, real,
-  versioned). Supabase stores only the user's saves.
-- No reminders for rolling/varies deadlines (they have no fixed date to count down to).
-- No migration of other apps sharing the Supabase project; scholarship-one only adds
-  its own table.
+  versioned). D1 stores only the user's saves.
+- No reminders for rolling/varies deadlines (no fixed date).
+- No Supabase.
 
 ## Architecture
 
 ```
-Browser (React SPA)
-  signed out → localStorage only (unchanged behavior)
-  signed in  → ScholarshipContext mirrors saves/notes/checklist/status to Supabase
-               (debounced writes, hydrate on load, local→account merge on first login)
-        │  supabase-js with SUPABASE_ANON_KEY (RLS enforces per-user access)
+Browser (React SPA, localStorage as today)
+  signed out → local only (unchanged)
+  signed in  → calls /api/* Functions with a session cookie; mirrors saves/notes/
+               checklist/status; hydrates on load; merges local saves on first login
+        │  fetch() to same-origin Pages Functions
         ▼
-Supabase
-  • Auth: magic-link email OTP (email is the identity)
-  • Postgres table saved_scholarships, RLS: user_id = auth.uid()
+Cloudflare Pages Functions  (functions/api/*)
+  • auth/request  → create user if new, mint one-time token, email magic link (Brevo)
+  • auth/verify   → validate token, set httpOnly session cookie
+  • auth/session, auth/signout
+  • saves (GET/PUT/DELETE) → read/write the signed-in user's rows
+        │  D1 binding (env.DB)
+        ▼
+Cloudflare D1 (SQLite): users, auth_tokens, sessions, saved_scholarships
         ▲
-        │  service-role key (bypasses RLS), server-side only
-GitHub Actions cron (daily, e.g. 13:00 UTC)
-  • query rows whose fixed deadline is 7 or 1 days out and not yet reminded at that mark
-  • send each user one email via Resend, then append the mark to reminder_sent
+        │  D1 HTTP API (account id + D1 token), server-side only
+GitHub Actions cron (daily)
+  • query saves whose fixed deadline is 7 or 1 days out and not yet reminded
+  • send one Brevo email per user, then record the mark
 ```
 
-Three independently testable units:
+Three independently testable units: **data + Functions API** (auth and saves), **client
+auth + sync**, and **the reminder cron**.
 
-- **Data layer** — the Supabase schema, RLS policies, and a migration. Testable with
-  the anon key (RLS) and service key (cron) directly.
-- **Client auth + sync** — a small auth module and the `ScholarshipContext`
-  integration. Testable signed-out (unchanged) and signed-in (writes/hydrates/merges).
-- **Reminder cron** — a standalone Node script plus a workflow. Testable by running the
-  script against seed rows with a dry-run flag.
-
-## Data model
-
-Supabase Auth manages `auth.users` (email is the identity). One new table:
+## Data model (D1 / SQLite)
 
 ```sql
-create table public.saved_scholarships (
-  user_id        uuid not null references auth.users (id) on delete cascade,
-  scholarship_id text not null,            -- catalog id, e.g. 'pell'
-  saved_at       timestamptz not null default now(),
-  updated_at     timestamptz not null default now(),
-  notes          text,
-  checklist      text[] not null default '{}',
-  apply_status   text not null default 'none',   -- none|interested|applied|submitted
-  deadline       text,                    -- snapshot of the catalog deadline string
-  reminder_sent  text[] not null default '{}',   -- {'d7','d1'} marks already emailed
-  primary key (user_id, scholarship_id)
+create table users (
+  id         text primary key,          -- uuid
+  email      text unique not null,
+  created_at integer not null           -- epoch ms
 );
 
-alter table public.saved_scholarships enable row level security;
+create table auth_tokens (               -- one-time magic-link tokens
+  token_hash text primary key,           -- sha-256 of the emailed token
+  user_id    text not null references users(id) on delete cascade,
+  expires_at integer not null,           -- ~15 min
+  used_at    integer
+);
 
-create policy "own rows" on public.saved_scholarships
-  for all using (auth.uid() = user_id) with check (auth.uid() = user_id);
+create table sessions (
+  id         text primary key,           -- random; stored in httpOnly cookie
+  user_id    text not null references users(id) on delete cascade,
+  expires_at integer not null
+);
+
+create table saved_scholarships (
+  user_id        text not null references users(id) on delete cascade,
+  scholarship_id text not null,          -- catalog id, e.g. 'pell'
+  saved_at       integer not null,
+  updated_at     integer not null,
+  notes          text,
+  checklist      text,                   -- JSON array of step ids
+  apply_status   text not null default 'none',
+  deadline       text,                   -- snapshot of catalog deadline string
+  reminder_sent  text not null default '',  -- csv of marks: 'd7,d1'
+  primary key (user_id, scholarship_id)
+);
 ```
 
-Notes:
+Access control is enforced **server-side in Functions** (every query is scoped to the
+session's `user_id`) — the SQLite equivalent of Supabase RLS, but in our code. The
+client never talks to D1 directly and holds no database credential.
 
-- The catalog `deadline` is snapshotted on save so the cron can compute days-left
-  without the client. The cron re-parses it with the same urgency logic the app uses
-  (fixed dates only).
-- `reminder_sent` makes the cron idempotent: a mark (`d7`, `d1`) is appended after a
-  successful send so re-runs never double-email.
-- Migration is applied via the Supabase Management API / CLI using
-  `SUPABASE_ACCESS_TOKEN`, checked into the repo as `supabase/migrations/`.
+The catalog `deadline` is snapshotted per row so the cron computes days-left without the
+client. `reminder_sent` marks (`d7`, `d1`) make the cron idempotent.
 
-## Auth flow (magic link)
+## Auth flow (custom magic link)
 
-- A sign-in entry point in the header/More menu and on the digest/reminders surface:
-  "Save to your account" → email field → `supabase.auth.signInWithOtp({ email })`.
-- UI shows "Check your inbox". The email link returns to the app; supabase-js
-  `detectSessionInUrl` (default on) consumes the token from the URL and establishes the
-  session — no custom callback route needed.
-- Session persists via supabase-js. A signed-in indicator shows the email + sign out.
-- Only the public anon key ships to the client. RLS is the security boundary.
+1. `POST /api/auth/request { email }` → upsert user, generate a random token, store its
+   sha-256 hash with a ~15-minute expiry, email the link
+   `https://scholarship-one.pages.dev/auth?token=…` via Brevo. Always responds 200
+   ("check your inbox") so it can't be used to probe which emails exist.
+2. The app's `/auth` route calls `POST /api/auth/verify { token }` → if the hash matches
+   an unused, unexpired token, mark it used, create a session, set an httpOnly, Secure,
+   SameSite=Lax cookie, and redirect to `/matches`.
+3. `GET /api/auth/session` returns the current email (or null); `POST /api/auth/signout`
+   clears the session. Rate-limit `auth/request` per email + IP (reuse the existing
+   `RATE_LIMIT_SALT` pattern).
 
 ## Client sync
 
-- New `src/lib/supabaseClient.ts` (createClient with url + anon key from Vite env).
-- New `src/state/account.ts` (or extend `ScholarshipContext`): tracks session; when
-  signed in, wraps the existing save/note/checklist/status mutations to also upsert the
-  row, and hydrates the table into context on load.
+- `src/lib/api.ts` — thin fetch wrapper for the `/api/*` endpoints (credentials: include).
+- `src/state/account.ts` — tracks session (email); on sign-in, hydrates saves from
+  `GET /api/saves` and, going forward, mirrors each save/note/checklist/status mutation
+  from `ScholarshipContext` via debounced `PUT /api/saves`. Signed out, behavior is
+  exactly as today (localStorage only).
 - **Merge on first sign-in:** union local shortlist/notes/checklist/status with any
-  existing account rows (account wins on conflict for a field only if newer by
-  `updated_at`; otherwise local fills gaps). Local storage remains as an offline cache.
-- Writes are debounced and best-effort: a failed sync never blocks the UI (the app
-  still works locally), and surfaces a subtle "not synced" note.
+  account rows; newer `updated_at` wins per field, otherwise local fills gaps. Local
+  storage stays as an offline cache.
+- Failures never block the UI; a subtle "not synced" note appears and it retries.
 
 ## Reminder cron
 
-- `scripts/send-reminders.mjs` (Node, runs on Actions): uses supabase-js with the
-  service-role key to select rows where the fixed deadline is exactly 7 or 1 days out
-  and the matching mark is absent from `reminder_sent`. Joins each row to the catalog
-  (bundled) for name/amount/url. Groups by user, sends one Resend email per user, then
-  appends the mark.
-- `.github/workflows/reminders.yml`: `schedule: cron` daily; secrets
-  `SUPABASE_URL`, `SUPABASE_SERVICE_ROLE_KEY`, `RESEND_API_KEY`, `DIGEST_FROM_EMAIL`
-  from repo secrets. The local `SUPABASE_SERVICE_ROLE_KEY_TPUSA` value is mirrored into
-  the repo secret `SUPABASE_SERVICE_ROLE_KEY` (clean name; same key, same project). Per the project rule, no heredocs in `run:` — the workflow calls
-  the script file. Supports `--dry-run` (log, no send, no mark) for verification.
-- Idempotent by construction (the `reminder_sent` marks), so a missed or double run is
-  safe.
+- `scripts/send-reminders.mjs` (Node, on Actions): queries D1 over its HTTP API (account
+  id + a D1 API token) for saves whose snapshotted fixed deadline is exactly 7 or 1 days
+  out and whose `reminder_sent` lacks that mark. Joins to the bundled catalog for
+  name/amount/url, groups by user (email from `users`), sends one Brevo email per user,
+  then appends the mark. `--dry-run` logs without sending or marking.
+- `.github/workflows/reminders.yml`: `schedule: cron` daily; secrets `CF_ACCOUNT_ID`,
+  `D1_DATABASE_ID`, `CLOUDFLARE_API_TOKEN` (D1 read/write), `BREVO_API_KEY`,
+  `DIGEST_FROM_EMAIL`. No heredocs in `run:` — it calls the script file.
+- Idempotent by the `reminder_sent` marks; a missed or double run is safe.
 
 ## Security
 
-- RLS is the boundary: the client only ever holds the anon key; every row read/write
-  is constrained to `auth.uid()`.
-- The service-role key lives only in GitHub Actions secrets and is used only by the
-  cron. It is never shipped to the client or committed.
-- All secrets are mirrored to GitHub repo secrets (PyNaCl + GitHub API) so Actions can
-  read them; nothing secret is added to the repo, Pages build, or client bundle.
-- Email addresses are stored by Supabase Auth; `saved_scholarships` holds no PII beyond
-  the `user_id` foreign key.
+- Sessions are httpOnly + Secure + SameSite=Lax cookies; tokens are single-use, hashed
+  at rest, short-lived. Every data query is scoped to the session's `user_id` in Function
+  code — the client cannot reach another user's rows.
+- The client bundle holds no secrets. D1 is reachable only through Functions (server) and
+  the cron (server). The D1/CF and Brevo credentials live only in Pages/Actions env +
+  GitHub repo secrets, mirrored via PyNaCl.
+- `saved_scholarships` holds no PII beyond the `user_id` link; `users` holds the email.
 
-## Prerequisites (operational)
+## Prerequisites
 
-Two are hard blockers that need you; the rest I can do once those clear.
+**The one thing needed from you:** a **Brevo** API key (free account, verify one sender
+email — no card, no domain) plus the sender address for `DIGEST_FROM_EMAIL`. This gates
+actual email delivery (magic links + reminders) only.
 
-**Blocker A — resume the Supabase project.** `SUPABASE_URL` (swordtruth) is paused.
-Resume it in the Supabase dashboard (Restore project), or tell me to point at a
-different active project instead. Nothing reads/writes data until this is done.
-
-**Blocker B — Resend.** There is no `RESEND_API_KEY` in the env. Provide a Resend API
-key and a verified sender domain (`DIGEST_FROM_EMAIL`). This gates two things: the
-reminder cron, and production-grade magic-link delivery (Supabase's built-in auth email
-is rate-limited to a few per hour and is fine only for early testing; for real use,
-point Supabase Auth SMTP at Resend).
-
-Once A and B clear, I can do the rest without further input:
-
-1. Apply the migration to the project (via `SUPABASE_ACCESS_TOKEN`), commit it under
-   `supabase/migrations/`.
-2. Functionally verify the anon key ↔ `SUPABASE_URL` pairing (no secret values printed).
-3. Enable email OTP / magic-link and set the redirect allowlist to include
-   `https://scholarship-one.pages.dev` and `http://localhost:5173` (via the Management
-   API or dashboard).
-4. Mirror `SUPABASE_URL`, `SUPABASE_SERVICE_ROLE_KEY`, `RESEND_API_KEY`,
-   `DIGEST_FROM_EMAIL` into the GitHub repo secrets for the cron.
+Everything else I provision myself with the existing Cloudflare token: create the D1
+database, apply the schema, bind it to Pages, deploy the Functions, and add the cron.
+Until the Brevo key lands, email is stubbed (dev logs the magic link; reminders dry-run),
+so the whole feature can be built and tested first.
 
 ## Testing
 
-- **Data layer:** insert as user A via anon key, confirm user B cannot read A's rows
-  (RLS). Confirm service key can read across users.
-- **Client:** signed-out flows unchanged (existing qa:hard / qa:cases stay green);
-  signed-in save writes a row; reload hydrates; first sign-in merges local saves.
-- **Cron:** seed rows at deadlines 7 and 1 days out; `--dry-run` lists exactly those;
-  a real run emails once and sets the mark; a second run sends nothing.
+- **Auth/data:** request → verify sets a session; a second use of the same token fails;
+  a user cannot read another user's saves (server scope check).
+- **Client:** signed-out flows unchanged (qa:hard / qa:cases stay green); signed-in save
+  persists; reload hydrates; first sign-in merges local saves.
+- **Cron:** seed rows at 7 and 1 days out; `--dry-run` lists exactly those; a real run
+  emails once and sets the mark; a re-run sends nothing.
 
 ## Rollout (phased)
 
-1. Data layer: migration + RLS + verify pairing.
-2. Client auth + sync (behind the existing UI; signed-out unaffected).
-3. Reminder cron + workflow, dry-run verified, then live.
-4. Deploy, verify prod, release notes, memory.
+1. D1 database + schema + binding; Functions for auth + saves; stubbed email.
+2. Client auth + sync (signed-out unaffected).
+3. Reminder cron + workflow, dry-run verified.
+4. Add Brevo key → turn on real email → verify end to end → deploy, release, memory.
 
 ## Open items
 
-- Sender domain for Resend (needed for deliverability; `onboarding@resend.dev` works
-  for testing only).
-- Reminder send hour (UTC) — default 13:00 UTC unless specified.
+- Brevo API key + verified sender address (only blocker to live email).
+- Daily reminder send hour (UTC); default 13:00 UTC.
