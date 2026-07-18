@@ -27,6 +27,18 @@ nothing.
    server-side cron). Data is isolated in a new `saved_scholarships` table with RLS.
    The reminder job runs as a daily GitHub Actions cron and sends via Resend.
 
+   Reality check (probed 2026-07-17): `SUPABASE_URL` resolves to the **swordtruth**
+   project (ref `jvkrdrboermwmpzblwlx`), which is currently **paused (INACTIVE)** — its
+   data/auth API does not respond until it is resumed. The Management API token still
+   works. Two consequences:
+   - The project must be **resumed** (Supabase dashboard → Restore project) before the
+     client or cron can reach it. Once live, the daily reminder cron keeps it warm so
+     it will not re-pause.
+   - Reusing a shared project means scholarship-one's auth users live in that project's
+     `auth.users` pool alongside other apps. Data stays isolated (own table + RLS), but
+     the identity pool is shared. Acceptable for a portfolio app; a dedicated project
+     would isolate it fully if preferred later.
+
 ## Non-goals
 
 - No password auth, no social login.
@@ -148,12 +160,28 @@ Notes:
 
 ## Prerequisites (operational)
 
-1. Apply the migration to the shared Supabase project (via `SUPABASE_ACCESS_TOKEN`).
-2. Confirm the anon key ↔ `SUPABASE_URL` pairing with a functional REST/auth probe
-   before building (no secret values printed).
-3. Enable email OTP / magic-link in the Supabase project's Auth settings and set the
-   site URL / redirect allowlist to include `https://scholarship-one.pages.dev`.
-4. Set `RESEND_API_KEY` and a verified `DIGEST_FROM_EMAIL` sender domain.
+Two are hard blockers that need you; the rest I can do once those clear.
+
+**Blocker A — resume the Supabase project.** `SUPABASE_URL` (swordtruth) is paused.
+Resume it in the Supabase dashboard (Restore project), or tell me to point at a
+different active project instead. Nothing reads/writes data until this is done.
+
+**Blocker B — Resend.** There is no `RESEND_API_KEY` in the env. Provide a Resend API
+key and a verified sender domain (`DIGEST_FROM_EMAIL`). This gates two things: the
+reminder cron, and production-grade magic-link delivery (Supabase's built-in auth email
+is rate-limited to a few per hour and is fine only for early testing; for real use,
+point Supabase Auth SMTP at Resend).
+
+Once A and B clear, I can do the rest without further input:
+
+1. Apply the migration to the project (via `SUPABASE_ACCESS_TOKEN`), commit it under
+   `supabase/migrations/`.
+2. Functionally verify the anon key ↔ `SUPABASE_URL` pairing (no secret values printed).
+3. Enable email OTP / magic-link and set the redirect allowlist to include
+   `https://scholarship-one.pages.dev` and `http://localhost:5173` (via the Management
+   API or dashboard).
+4. Mirror `SUPABASE_URL`, `SUPABASE_SERVICE_ROLE_KEY`, `RESEND_API_KEY`,
+   `DIGEST_FROM_EMAIL` into the GitHub repo secrets for the cron.
 
 ## Testing
 
