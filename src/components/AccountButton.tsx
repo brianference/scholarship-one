@@ -18,7 +18,8 @@ export function AccountButton() {
     return () => document.removeEventListener('mousedown', onDoc)
   }, [menu])
 
-  if (account.status === 'loading') return null
+  // Hide entirely until accounts are usable (email delivery configured server-side).
+  if (account.status === 'loading' || !account.enabled) return null
 
   if (account.status === 'signed-out') {
     return (

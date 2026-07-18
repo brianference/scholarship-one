@@ -9,5 +9,5 @@ pages_build_output_dir = "dist"
 [[d1_databases]]
 binding = "DB"
 database_name = "scholarship-one-db"
-database_id = "PLACEHOLDER_SET_AFTER_D1_CREATE"
+database_id = "df213333-9c8a-4943-9015-c594462ace85"
 migrations_dir = "migrations"

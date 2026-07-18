@@ -34,7 +34,7 @@ export function verifyToken(token: string): Promise<{ ok: boolean; email: string
   return req('/api/auth/verify', { method: 'POST', body: JSON.stringify({ token }) })
 }
 
-export function getAccountSession(): Promise<{ email: string | null }> {
+export function getAccountSession(): Promise<{ email: string | null; enabled?: boolean }> {
   return req('/api/auth/session')
 }
 

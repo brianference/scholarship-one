@@ -11,6 +11,8 @@ type AccountStatus = 'loading' | 'signed-out' | 'signed-in'
 type AccountContextValue = {
   status: AccountStatus
   email: string | null
+  /** Whether accounts are usable (email delivery configured on the server). */
+  enabled: boolean
   /** Send a magic link; returns devLink in local dev only. */
   requestLink: (email: string) => Promise<{ ok: boolean; devLink?: string }>
   /** Redeem a token (from the /auth route). */
@@ -23,6 +25,7 @@ const AccountContext = createContext<AccountContextValue | null>(null)
 export function AccountProvider({ children }: { children: ReactNode }) {
   const [status, setStatus] = useState<AccountStatus>('loading')
   const [email, setEmail] = useState<string | null>(null)
+  const [enabled, setEnabled] = useState(false)
 
   useEffect(() => {
     let alive = true
@@ -30,6 +33,7 @@ export function AccountProvider({ children }: { children: ReactNode }) {
       .then((s) => {
         if (!alive) return
         setEmail(s.email)
+        setEnabled(s.enabled !== false)
         setStatus(s.email ? 'signed-in' : 'signed-out')
       })
       .catch(() => {
@@ -67,7 +71,7 @@ export function AccountProvider({ children }: { children: ReactNode }) {
     setStatus('signed-out')
   }, [])
 
-  const value: AccountContextValue = { status, email, requestLink, verify, signOut: doSignOut }
+  const value: AccountContextValue = { status, email, enabled, requestLink, verify, signOut: doSignOut }
   return <AccountContext.Provider value={value}>{children}</AccountContext.Provider>
 }
 
