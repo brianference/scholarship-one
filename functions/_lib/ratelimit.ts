@@ -87,6 +87,19 @@ export async function guard(
   )
 }
 
+/**
+ * Clear a subject's window after a successful authentication.
+ *
+ * Without this, signing in legitimately eats the same budget as guessing: a
+ * student signing in on a phone, a laptop, and a library machine would spend
+ * three of five attempts and could lock themselves out. The limit exists to
+ * stop repeated *failures*, so success resets it.
+ */
+export async function clearSubject(env: Env, endpoint: string, subject: string): Promise<void> {
+  const key = await bucketKey(env, `${endpoint}:subject`, subject)
+  await env.DB.prepare('delete from rate_limits where bucket = ?').bind(key).run()
+}
+
 /** Drop windows that have long since expired. Called opportunistically. */
 export async function sweep(env: Env): Promise<void> {
   await env.DB.prepare('delete from rate_limits where window_start < ?')

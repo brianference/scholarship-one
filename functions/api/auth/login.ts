@@ -4,7 +4,7 @@ import { json, sessionCookie } from '../../_lib/http'
 import { createSession, SESSION_TTL_SECONDS } from '../../_lib/auth'
 import { hashPassword, needsRehash, verifyPassword } from '../../_lib/password'
 import { loginSchema, parseBody } from '../../_lib/validate'
-import { guard } from '../../_lib/ratelimit'
+import { clearSubject, guard } from '../../_lib/ratelimit'
 
 /** One message for every failure mode, so the endpoint cannot enumerate accounts. */
 const GENERIC_FAILURE = 'That email and password combination did not match.'
@@ -43,6 +43,10 @@ export async function onRequestPost({ request, env }: FnCtx) {
       .bind(next.hash, next.salt, next.iterations, Date.now(), user.id)
       .run()
   }
+
+  // Correct credentials clear the failure counter, so signing in on several
+  // devices never counts toward a lockout meant to stop password guessing.
+  await clearSubject(env, 'login', email)
 
   const sid = await createSession(env, user.id)
   return json({ ok: true, email }, 200, { 'Set-Cookie': sessionCookie(sid, SESSION_TTL_SECONDS) })

@@ -91,6 +91,21 @@ for (let i = 1; i <= 8; i++) {
 // Five wrong guesses are allowed, so the sixth is the one that must be refused.
 check(`per-account limit trips on the 6th attempt (got ${limitAt})`, limitAt === 6)
 
+// Regression: a successful sign-in must clear the failure counter. Otherwise
+// signing in on several devices spends the same budget as password guessing
+// and a legitimate user can lock themselves out.
+const resetEmail = uniq(), resetPw = 'multi-device-user-42'
+await post('/api/auth/register', { email: resetEmail, password: resetPw })
+for (let i = 0; i < 4; i++) await post('/api/auth/login', { email: resetEmail, password: 'wrong-guess-here' })
+const goodLogin = await post('/api/auth/login', { email: resetEmail, password: resetPw })
+check('correct password still works after 4 failures', goodLogin.status === 200, String(goodLogin.status))
+let trippedAfterSuccess = 0
+for (let i = 1; i <= 8; i++) {
+  const x = await post('/api/auth/login', { email: resetEmail, password: 'wrong-guess-here' })
+  if (x.status === 429) { trippedAfterSuccess = i; break }
+}
+check(`success resets the counter (full 5 again, tripped at ${trippedAfterSuccess})`, trippedAfterSuccess === 6)
+
 // Regression: students share NAT on school and library networks. A different
 // account from the same IP must still be able to sign in after the above.
 const natEmail = uniq(), natPw = 'shared-network-user-5'
