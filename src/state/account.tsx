@@ -4,7 +4,15 @@
  * the AccountSync layer, which mirrors the workspace to the server.
  */
 import { createContext, useCallback, useContext, useEffect, useState, type ReactNode } from 'react'
-import { getAccountSession, requestMagicLink, signOut, verifyToken } from '../lib/accountApi'
+import {
+  getAccountSession,
+  loginWithPassword,
+  registerAccount,
+  requestMagicLink,
+  resetPassword,
+  signOut,
+  verifyToken,
+} from '../lib/accountApi'
 
 type AccountStatus = 'loading' | 'signed-out' | 'signed-in'
 
@@ -17,6 +25,12 @@ type AccountContextValue = {
   requestLink: (email: string) => Promise<{ ok: boolean; devLink?: string }>
   /** Redeem a token (from the /auth route). */
   verify: (token: string) => Promise<boolean>
+  /** Create a password account and sign in. Throws ApiError on failure. */
+  register: (email: string, password: string) => Promise<void>
+  /** Sign in with a password. Throws ApiError on failure. */
+  login: (email: string, password: string) => Promise<void>
+  /** Finish a password reset and sign in. Throws ApiError on failure. */
+  completeReset: (token: string, password: string) => Promise<void>
   signOut: () => Promise<void>
 }
 
@@ -61,6 +75,26 @@ export function AccountProvider({ children }: { children: ReactNode }) {
     }
   }, [])
 
+  // These deliberately let ApiError propagate: the forms need the per-field
+  // messages and the 429 retry hint, which a boolean return would discard.
+  const register = useCallback(async (addr: string, password: string) => {
+    const r = await registerAccount(addr, password)
+    setEmail(r.email)
+    setStatus('signed-in')
+  }, [])
+
+  const login = useCallback(async (addr: string, password: string) => {
+    const r = await loginWithPassword(addr, password)
+    setEmail(r.email)
+    setStatus('signed-in')
+  }, [])
+
+  const completeReset = useCallback(async (token: string, password: string) => {
+    const r = await resetPassword(token, password)
+    setEmail(r.email)
+    setStatus('signed-in')
+  }, [])
+
   const doSignOut = useCallback(async () => {
     try {
       await signOut()
@@ -71,7 +105,17 @@ export function AccountProvider({ children }: { children: ReactNode }) {
     setStatus('signed-out')
   }, [])
 
-  const value: AccountContextValue = { status, email, enabled, requestLink, verify, signOut: doSignOut }
+  const value: AccountContextValue = {
+    status,
+    email,
+    enabled,
+    requestLink,
+    verify,
+    register,
+    login,
+    completeReset,
+    signOut: doSignOut,
+  }
   return <AccountContext.Provider value={value}>{children}</AccountContext.Provider>
 }
 

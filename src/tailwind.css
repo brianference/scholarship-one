@@ -1,0 +1,79 @@
+/**
+ * Tailwind v4 layer for Scholarship One.
+ *
+ * The palette is bridged to the existing runtime CSS variables rather than
+ * hard-coded, so `data-theme` still flips light/dark for both the legacy
+ * stylesheet and Tailwind utilities during the migration. When styles.css is
+ * finally deleted, the var() indirection here is the only thing that needs
+ * replacing with literal values.
+ */
+@import 'tailwindcss';
+
+/* Dark mode is driven by a data attribute, not the `class` strategy. */
+@custom-variant dark ([data-theme='dark'] &);
+
+@theme {
+  --color-bg: var(--bg);
+  --color-bg-elev: var(--bg-elev);
+  --color-bg-solid: var(--bg-solid);
+  --color-ink: var(--text);
+  --color-muted: var(--muted);
+  --color-line: var(--border);
+  --color-line-strong: var(--border-strong);
+  --color-accent: var(--accent);
+  --color-accent-2: var(--accent-2);
+  --color-accent-soft: var(--accent-soft);
+  --color-danger: var(--danger);
+
+  --radius-card: var(--radius);
+  --radius-control: var(--radius-sm);
+
+  --font-sans: 'Plus Jakarta Sans', 'Segoe UI', system-ui, -apple-system, sans-serif;
+
+  /* Matches --control-h / --control-h-lg so Tailwind buttons line up with legacy ones. */
+  --spacing-control: 40px;
+  --spacing-control-lg: 44px;
+
+  --shadow-card: 0 8px 32px rgb(60 30 15 / 0.08);
+  --shadow-lift: 0 16px 48px rgb(60 30 15 / 0.14);
+}
+
+@layer components {
+  /* Shared surface treatment for cards, sheets, and dialogs. */
+  .surface {
+    @apply rounded-[var(--radius)] border border-line-strong bg-bg-solid shadow-card;
+  }
+
+  /* Focus ring used everywhere; matches the legacy :focus-visible rule. */
+  .focus-ring {
+    @apply focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-accent;
+  }
+}
+
+/* Sweep used by <Skeleton>. Defined here so it survives deleting styles.css. */
+@keyframes shimmer {
+  100% {
+    transform: translateX(100%);
+  }
+}
+
+@keyframes toast-in {
+  from {
+    opacity: 0;
+    transform: translateY(8px);
+  }
+  to {
+    opacity: 1;
+    transform: translateY(0);
+  }
+}
+
+@layer utilities {
+  /* Respect users who ask for less motion. */
+  @media (prefers-reduced-motion: reduce) {
+    .motion-safe-only {
+      animation: none !important;
+      transition: none !important;
+    }
+  }
+}

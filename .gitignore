@@ -16,3 +16,6 @@ docs/*-results.json
 
 # wrangler local build artifacts
 .wrangler/
+
+# QA screenshots are regenerated on every run
+docs/qa/
