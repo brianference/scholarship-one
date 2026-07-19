@@ -386,6 +386,9 @@ a { color: var(--accent); }
 .results-tools__summary::-webkit-details-marker { display: none; }
 .results-tools__body { margin-top: 12px; }
 .brand {
+  display: inline-flex;
+  align-items: center;
+  gap: 8px;
   font-weight: 800;
   font-size: 1.05rem;
   text-decoration: none;
@@ -394,6 +397,13 @@ a { color: var(--accent); }
   white-space: nowrap;
   line-height: 1.2;
   flex-shrink: 0;
+}
+/* Below 380px the wordmark competes with search for the row; the mark alone
+   still identifies the site and keeps the header to a single line. */
+@media (max-width: 379px) {
+  .brand__word {
+    display: none;
+  }
 }
 .brand:hover {
   color: var(--accent);

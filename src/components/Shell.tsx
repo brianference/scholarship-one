@@ -8,6 +8,8 @@ import { ChatDock } from './ChatDock'
 import { ThemeToggle } from './ThemeToggle'
 import { HeaderSearch } from './HeaderSearch'
 import { AccountButton } from './AccountButton'
+import { SiteFooter } from './SiteFooter'
+import { BrandMark } from './BrandLogo'
 import type { SiteConfig } from '../config/site'
 import type { Profile } from '../lib/profile'
 
@@ -139,8 +141,9 @@ export function Shell({
     <div className={`shell shell--chat${panelOpen ? ' shell--chat-open' : ' shell--chat-collapsed'}`}>
       <header className="topbar glass-bar topbar--search">
         <div className="topbar__row topbar__row--primary">
-          <Link to="/" className="brand">
-            {config.productName}
+          <Link to="/" className="brand" aria-label={`${config.productName} home`}>
+            <BrandMark className="size-[26px] shrink-0" />
+            <span className="brand__word">{config.productName}</span>
           </Link>
 
           {onHeaderSearch ? (
@@ -266,16 +269,7 @@ export function Shell({
         onPinMatches={onPinMatches}
       />
 
-      <footer className="footer">
-        <p>
-          {config.footerLine}{' '}
-          <a href={config.githubUrl} target="_blank" rel="noreferrer">
-            GitHub
-          </a>
-        </p>
-        <p className="recruiter-strip">{config.stackStrip}</p>
-        {config.finePrint ? <p className="fine">{config.finePrint}</p> : null}
-      </footer>
+      <SiteFooter config={config} />
 
       {/* Mobile bottom tab bar. Match opens the assistant sheet; the rest route to sections. */}
       <nav className="tabbar" aria-label="Primary (mobile)">
