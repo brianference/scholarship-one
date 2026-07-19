@@ -26,7 +26,18 @@ export async function onRequestPost({ request, env }: FnCtx) {
     return json({ error: 'An account with that email already exists. Sign in instead.', field: 'email' }, 409)
   }
 
-  const { hash, salt, iterations } = await hashPassword(password)
+  let hash: string
+  let salt: string
+  let iterations: number
+  try {
+    ;({ hash, salt, iterations } = await hashPassword(password))
+  } catch (err) {
+    // Web Crypto failures here are a server misconfiguration, not the caller's
+    // fault. Log the detail and return something a person can act on, instead of
+    // letting the runtime emit a bare 1101.
+    console.error('password hashing failed', err)
+    return json({ error: 'We could not create your account right now. Try again shortly.' }, 500)
+  }
 
   let userId: string
   if (existing) {

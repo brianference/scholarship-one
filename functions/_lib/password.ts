@@ -6,8 +6,22 @@
  * dependency. 210,000 iterations matches current OWASP guidance for PBKDF2-SHA256.
  */
 
-/** Iterations used for newly created hashes. Stored per row so this can be raised. */
-export const PBKDF2_ITERATIONS = 210_000
+/**
+ * Iterations used for newly created hashes. Stored per row so this can be raised
+ * later without invalidating existing hashes.
+ *
+ * OWASP recommends 210,000 for PBKDF2-SHA256, but the Workers runtime rejects
+ * anything above 100,000 — deriveBits throws, which surfaces as a 1101 in
+ * production while `wrangler pages dev` accepts it locally. 100,000 is therefore
+ * the platform ceiling, not a preference. It remains a defensible cost (it was
+ * OWASP's own recommendation until recently), and the per-row iteration count
+ * means every account can be upgraded transparently on next sign-in if the cap
+ * is ever lifted.
+ */
+export const PBKDF2_ITERATIONS = 100_000
+
+/** The hard limit imposed by the Workers runtime. Exceeding it throws. */
+export const WORKERS_PBKDF2_MAX = 100_000
 const SALT_BYTES = 16
 const KEY_BITS = 256
 
@@ -36,6 +50,10 @@ function fromBase64(b64: string): Bytes {
 }
 
 async function derive(password: string, salt: Bytes, iterations: number): Promise<Bytes> {
+  if (iterations > WORKERS_PBKDF2_MAX) {
+    // Fail loudly here rather than as an opaque 1101 from deep inside Web Crypto.
+    throw new Error(`PBKDF2 iterations ${iterations} exceed the Workers limit of ${WORKERS_PBKDF2_MAX}`)
+  }
   const key = await crypto.subtle.importKey('raw', new TextEncoder().encode(password), 'PBKDF2', false, [
     'deriveBits',
   ])
