@@ -13,3 +13,6 @@ docs/visual/
 docs/visual-audit/
 docs/visual-prod/
 docs/*-results.json
+
+# wrangler local build artifacts
+.wrangler/
