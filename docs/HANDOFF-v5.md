@@ -48,16 +48,25 @@ school or library NAT would lock out everyone behind that address.
 - **Phase 4** — prerender, JSON-LD, sitemap, OG image, mobile audit, `qa:full`,
   release.
 
-## Deliberately deferred
+## Deployed
 
-The remote D1 migration and the production deploy are **not** done. `0002` has
-only been applied locally. Applying it remotely is additive and safe, but
-shipping auth endpoints with no UI in front of them adds attack surface for no
-user benefit, so both should happen together with the Phase 1 screens.
+`0002` is applied to remote D1 and the app is live. Production verified by
+matching asset hash (`index-Cl2WbgYR.js`) and a 7/7 auth smoke test against the
+live database. Smoke-test rows were deleted afterwards.
 
-```
-npx wrangler d1 migrations apply scholarship-one-db --remote   # when UI is ready
-```
+### The production-only bug worth remembering
+
+**The Workers runtime rejects PBKDF2 above 100,000 iterations.** `deriveBits`
+throws, surfacing as a bare `error code: 1101`. `wrangler pages dev` accepts
+210,000 without complaint, so this was invisible until the code ran on real
+Cloudflare infrastructure — every local test passed. `WORKERS_PBKDF2_MAX` and a
+unit test now pin the ceiling. If Cloudflare ever raises it, bump
+`PBKDF2_ITERATIONS`; the per-row `password_iters` column upgrades every existing
+account transparently on next sign-in.
+
+Diagnosis path that worked: contact and reset-request both returned 200, and
+they exercise Zod, rate limiting, and D1 — which narrowed the failure to the one
+thing register does that they do not.
 
 ## Decisions locked with the user
 
