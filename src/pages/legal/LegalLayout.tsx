@@ -1,6 +1,7 @@
 /** Shared layout for the policy and marketing pages. */
 import type { ReactNode } from 'react'
 import { Link } from 'react-router-dom'
+import { safeJsonLd, SITE_ORIGIN } from '../../lib/jsonLd'
 
 export const OPERATOR_JURISDICTION = 'Arizona, United States'
 export const CONTACT_EMAIL = 'brianference@protonmail.com'
@@ -69,17 +70,6 @@ export function List({ items }: { items: ReactNode[] }) {
 
 export type Crumb = { label: string; to?: string }
 
-/**
- * Serialise JSON for embedding in a <script> block.
- *
- * JSON.stringify escapes quotes but leaves `<` alone, so a label containing
- * `</script>` would close the tag early and let anything after it execute.
- * Escaping `<` as < is still valid JSON and closes that hole. This matters
- * because breadcrumb labels carry award names, not just fixed page titles.
- */
-function safeJsonLd(value: unknown): string {
-  return JSON.stringify(value).replace(/</g, '\\u003c')
-}
 
 /**
  * Breadcrumb trail with schema.org BreadcrumbList markup, so search engines can
@@ -93,7 +83,7 @@ export function Breadcrumbs({ trail }: { trail: Crumb[] }) {
       '@type': 'ListItem',
       position: i + 1,
       name: crumb.label,
-      ...(crumb.to ? { item: `https://scholarship-one.pages.dev${crumb.to}` } : {}),
+      ...(crumb.to ? { item: `${SITE_ORIGIN}${crumb.to}` } : {}),
     })),
   }
 

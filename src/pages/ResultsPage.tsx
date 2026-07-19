@@ -19,6 +19,7 @@ import { scoreItem } from '../lib/scoring'
 import { urgency } from '../lib/urgency'
 import { PageAiActions } from '../components/PageAiActions'
 import { useScholarship } from '../state/ScholarshipContext'
+import { useConfirmedSave } from '../lib/useConfirmedSave'
 
 function CardList({
   items,
@@ -27,15 +28,17 @@ function CardList({
   items: ReturnType<typeof useScholarship>['ranked']
   s: ReturnType<typeof useScholarship>
 }) {
+  const { requestToggle, dialog: unsaveDialog } = useConfirmedSave({ shortlist: s.shortlist, toggleSave: s.toggleSave })
   return (
     <div className="list">
+      {unsaveDialog}
       {items.map((item) => (
         <div key={item.id} className={item.pinned ? 'result-row result-row--pinned' : 'result-row'}>
           {item.pinned ? <p className="result-row__badge">Suggested</p> : null}
           <ScholarshipCard
             item={item}
             saved={s.shortlist.includes(item.id)}
-            onToggleSave={() => s.toggleSave(item.id)}
+            onToggleSave={() => requestToggle({ id: item.id, name: item.name })}
             applyStatus={s.applyMap[item.id] || 'none'}
             onApplyStatusChange={(status) => s.setApplyStatus(item.id, status)}
             note={s.notes[item.id] || ''}

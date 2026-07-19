@@ -18,6 +18,7 @@ import { APPLY_STATUS_LABEL } from '../lib/applyStatus'
 import { profileSummary } from '../lib/profile'
 import { buildSharePack, buildShareUrl } from '../lib/sharePack'
 import { useScholarship } from '../state/ScholarshipContext'
+import { useConfirmedSave } from '../lib/useConfirmedSave'
 
 type MatchesSort = 'match' | 'deadline' | 'amount'
 
@@ -47,6 +48,7 @@ function dueShort(deadline: string): string {
 
 export function MatchesPage() {
   const s = useScholarship()
+  const { requestToggle, dialog: unsaveDialog } = useConfirmedSave({ shortlist: s.shortlist, toggleSave: s.toggleSave })
   const [shareNote, setShareNote] = useState<string | null>(null)
   const [sort, setSort] = useState<MatchesSort>('match')
   const [openId, setOpenId] = useState<string | null>(null)
@@ -147,6 +149,7 @@ export function MatchesPage() {
 
   return (
     <div className="page-stack">
+      {unsaveDialog}
       <p className="meta page-crumb">
         <Link to="/results">Results</Link> · Matches for you
       </p>
@@ -290,7 +293,7 @@ export function MatchesPage() {
                         item={item}
                         hideLead
                         saved={s.shortlist.includes(item.id)}
-                        onToggleSave={() => s.toggleSave(item.id)}
+                        onToggleSave={() => requestToggle({ id: item.id, name: item.name })}
                         applyStatus={s.applyMap[item.id] || 'none'}
                         onApplyStatusChange={(status) => s.setApplyStatus(item.id, status)}
                         note={s.notes[item.id] || ''}

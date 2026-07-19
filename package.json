@@ -20,7 +20,12 @@
     "qa:audit100": "npx tsx scripts/audit-100.ts",
     "qa:visual-routes": "node scripts/qa-visual-routes.mjs",
     "qa:prod": "node scripts/qa-prod-verify.mjs",
-    "qa:full": "npm run build && npm run qa:cases && npm run qa:hard && npm run qa:visual && npm run qa:sim50 && npm run qa:audit100 && npm run qa:prod"
+    "qa:full": "npm run build && npm run qa:cases && npm run qa:hard && npm run qa:visual && npm run qa:sim50 && npm run qa:audit100 && npm run qa:prod",
+    "qa:detail": "node scripts/qa-detail.mjs",
+    "qa:pages": "node scripts/qa-pages.mjs",
+    "qa:chrome": "node scripts/qa-chrome.mjs",
+    "qa:authui": "node scripts/qa-auth-ui.mjs",
+    "qa:v5": "npm run test:password && npm run test:auth && npm run qa:authui && npm run qa:pages && npm run qa:chrome && npm run qa:detail"
   },
   "dependencies": {
     "react": "^18.3.1",

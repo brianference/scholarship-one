@@ -5,6 +5,7 @@ import type { Profile } from '../lib/profile'
 import type { ApplyStatus } from '../lib/applyStatus'
 import type { SavedSearch } from '../lib/savedSearches'
 import type { ChecklistState } from '../lib/checklist'
+import { ConfirmDialog } from './ui/ConfirmDialog'
 
 export type DataToolsProps = {
   profile: Profile
@@ -39,6 +40,8 @@ export function DataTools(props: DataToolsProps) {
     window.setTimeout(() => setStatus(null), 2000)
   }
 
+  const [pendingRestore, setPendingRestore] = useState<BackupPayload | null>(null)
+
   function handleFile(file: File | null) {
     if (!file) return
     const reader = new FileReader()
@@ -48,18 +51,30 @@ export function DataTools(props: DataToolsProps) {
         setStatus('Invalid backup file')
         return
       }
-      if (!window.confirm('Restore this backup? It will replace your current saved list, notes, and profile on this device.')) {
-        return
-      }
-      props.onRestore(parsed)
-      setStatus('Backup restored')
-      window.setTimeout(() => setStatus(null), 2500)
+      // Hold the parsed payload and let ConfirmDialog gate it. window.confirm
+      // blocks the main thread, cannot be styled or themed, and on mobile
+      // renders as a jarring system sheet.
+      setPendingRestore(parsed)
     }
     reader.readAsText(file)
   }
 
   return (
     <div className="data-tools" aria-label="Backup and restore">
+      <ConfirmDialog
+        open={!!pendingRestore}
+        title="Restore this backup?"
+        body="This replaces your current saved list, notes, and profile on this device. Anything not in the backup file is lost. Download a fresh backup first if you are unsure."
+        confirmLabel="Replace my data"
+        cancelLabel="Keep what I have"
+        onCancel={() => setPendingRestore(null)}
+        onConfirm={() => {
+          if (pendingRestore) props.onRestore(pendingRestore)
+          setPendingRestore(null)
+          setStatus('Backup restored')
+          window.setTimeout(() => setStatus(null), 2500)
+        }}
+      />
       <button type="button" className="btn btn-ghost" onClick={handleExport}>
         Backup data
       </button>

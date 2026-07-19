@@ -26,6 +26,7 @@ import AboutPage from './pages/legal/AboutPage'
 import TermsPage from './pages/legal/TermsPage'
 import PrivacyPage from './pages/legal/PrivacyPage'
 import ContactPage from './pages/legal/ContactPage'
+import { ScholarshipDetailPage } from './pages/ScholarshipDetailPage'
 
 export default function App() {
   useEffect(() => {
@@ -60,6 +61,7 @@ export default function App() {
                 <Route path="/terms" element={<TermsPage />} />
                 <Route path="/privacy" element={<PrivacyPage />} />
                 <Route path="/contact" element={<ContactPage />} />
+                <Route path="/scholarship/:id" element={<ScholarshipDetailPage />} />
               </Route>
 
               {/* Renames / legacy paths */}

@@ -2,7 +2,9 @@ import { useState } from 'react'
 import type { ApplyStatus } from '../../lib/applyStatus'
 import { APPLY_STATUS_LABEL } from '../../lib/applyStatus'
 import { DEFAULT_CHECKLIST, checklistProgress } from '../../lib/checklist'
-import { iconForTags, MatchRing } from './cardVisuals'
+import { Link } from 'react-router-dom'
+import { CategoryBadge } from './CategoryArt'
+import { MatchRing } from './cardVisuals'
 
 export type RankedScholarship = {
   id: string
@@ -86,11 +88,13 @@ export function ScholarshipCard({
       <div className="grow">
         {hideLead ? null : (
           <div className="card-lead">
-            <span className="card-lead__tile" aria-hidden="true">
-              {iconForTags(item.tags)}
-            </span>
+            <CategoryBadge id={item.id} tags={item.tags} className="size-11 shrink-0" />
             <div className="card-lead__title">
-              <h3>{item.name}</h3>
+              <h3>
+                <Link to={`/scholarship/${item.id}`} className="card-lead__link">
+                  {item.name}
+                </Link>
+              </h3>
               <p className="card-lead__amt">{item.amount}</p>
             </div>
             <MatchRing score={item.score} />
@@ -230,6 +234,9 @@ export function ScholarshipCard({
             Ask AI about this
           </button>
         ) : null}
+        <Link className="btn btn-secondary" to={`/scholarship/${item.id}`}>
+          Full details
+        </Link>
         <a
           className="btn btn-primary"
           href={item.url}
