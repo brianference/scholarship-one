@@ -22,6 +22,10 @@ import RegisterPage from './pages/auth/RegisterPage'
 import LoginPage from './pages/auth/LoginPage'
 import ForgotPasswordPage from './pages/auth/ForgotPasswordPage'
 import ResetPasswordPage from './pages/auth/ResetPasswordPage'
+import AboutPage from './pages/legal/AboutPage'
+import TermsPage from './pages/legal/TermsPage'
+import PrivacyPage from './pages/legal/PrivacyPage'
+import ContactPage from './pages/legal/ContactPage'
 
 export default function App() {
   useEffect(() => {
@@ -52,6 +56,10 @@ export default function App() {
                 <Route path="/path" element={<PathPage />} />
                 <Route path="/activity" element={<ActivityPage />} />
                 <Route path="/import" element={<ImportPage />} />
+                <Route path="/about" element={<AboutPage />} />
+                <Route path="/terms" element={<TermsPage />} />
+                <Route path="/privacy" element={<PrivacyPage />} />
+                <Route path="/contact" element={<ContactPage />} />
               </Route>
 
               {/* Renames / legacy paths */}
