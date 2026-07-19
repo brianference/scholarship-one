@@ -16,6 +16,19 @@ export function randomToken(bytes = 32): string {
   return [...arr].map((b) => b.toString(16).padStart(2, '0')).join('')
 }
 
+/** Session lifetime, shared by the magic-link and password sign-in paths. */
+export const SESSION_TTL_SECONDS = 60 * 24 * 60 * 60 // 60 days
+
+/** Issue a session row and return its id, for the Set-Cookie header. */
+export async function createSession(env: Env, userId: string): Promise<string> {
+  const sid = randomToken(24)
+  const now = Date.now()
+  await env.DB.prepare('insert into sessions (id, user_id, created_at, expires_at) values (?, ?, ?, ?)')
+    .bind(sid, userId, now, now + SESSION_TTL_SECONDS * 1000)
+    .run()
+  return sid
+}
+
 export type Session = { userId: string; email: string }
 
 /** Resolve the current session from the cookie, or null. */

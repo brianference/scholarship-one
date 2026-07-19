@@ -44,6 +44,28 @@ export function magicLinkHtml(link: string): string {
   )
 }
 
+export function passwordResetHtml(link: string): string {
+  return wrap(
+    `<p>Someone asked to reset the password on this account. Choose a new one:</p>
+     <p><a href="${link}" style="display:inline-block;background:#c45c26;color:#fff;text-decoration:none;padding:12px 20px;border-radius:12px;font-weight:600">Set a new password</a></p>
+     <p style="color:#8a7365;font-size:13px">This link expires in 60 minutes and can be used once. If you didn't request it, ignore this email — your password stays as it is.</p>`,
+  )
+}
+
+export function contactNotificationHtml(msg: {
+  name: string
+  email: string
+  subject: string
+  message: string
+}): string {
+  return wrap(
+    `<p><strong>New Contact Us message</strong></p>
+     <p style="margin:0 0 4px"><strong>From:</strong> ${escapeHtml(msg.name)} &lt;${escapeHtml(msg.email)}&gt;</p>
+     <p style="margin:0 0 12px"><strong>Subject:</strong> ${escapeHtml(msg.subject)}</p>
+     <div style="white-space:pre-wrap;border-left:3px solid #e6d8cd;padding-left:12px">${escapeHtml(msg.message)}</div>`,
+  )
+}
+
 export function reminderHtml(items: { name: string; deadline: string; daysLeft: number; amount: string; url: string }[]): string {
   const rows = items
     .map(

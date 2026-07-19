@@ -8,6 +8,8 @@
     "typecheck": "tsc --noEmit",
     "build": "vite build",
     "preview": "vite preview",
+    "test:password": "node scripts/test-password.mjs",
+    "test:auth": "node scripts/test-auth-e2e.mjs",
     "qa": "node scripts/qa-full-pass.mjs",
     "qa:match": "node scripts/match-scenarios.mjs",
     "qa:onboarding": "node scripts/qa-onboarding.mjs",
@@ -23,7 +25,8 @@
   "dependencies": {
     "react": "^18.3.1",
     "react-dom": "^18.3.1",
-    "react-router-dom": "^6.28.0"
+    "react-router-dom": "^6.28.0",
+    "zod": "^3.25.76"
   },
   "devDependencies": {
     "@types/react": "^18.3.12",
