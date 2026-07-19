@@ -1,18 +1,25 @@
 /** Centred card layout shared by every auth screen. */
 import type { ReactNode } from 'react'
 import { Link } from 'react-router-dom'
+import { useMeta } from '../../lib/seo'
 
 export function AuthShell({
   title,
   subtitle,
+  path,
   children,
   footer,
 }: {
   title: string
   subtitle?: ReactNode
+  /** Route path for the canonical URL. */
+  path: string
   children: ReactNode
   footer?: ReactNode
 }) {
+  // Auth screens are noindex: they are thin, identical to every other product's
+  // sign-in page, and would compete with the homepage for the brand query.
+  useMeta({ title, path, noindex: true })
   return (
     <main id="main" className="mx-auto flex w-full max-w-md flex-col gap-6 px-4 py-10 sm:py-16">
       <div className="text-center">

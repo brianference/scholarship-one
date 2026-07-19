@@ -5,6 +5,8 @@ import { CONTACT_EMAIL, LegalPage, List, OPERATOR_JURISDICTION, POLICY_UPDATED, 
 export default function TermsPage() {
   return (
     <LegalPage
+      path="/terms"
+      description="The rules for using Scholarship One: who can use it, what you can and cannot do, content removal, and limitation of liability. Written to be readable."
       title="Terms and Conditions"
       updated={POLICY_UPDATED}
       intro="These are the rules for using Scholarship One. We have kept them short and readable, because terms nobody can understand protect nobody."

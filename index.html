@@ -22,7 +22,33 @@
     />
     <meta property="og:type" content="website" />
     <meta name="twitter:card" content="summary_large_image" />
-    <meta name="keywords" content="scholarships, financial aid, college, STEM, nursing, TypeScript, React" />
+    <meta property="og:site_name" content="Scholarship One" />
+    <meta property="og:image" content="https://scholarship-one.pages.dev/og.png" />
+    <meta name="twitter:image" content="https://scholarship-one.pages.dev/og.png" />
+    <link rel="canonical" href="https://scholarship-one.pages.dev/" />
+    <meta name="robots" content="index, follow" />
+    <!-- No <meta name="keywords">: search engines have ignored it for years, and
+         the previous value listed TypeScript and React, which describe the build
+         rather than anything a student would ever search for. -->
+
+    <!-- Site-wide identity. Per-page JSON-LD is injected by the route components. -->
+    <script type="application/ld+json">
+      {
+        "@context": "https://schema.org",
+        "@type": "WebSite",
+        "name": "Scholarship One",
+        "url": "https://scholarship-one.pages.dev",
+        "description": "Search real scholarships by major, state, and background. Free, with official links and no sponsored listings.",
+        "potentialAction": {
+          "@type": "SearchAction",
+          "target": {
+            "@type": "EntryPoint",
+            "urlTemplate": "https://scholarship-one.pages.dev/results?q={search_term_string}"
+          },
+          "query-input": "required name=search_term_string"
+        }
+      }
+    </script>
     <link rel="preconnect" href="https://fonts.googleapis.com" />
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
     <link

@@ -7,8 +7,16 @@ import { PageAiActions } from '../components/PageAiActions'
 import { getAnalyticsSummary } from '../lib/analytics'
 import { loadDigestActivity } from '../lib/digestActivity'
 import { useScholarship } from '../state/ScholarshipContext'
+import { useMeta } from '../lib/seo'
 
 export function ActivityPage() {
+  useMeta({
+    title: 'Activity',
+    description:
+      'Your recent scholarship activity.',
+    path: '/activity',
+    noindex: true,
+  })
   const { askAi, shortlist } = useScholarship()
   const summary = getAnalyticsSummary()
   const digest = loadDigestActivity()

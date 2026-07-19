@@ -72,6 +72,7 @@ export default function LoginPage() {
 
   return (
     <AuthShell
+      path="/login"
       title="Welcome back"
       subtitle="Sign in to reach your saved scholarships and application tracker."
       footer={<>New here? <AuthLink to="/register">Create an account</AuthLink></>}

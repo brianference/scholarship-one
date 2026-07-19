@@ -34,7 +34,7 @@ export default function ForgotPasswordPage() {
   // confirmation is deliberately worded not to reveal whether an account exists.
   if (sent) {
     return (
-      <AuthShell title="Check your email" footer={<AuthLink to="/login">Back to sign in</AuthLink>}>
+      <AuthShell path="/forgot-password" title="Check your email" footer={<AuthLink to="/login">Back to sign in</AuthLink>}>
         <Alert tone="success">
           If an account exists for <strong>{email.trim()}</strong>, a reset link is on its way. It works once and expires
           in an hour.
@@ -48,6 +48,7 @@ export default function ForgotPasswordPage() {
 
   return (
     <AuthShell
+      path="/forgot-password"
       title="Reset your password"
       subtitle="Give us the email on your account and we'll send a link to set a new password."
       footer={<AuthLink to="/login">Back to sign in</AuthLink>}

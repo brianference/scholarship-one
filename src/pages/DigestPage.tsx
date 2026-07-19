@@ -5,8 +5,15 @@ import { Link, useNavigate } from 'react-router-dom'
 import { WeeklyDigestPanel } from '../components/WeeklyDigest'
 import { CATALOG } from '../data/catalog'
 import { useScholarship } from '../state/ScholarshipContext'
+import { useMeta } from '../lib/seo'
 
 export function DigestPage() {
+  useMeta({
+    title: 'Scholarship deadlines',
+    description:
+      'See which scholarship deadlines are coming up, export a calendar file, or email yourself a weekly digest.',
+    path: '/digest',
+  })
   const { shortlist, setOnlyShort, askAi } = useScholarship()
   const navigate = useNavigate()
 

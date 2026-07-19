@@ -2,6 +2,7 @@
 import type { ReactNode } from 'react'
 import { Link } from 'react-router-dom'
 import { safeJsonLd, SITE_ORIGIN } from '../../lib/jsonLd'
+import { useMeta } from '../../lib/seo'
 
 export const OPERATOR_JURISDICTION = 'Arizona, United States'
 export const CONTACT_EMAIL = 'brianference@protonmail.com'
@@ -13,13 +14,20 @@ export function LegalPage({
   title,
   intro,
   updated,
+  path,
+  description,
   children,
 }: {
   title: string
   intro?: ReactNode
   updated?: string
+  /** Route path, used for the canonical URL. */
+  path: string
+  /** Search-result snippet. Falls back to the site default when omitted. */
+  description?: string
   children: ReactNode
 }) {
+  useMeta({ title, description, path })
   return (
     <main id="main" className="mx-auto w-full max-w-3xl px-4 pb-24 pt-8 sm:pt-12">
       <Breadcrumbs trail={[{ label: 'Home', to: '/' }, { label: title }]} />

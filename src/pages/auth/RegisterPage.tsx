@@ -56,6 +56,7 @@ export default function RegisterPage() {
 
   return (
     <AuthShell
+      path="/register"
       title="Create your account"
       subtitle="Save scholarships, track your applications, and get deadline reminders before they pass."
       footer={<>Already have an account? <AuthLink to="/login">Sign in</AuthLink></>}

@@ -25,7 +25,12 @@
     "qa:pages": "node scripts/qa-pages.mjs",
     "qa:chrome": "node scripts/qa-chrome.mjs",
     "qa:authui": "node scripts/qa-auth-ui.mjs",
-    "qa:v5": "npm run test:password && npm run test:auth && npm run qa:authui && npm run qa:pages && npm run qa:chrome && npm run qa:detail"
+    "qa:v5": "npm run test:password && npm run test:auth && npm run qa:authui && npm run qa:pages && npm run qa:chrome && npm run qa:detail && npm run qa:seo",
+    "seo:sitemap": "node scripts/gen-seo.mjs",
+    "seo:og": "node scripts/gen-og-image.mjs",
+    "seo:prerender": "node scripts/prerender.mjs",
+    "build:prod": "npm run build && npm run seo:sitemap && npm run seo:og && npm run seo:prerender",
+    "qa:seo": "node scripts/qa-seo.mjs"
   },
   "dependencies": {
     "react": "^18.3.1",

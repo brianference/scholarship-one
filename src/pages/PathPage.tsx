@@ -5,8 +5,16 @@ import { Link, useNavigate } from 'react-router-dom'
 import { WorkspaceStrip } from '../components/WorkspaceStrip'
 import { PageAiActions } from '../components/PageAiActions'
 import { useScholarship } from '../state/ScholarshipContext'
+import { useMeta } from '../lib/seo'
 
 export function PathPage() {
+  useMeta({
+    title: 'Your path',
+    description:
+      'Your personalised scholarship plan.',
+    path: '/path',
+    noindex: true,
+  })
   const s = useScholarship()
   const navigate = useNavigate()
 

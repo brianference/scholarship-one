@@ -27,10 +27,19 @@ for (const p of PAGES) {
   const h1s = await page.locator('h1').count()
   check(`${p.path} has exactly one h1`, h1s === 1, `found ${h1s}`)
   check(`${p.path} shows a breadcrumb`, await page.getByRole('navigation', { name: /breadcrumb/i }).isVisible())
-  const ld = await page.locator('script[type="application/ld+json"]').first().textContent()
-  let parsed = null
-  try { parsed = JSON.parse(ld || '') } catch {}
-  check(`${p.path} emits valid BreadcrumbList JSON-LD`, parsed?.['@type'] === 'BreadcrumbList', String(ld).slice(0, 60))
+  // Search every block, not just the first: index.html carries a site-wide
+  // WebSite block that now precedes the route's BreadcrumbList.
+  const lds = await page.locator('script[type="application/ld+json"]').allTextContents()
+  let crumbs = null
+  let allParse = true
+  for (const raw of lds) {
+    try {
+      const parsed = JSON.parse(raw)
+      if (parsed['@type'] === 'BreadcrumbList') crumbs = parsed
+    } catch { allParse = false }
+  }
+  check(`${p.path} emits valid BreadcrumbList JSON-LD`, !!crumbs, `${lds.length} blocks`)
+  check(`${p.path} every JSON-LD block parses`, allParse)
   await page.screenshot({ path: `${SHOTS}${p.path.replace('/', '/')}-desktop.png`.replace('//', '/'), fullPage: true })
 }
 

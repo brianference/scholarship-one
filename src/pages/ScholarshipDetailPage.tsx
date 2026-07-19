@@ -14,6 +14,7 @@ import { DEFAULT_CHECKLIST } from '../lib/checklist'
 import { matchWhy } from '../lib/matchWhy'
 import { classifyDeadline } from '../lib/urgency'
 import { safeJsonLd, SITE_ORIGIN } from '../lib/jsonLd'
+import { applyMeta } from '../lib/seo'
 
 
 export function ScholarshipDetailPage() {
@@ -29,6 +30,21 @@ export function ScholarshipDetailPage() {
 
   const savedNote = award ? store.notes[award.id] || '' : ''
   useEffect(() => setDraftNote(savedNote), [savedNote])
+
+  // applyMeta rather than useMeta: this runs before the early return for an
+  // unknown id, so both the found and not-found states get correct metadata.
+  useEffect(() => {
+    if (award) {
+      applyMeta({
+        title: award.name,
+        description: `${award.summary} Amount: ${award.amount}. Deadline: ${award.deadline}. Apply on the official page.`,
+        path: `/scholarship/${award.id}`,
+        type: 'article',
+      })
+    } else {
+      applyMeta({ title: 'Scholarship not found', path: `/scholarship/${id}`, noindex: true })
+    }
+  }, [award, id])
 
   // Awards are looked up by URL, so an unknown or stale id is a real case, not
   // an edge case — someone can bookmark or share a link to a removed award.

@@ -5,6 +5,8 @@ import { CONTACT_EMAIL, LegalPage, List, POLICY_UPDATED, Section } from './Legal
 export default function PrivacyPage() {
   return (
     <LegalPage
+      path="/privacy"
+      description="How Scholarship One handles your data: what we collect, what we never collect, and how to delete your account. We do not sell your information."
       title="Privacy Policy"
       updated={POLICY_UPDATED}
       intro="Short version: we collect the little we need to run your account, we do not sell it, and you can delete it whenever you want."

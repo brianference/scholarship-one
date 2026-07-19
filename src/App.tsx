@@ -27,6 +27,7 @@ import TermsPage from './pages/legal/TermsPage'
 import PrivacyPage from './pages/legal/PrivacyPage'
 import ContactPage from './pages/legal/ContactPage'
 import { ScholarshipDetailPage } from './pages/ScholarshipDetailPage'
+import NotFoundPage from './pages/NotFoundPage'
 
 export default function App() {
   useEffect(() => {
@@ -62,6 +63,9 @@ export default function App() {
                 <Route path="/privacy" element={<PrivacyPage />} />
                 <Route path="/contact" element={<ContactPage />} />
                 <Route path="/scholarship/:id" element={<ScholarshipDetailPage />} />
+                {/* A real 404 inside the layout. Redirecting to "/" made every
+                    dead URL a soft 404: a 200 with unrelated content. */}
+                <Route path="*" element={<NotFoundPage />} />
               </Route>
 
               {/* Renames / legacy paths */}
@@ -71,7 +75,7 @@ export default function App() {
               <Route path="/matcher" element={<Navigate to="/matches" replace />} />
               <Route path="/signin" element={<Navigate to="/login" replace />} />
               <Route path="/sign-up" element={<Navigate to="/register" replace />} />
-              <Route path="*" element={<Navigate to="/" replace />} />
+
             </Routes>
           </ScholarshipProvider>
         </ToastProvider>

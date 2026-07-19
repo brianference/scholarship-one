@@ -20,6 +20,7 @@ import { urgency } from '../lib/urgency'
 import { PageAiActions } from '../components/PageAiActions'
 import { useScholarship } from '../state/ScholarshipContext'
 import { useConfirmedSave } from '../lib/useConfirmedSave'
+import { useMeta } from '../lib/seo'
 
 function CardList({
   items,
@@ -77,6 +78,12 @@ function CardList({
 }
 
 export function ResultsPage() {
+  useMeta({
+    title: 'Browse all scholarships',
+    description:
+      'Browse and filter the full catalog of real scholarships. Every award links to its official page with verified amounts and deadlines.',
+    path: '/results',
+  })
   const s = useScholarship()
   const [copyNote, setCopyNote] = useState<string | null>(null)
   const [showTools, setShowTools] = useState(false)

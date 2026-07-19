@@ -5,10 +5,18 @@ import { Alert } from '../../components/ui/Alert'
 import { Button } from '../../components/ui/Button'
 import { Field, TextAreaField } from '../../components/ui/Field'
 import { ApiError, sendContactMessage } from '../../lib/accountApi'
+import { useMeta } from '../../lib/seo'
 
 const MIN_MESSAGE = 10
 
 export default function ContactPage() {
+  useMeta({
+    title: 'Contact Us',
+    description:
+      'Report a broken scholarship link, suggest an award, or ask a question. A real person reads every message.',
+    path: '/contact',
+  })
+
   const [form, setForm] = useState({ name: '', email: '', subject: '', message: '' })
   /** Honeypot. Left empty by people, filled by bots. */
   const [website, setWebsite] = useState('')

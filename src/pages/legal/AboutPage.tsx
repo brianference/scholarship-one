@@ -5,6 +5,8 @@ import { CONTACT_EMAIL, LegalPage, List, OPERATOR_JURISDICTION, Section } from '
 export default function AboutPage() {
   return (
     <LegalPage
+      path="/about"
+      description="Why Scholarship One exists: real awards with official links, no sponsored placements, no selling your details, and no sign-up wall to search."
       title="About Us"
       intro="Scholarship One helps students find awards they can actually win, and keep track of the applications they start."
     >

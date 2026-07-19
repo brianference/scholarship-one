@@ -25,7 +25,7 @@ export default function ResetPasswordPage() {
   // A visitor who lands here without a token followed a broken or truncated link.
   if (!token) {
     return (
-      <AuthShell title="This link is incomplete" footer={<AuthLink to="/forgot-password">Request a new link</AuthLink>}>
+      <AuthShell path="/reset" title="This link is incomplete" footer={<AuthLink to="/forgot-password">Request a new link</AuthLink>}>
         <Alert tone="error">
           The reset link is missing its token. Email clients sometimes split long links across lines — request a fresh
           one and open it in a single click.
@@ -63,6 +63,7 @@ export default function ResetPasswordPage() {
 
   return (
     <AuthShell
+      path="/reset"
       title="Choose a new password"
       subtitle="Setting a new password signs out every other device on this account."
       footer={<AuthLink to="/login">Back to sign in</AuthLink>}

@@ -19,6 +19,7 @@ import { profileSummary } from '../lib/profile'
 import { buildSharePack, buildShareUrl } from '../lib/sharePack'
 import { useScholarship } from '../state/ScholarshipContext'
 import { useConfirmedSave } from '../lib/useConfirmedSave'
+import { useMeta } from '../lib/seo'
 
 type MatchesSort = 'match' | 'deadline' | 'amount'
 
@@ -47,6 +48,12 @@ function dueShort(deadline: string): string {
 }
 
 export function MatchesPage() {
+  useMeta({
+    title: 'My scholarship matches',
+    description:
+      'Scholarships ranked against your major, state, year, and background, with an explanation of why each one matched.',
+    path: '/matches',
+  })
   const s = useScholarship()
   const { requestToggle, dialog: unsaveDialog } = useConfirmedSave({ shortlist: s.shortlist, toggleSave: s.toggleSave })
   const [shareNote, setShareNote] = useState<string | null>(null)

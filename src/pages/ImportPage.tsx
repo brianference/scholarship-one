@@ -5,8 +5,16 @@ import { useEffect, useState } from 'react'
 import { Link, useNavigate, useSearchParams } from 'react-router-dom'
 import { decodeSharePack } from '../lib/sharePack'
 import { useScholarship } from '../state/ScholarshipContext'
+import { useMeta } from '../lib/seo'
 
 export function ImportPage() {
+  useMeta({
+    title: 'Import a share link',
+    description:
+      'Restore a shared scholarship list.',
+    path: '/import',
+    noindex: true,
+  })
   const [params] = useSearchParams()
   const s = useScholarship()
   const navigate = useNavigate()

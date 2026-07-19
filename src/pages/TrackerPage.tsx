@@ -5,8 +5,16 @@ import { Link } from 'react-router-dom'
 import { TrackerBoard } from '../components/TrackerBoard'
 import { PageAiActions } from '../components/PageAiActions'
 import { useScholarship } from '../state/ScholarshipContext'
+import { useMeta } from '../lib/seo'
 
 export function TrackerPage() {
+  useMeta({
+    title: 'Application tracker',
+    description:
+      'Track where you are in every scholarship application.',
+    path: '/tracker',
+    noindex: true,
+  })
   const { pipelineItems, setApplyStatus, markOfficialOpen, askAi, shortlist } = useScholarship()
 
   const interested = pipelineItems.filter((i) => i.status === 'interested')
