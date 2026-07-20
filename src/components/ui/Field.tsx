@@ -32,7 +32,7 @@ export const Field = forwardRef<HTMLInputElement, FieldProps>(function Field(
 
   return (
     <div className={`flex flex-col gap-1.5 ${className}`}>
-      <label htmlFor={inputId} className="text-[var(--font-size-sm)] font-semibold text-[var(--text)]">
+      <label htmlFor={inputId} className="text-[length:var(--font-size-sm)] font-semibold text-[var(--text)]">
         {label}
       </label>
       <input
@@ -45,12 +45,12 @@ export const Field = forwardRef<HTMLInputElement, FieldProps>(function Field(
         {...rest}
       />
       {hint && !error && (
-        <p id={hintId} className="text-[var(--font-size-xs)] text-[var(--muted)]">
+        <p id={hintId} className="text-[length:var(--font-size-xs)] text-[var(--muted)]">
           {hint}
         </p>
       )}
       {error && (
-        <p id={errorId} role="alert" className="text-[var(--font-size-xs)] font-medium text-[var(--danger)]">
+        <p id={errorId} role="alert" className="text-[length:var(--font-size-xs)] font-medium text-[var(--danger)]">
           {error}
         </p>
       )}
@@ -71,7 +71,7 @@ export const TextAreaField = forwardRef<HTMLTextAreaElement, TextAreaProps>(func
 
   return (
     <div className={`flex flex-col gap-1.5 ${className}`}>
-      <label htmlFor={inputId} className="text-[var(--font-size-sm)] font-semibold text-[var(--text)]">
+      <label htmlFor={inputId} className="text-[length:var(--font-size-sm)] font-semibold text-[var(--text)]">
         {label}
       </label>
       <textarea
@@ -83,9 +83,9 @@ export const TextAreaField = forwardRef<HTMLTextAreaElement, TextAreaProps>(func
         aria-describedby={error ? errorId : undefined}
         {...rest}
       />
-      {hint && !error && <p className="text-[var(--font-size-xs)] text-[var(--muted)]">{hint}</p>}
+      {hint && !error && <p className="text-[length:var(--font-size-xs)] text-[var(--muted)]">{hint}</p>}
       {error && (
-        <p id={errorId} role="alert" className="text-[var(--font-size-xs)] font-medium text-[var(--danger)]">
+        <p id={errorId} role="alert" className="text-[length:var(--font-size-xs)] font-medium text-[var(--danger)]">
           {error}
         </p>
       )}

@@ -105,7 +105,7 @@ export function ConfirmDialog({
         <h2 id="confirm-title" className="m-0 text-lg font-bold text-[var(--text)]">
           {title}
         </h2>
-        <div id="confirm-body" className="mt-2 text-[var(--font-size-sm)] leading-relaxed text-[var(--muted)]">
+        <div id="confirm-body" className="mt-2 text-[length:var(--font-size-sm)] leading-relaxed text-[var(--muted)]">
           {body}
         </div>
         <div className="mt-5 flex flex-col-reverse gap-2 sm:flex-row sm:justify-end">

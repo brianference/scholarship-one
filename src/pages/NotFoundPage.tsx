@@ -24,13 +24,13 @@ export default function NotFoundPage() {
       <Breadcrumbs trail={[{ label: 'Home', to: '/' }, { label: 'Page not found' }]} />
 
       <div className="surface mt-6 p-6 sm:p-8">
-        <p className="m-0 text-[var(--font-size-sm)] font-bold uppercase tracking-wide text-[var(--accent)]">
+        <p className="m-0 text-[length:var(--font-size-sm)] font-bold uppercase tracking-wide text-[var(--accent)]">
           Error 404
         </p>
         <h1 className="mt-2 mb-0 text-2xl font-extrabold tracking-tight text-[var(--text)] sm:text-3xl">
           We couldn&rsquo;t find that page
         </h1>
-        <p className="mt-3 mb-0 text-[var(--font-size)] leading-relaxed text-[var(--muted)]">
+        <p className="mt-3 mb-0 text-[length:var(--font-size)] leading-relaxed text-[var(--muted)]">
           The link may be out of date, or the page may have moved. Nothing you saved is affected.
         </p>
 
@@ -46,7 +46,7 @@ export default function NotFoundPage() {
         </div>
 
         <nav aria-label="Helpful links" className="mt-8 border-t border-[var(--border-strong)] pt-5">
-          <h2 className="m-0 text-[var(--font-size-sm)] font-bold text-[var(--text)]">Popular pages</h2>
+          <h2 className="m-0 text-[length:var(--font-size-sm)] font-bold text-[var(--text)]">Popular pages</h2>
           <ul className="m-0 mt-2 flex list-none flex-wrap gap-x-5 gap-y-1 p-0">
             {[
               { to: '/', label: 'Home' },
@@ -58,7 +58,7 @@ export default function NotFoundPage() {
               <li key={link.to}>
                 <Link
                   to={link.to}
-                  className="inline-flex min-h-[28px] items-center rounded-sm text-[var(--font-size-sm)] font-medium text-[var(--accent)] hover:underline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-[var(--accent)]"
+                  className="inline-flex min-h-[28px] items-center rounded-sm text-[length:var(--font-size-sm)] font-medium text-[var(--accent)] hover:underline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-[var(--accent)]"
                 >
                   {link.label}
                 </Link>

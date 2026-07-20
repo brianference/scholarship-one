@@ -115,7 +115,7 @@ export default function LoginPage() {
           {busy ? 'Signing in' : 'Sign in'}
         </Button>
 
-        <div className="flex items-center gap-3 text-[var(--font-size-xs)] text-[var(--muted)]">
+        <div className="flex items-center gap-3 text-[length:var(--font-size-xs)] text-[var(--muted)]">
           <span className="h-px flex-1 bg-[var(--border-strong)]" />
           or
           <span className="h-px flex-1 bg-[var(--border-strong)]" />

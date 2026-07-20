@@ -44,7 +44,7 @@ export function PasswordField({ label, error, showStrength = false, id, value, .
 
   return (
     <div className="flex flex-col gap-1.5">
-      <label htmlFor={inputId} className="text-[var(--font-size-sm)] font-semibold text-[var(--text)]">
+      <label htmlFor={inputId} className="text-[length:var(--font-size-sm)] font-semibold text-[var(--text)]">
         {label}
       </label>
 
@@ -98,18 +98,18 @@ export function PasswordField({ label, error, showStrength = false, id, value, .
               />
             ))}
           </div>
-          <span className="text-[var(--font-size-xs)] font-medium text-[var(--muted)]">{strength.label}</span>
+          <span className="text-[length:var(--font-size-xs)] font-medium text-[var(--muted)]">{strength.label}</span>
         </div>
       )}
 
       {showStrength && !error && (
-        <p className="m-0 text-[var(--font-size-xs)] text-[var(--muted)]">
+        <p className="m-0 text-[length:var(--font-size-xs)] text-[var(--muted)]">
           At least {MIN_PASSWORD_LENGTH} characters. A few unrelated words beats a short, cryptic one.
         </p>
       )}
 
       {error && (
-        <p id={errorId} role="alert" className="text-[var(--font-size-xs)] font-medium text-[var(--danger)]">
+        <p id={errorId} role="alert" className="text-[length:var(--font-size-xs)] font-medium text-[var(--danger)]">
           {error}
         </p>
       )}

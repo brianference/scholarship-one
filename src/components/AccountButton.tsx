@@ -2,6 +2,7 @@
 import { useEffect, useRef, useState } from 'react'
 import { useAccount } from '../state/account'
 import { SignInModal } from './SignInModal'
+import { Skeleton } from './ui/Skeleton'
 
 export function AccountButton() {
   const account = useAccount()
@@ -18,8 +19,20 @@ export function AccountButton() {
     return () => document.removeEventListener('mousedown', onDoc)
   }, [menu])
 
-  // Hide entirely until accounts are usable (email delivery configured server-side).
-  if (account.status === 'loading' || !account.enabled) return null
+  // While the session resolves, hold the button's footprint with a skeleton.
+  // Returning null here made the whole topbar reflow when the control popped in
+  // a moment later, nudging search and the theme toggle sideways.
+  if (account.status === 'loading') {
+    return (
+      <Skeleton
+        className="h-[var(--control-h)] w-[92px] rounded-[var(--radius-pill)]"
+        aria-label="Loading your account"
+      />
+    )
+  }
+
+  // Hidden entirely when accounts are not usable (no server-side email delivery).
+  if (!account.enabled) return null
 
   if (account.status === 'signed-out') {
     return (

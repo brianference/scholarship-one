@@ -36,11 +36,11 @@ export function AuthShell({
 
       <div className="surface p-6 sm:p-7">
         <h1 className="m-0 text-xl font-extrabold tracking-tight text-[var(--text)]">{title}</h1>
-        {subtitle && <p className="mt-1.5 mb-0 text-[var(--font-size-sm)] leading-relaxed text-[var(--muted)]">{subtitle}</p>}
+        {subtitle && <p className="mt-1.5 mb-0 text-[length:var(--font-size-sm)] leading-relaxed text-[var(--muted)]">{subtitle}</p>}
         <div className="mt-5">{children}</div>
       </div>
 
-      {footer && <div className="text-center text-[var(--font-size-sm)] text-[var(--muted)]">{footer}</div>}
+      {footer && <div className="text-center text-[length:var(--font-size-sm)] text-[var(--muted)]">{footer}</div>}
     </main>
   )
 }

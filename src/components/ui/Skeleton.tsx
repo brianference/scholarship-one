@@ -6,8 +6,21 @@ const SHIMMER =
   'after:bg-gradient-to-r after:from-transparent after:via-white/25 after:to-transparent ' +
   'motion-reduce:after:hidden'
 
-export function Skeleton({ className = '' }: { className?: string }) {
-  return <div className={`${SHIMMER} rounded-[var(--radius-sm)] ${className}`} />
+export function Skeleton({
+  className = '',
+  'aria-label': ariaLabel,
+}: {
+  className?: string
+  'aria-label'?: string
+}) {
+  return (
+    <div
+      className={`${SHIMMER} rounded-[var(--radius-sm)] ${className}`}
+      // Labelled skeletons announce what is loading; unlabelled ones are
+      // decorative and stay out of the accessibility tree entirely.
+      {...(ariaLabel ? { role: 'status', 'aria-label': ariaLabel } : { 'aria-hidden': true })}
+    />
+  )
 }
 
 /** A few lines of fake text. The last line is short, the way real text wraps. */

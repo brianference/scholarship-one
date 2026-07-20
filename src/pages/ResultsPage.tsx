@@ -20,6 +20,7 @@ import { urgency } from '../lib/urgency'
 import { PageAiActions } from '../components/PageAiActions'
 import { useScholarship } from '../state/ScholarshipContext'
 import { useConfirmedSave } from '../lib/useConfirmedSave'
+import { LoadingRegion, SkeletonCard } from '../components/ui/Skeleton'
 import { useMeta } from '../lib/seo'
 
 function CardList({
@@ -30,6 +31,32 @@ function CardList({
   s: ReturnType<typeof useScholarship>
 }) {
   const { requestToggle, dialog: unsaveDialog } = useConfirmedSave({ shortlist: s.shortlist, toggleSave: s.toggleSave })
+
+  /**
+   * Rendering ~200 cards takes a visible beat on a phone, and the profile and
+   * saved list are read from localStorage on mount, so the first frame has no
+   * items. Show card-shaped skeletons for that frame instead of a blank column,
+   * which reads as "nothing matched".
+   */
+  const [ready, setReady] = useState(false)
+  useEffect(() => {
+    // A frame, not a timer: this waits for paint rather than guessing a delay.
+    const id = requestAnimationFrame(() => setReady(true))
+    return () => cancelAnimationFrame(id)
+  }, [])
+
+  if (!ready && items.length > 0) {
+    return (
+      <LoadingRegion label="Loading scholarships">
+        <div className="list">
+          {Array.from({ length: Math.min(6, items.length) }, (_, i) => (
+            <SkeletonCard key={i} />
+          ))}
+        </div>
+      </LoadingRegion>
+    )
+  }
+
   return (
     <div className="list">
       {unsaveDialog}

@@ -133,9 +133,9 @@ export default function ContactPage() {
           )}
         </div>
 
-        <aside className="flex flex-col gap-5 text-[var(--font-size-sm)] leading-relaxed text-[var(--muted)]">
+        <aside className="flex flex-col gap-5 text-[length:var(--font-size-sm)] leading-relaxed text-[var(--muted)]">
           <div>
-            <h2 className="m-0 text-[var(--font-size)] font-bold text-[var(--text)]">Prefer email?</h2>
+            <h2 className="m-0 text-[length:var(--font-size)] font-bold text-[var(--text)]">Prefer email?</h2>
             <p className="mt-1.5 mb-0">
               <a
                 href={`mailto:${CONTACT_EMAIL}`}
@@ -146,11 +146,11 @@ export default function ContactPage() {
             </p>
           </div>
           <div>
-            <h2 className="m-0 text-[var(--font-size)] font-bold text-[var(--text)]">Response time</h2>
+            <h2 className="m-0 text-[length:var(--font-size)] font-bold text-[var(--text)]">Response time</h2>
             <p className="mt-1.5 mb-0">This is run by one person, so expect a few days rather than a few hours.</p>
           </div>
           <div>
-            <h2 className="m-0 text-[var(--font-size)] font-bold text-[var(--text)]">Please don't send</h2>
+            <h2 className="m-0 text-[length:var(--font-size)] font-bold text-[var(--text)]">Please don't send</h2>
             <p className="mt-1.5 mb-0">
               Social Security numbers, bank details, or copies of financial aid forms. We never need them, and no
               legitimate scholarship asks for them by email.

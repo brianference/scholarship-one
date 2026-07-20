@@ -27,7 +27,7 @@ export function Alert({ tone = 'info', children }: { tone?: Tone; children: Reac
     <div
       // Errors interrupt; success and info wait for a pause in speech.
       role={tone === 'error' ? 'alert' : 'status'}
-      className={`flex items-start gap-2.5 rounded-[var(--radius-sm)] border px-3.5 py-3 text-[var(--font-size-sm)] ${t.wrap}`}
+      className={`flex items-start gap-2.5 rounded-[var(--radius-sm)] border px-3.5 py-3 text-[length:var(--font-size-sm)] ${t.wrap}`}
     >
       <svg
         className="mt-0.5 size-4 shrink-0"

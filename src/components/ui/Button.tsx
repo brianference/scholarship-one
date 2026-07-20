@@ -12,7 +12,10 @@ const BASE =
   'disabled:cursor-not-allowed disabled:opacity-60 active:not-disabled:translate-y-px'
 
 const VARIANTS: Record<Variant, string> = {
-  primary: 'bg-[var(--accent)] text-white hover:not-disabled:brightness-110 shadow-[0_2px_8px_rgba(196,92,38,0.28)]',
+  // text-accent-on, not text-white: in dark mode the accent is light enough that
+  // white on it is only 2.98:1. The token carries near-black there instead.
+  primary:
+    'bg-[var(--accent)] text-[var(--accent-on)] hover:not-disabled:brightness-110 shadow-[0_2px_8px_rgba(181,85,35,0.28)]',
   secondary:
     'bg-[var(--bg-solid)] text-[var(--text)] border border-[var(--border-strong)] hover:not-disabled:bg-[var(--accent-soft)]',
   ghost: 'bg-transparent text-[var(--muted)] hover:not-disabled:text-[var(--text)] hover:not-disabled:bg-[var(--accent-soft)]',
@@ -21,8 +24,8 @@ const VARIANTS: Record<Variant, string> = {
 
 /** Sizes map to --control-h / --control-h-lg so these line up with legacy controls. */
 const SIZES: Record<Size, string> = {
-  md: 'h-[var(--control-h)] px-4 text-[var(--font-size-sm)]',
-  lg: 'h-[var(--control-h-lg)] px-5 text-[var(--font-size)]',
+  md: 'h-[var(--control-h)] px-4 text-[length:var(--font-size-sm)]',
+  lg: 'h-[var(--control-h-lg)] px-5 text-[length:var(--font-size)]',
 }
 
 export function buttonClass(variant: Variant = 'primary', size: Size = 'md', extra = ''): string {

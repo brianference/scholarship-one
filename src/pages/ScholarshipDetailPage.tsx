@@ -54,7 +54,7 @@ export function ScholarshipDetailPage() {
         <Breadcrumbs trail={[{ label: 'Home', to: '/' }, { label: 'Browse catalog', to: '/results' }, { label: 'Not found' }]} />
         <div className="surface mt-6 p-6">
           <h1 className="m-0 text-2xl font-extrabold tracking-tight text-[var(--text)]">We couldn't find that award</h1>
-          <p className="mt-2 text-[var(--font-size-sm)] leading-relaxed text-[var(--muted)]">
+          <p className="mt-2 text-[length:var(--font-size-sm)] leading-relaxed text-[var(--muted)]">
             The link may be out of date, or the program may have been removed from our catalog. Browsing the full list is
             the fastest way to find what you were after.
           </p>
@@ -115,7 +115,7 @@ export function ScholarshipDetailPage() {
       <CategoryArt id={award.id} tags={award.tags} className="mt-4 h-28 sm:h-36" />
 
       <header className="mt-5">
-        <p className="m-0 text-[var(--font-size-xs)] font-semibold uppercase tracking-wide text-[var(--muted)]">
+        <p className="m-0 text-[length:var(--font-size-xs)] font-semibold uppercase tracking-wide text-[var(--muted)]">
           {theme.label}
         </p>
         <h1 className="mt-1.5 mb-0 text-2xl font-extrabold leading-tight tracking-tight text-[var(--text)] sm:text-3xl">
@@ -155,7 +155,7 @@ export function ScholarshipDetailPage() {
 
       {reasons.length > 0 && (
         <Section title="Why this matches you">
-          <ul className="m-0 flex list-disc flex-col gap-1.5 pl-5 text-[var(--font-size-sm)] leading-relaxed text-[var(--muted)]">
+          <ul className="m-0 flex list-disc flex-col gap-1.5 pl-5 text-[length:var(--font-size-sm)] leading-relaxed text-[var(--muted)]">
             {reasons.map((reason) => (
               <li key={reason}>{reason}</li>
             ))}
@@ -168,7 +168,7 @@ export function ScholarshipDetailPage() {
           {award.tags.map((tag) => (
             <li
               key={tag}
-              className="rounded-[var(--radius-pill)] border border-[var(--border-strong)] bg-[var(--accent-soft)] px-2.5 py-1 text-[var(--font-size-xs)] font-medium text-[var(--text)]"
+              className="rounded-[var(--radius-pill)] border border-[var(--border-strong)] bg-[var(--accent-soft)] px-2.5 py-1 text-[length:var(--font-size-xs)] font-medium text-[var(--text)]"
             >
               {tag.replace(/-/g, ' ')}
             </li>
@@ -182,7 +182,7 @@ export function ScholarshipDetailPage() {
             const done = completedSteps.includes(step.id)
             return (
               <li key={step.id}>
-                <label className="flex min-h-[36px] cursor-pointer items-center gap-2.5 rounded-[var(--radius-sm)] px-1 text-[var(--font-size-sm)] text-[var(--text)] transition-colors hover:bg-[var(--accent-soft)]">
+                <label className="flex min-h-[36px] cursor-pointer items-center gap-2.5 rounded-[var(--radius-sm)] px-1 text-[length:var(--font-size-sm)] text-[var(--text)] transition-colors hover:bg-[var(--accent-soft)]">
                   <input
                     type="checkbox"
                     checked={done}
@@ -276,11 +276,11 @@ function Fact({
     tone === 'danger' ? 'text-[var(--danger)]' : tone === 'warn' ? 'text-[var(--accent)]' : 'text-[var(--text)]'
   return (
     <div className="surface p-3.5">
-      <dt className="m-0 text-[var(--font-size-xs)] font-semibold uppercase tracking-wide text-[var(--muted)]">
+      <dt className="m-0 text-[length:var(--font-size-xs)] font-semibold uppercase tracking-wide text-[var(--muted)]">
         {label}
       </dt>
-      <dd className={`m-0 mt-1 text-[var(--font-size)] font-bold ${toneClass}`}>{value}</dd>
-      {note && <p className="m-0 mt-1 text-[var(--font-size-xs)] text-[var(--muted)]">{note}</p>}
+      <dd className={`m-0 mt-1 text-[length:var(--font-size)] font-bold ${toneClass}`}>{value}</dd>
+      {note && <p className="m-0 mt-1 text-[length:var(--font-size-xs)] text-[var(--muted)]">{note}</p>}
     </div>
   )
 }

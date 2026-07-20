@@ -39,7 +39,7 @@ export default function ForgotPasswordPage() {
           If an account exists for <strong>{email.trim()}</strong>, a reset link is on its way. It works once and expires
           in an hour.
         </Alert>
-        <p className="mt-4 mb-0 text-[var(--font-size-sm)] leading-relaxed text-[var(--muted)]">
+        <p className="mt-4 mb-0 text-[length:var(--font-size-sm)] leading-relaxed text-[var(--muted)]">
           Nothing arriving? Check your spam folder, then try again in a few minutes.
         </p>
       </AuthShell>

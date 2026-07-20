@@ -36,7 +36,7 @@ export function LegalPage({
         <h1 className="m-0 text-3xl font-extrabold tracking-tight text-[var(--text)] sm:text-4xl">{title}</h1>
         {intro && <p className="mt-3 mb-0 text-base leading-relaxed text-[var(--muted)]">{intro}</p>}
         {updated && (
-          <p className="mt-3 mb-0 text-[var(--font-size-xs)] font-medium uppercase tracking-wide text-[var(--muted)]">
+          <p className="mt-3 mb-0 text-[length:var(--font-size-xs)] font-medium uppercase tracking-wide text-[var(--muted)]">
             Last updated {updated}
           </p>
         )}
@@ -58,7 +58,7 @@ export function Section({ heading, children }: { heading: string; children: Reac
       <h2 id={id} className="m-0 text-xl font-bold tracking-tight text-[var(--text)]">
         {heading}
       </h2>
-      <div className="mt-2.5 flex flex-col gap-3 text-[var(--font-size)] leading-relaxed text-[var(--muted)] [&_a]:font-semibold [&_a]:text-[var(--accent)] [&_a:hover]:underline [&_strong]:text-[var(--text)]">
+      <div className="mt-2.5 flex flex-col gap-3 text-[length:var(--font-size)] leading-relaxed text-[var(--muted)] [&_a]:font-semibold [&_a]:text-[var(--accent)] [&_a:hover]:underline [&_strong]:text-[var(--text)]">
         {children}
       </div>
     </section>
@@ -100,7 +100,7 @@ export function Breadcrumbs({ trail }: { trail: Crumb[] }) {
       <nav aria-label="Breadcrumb">
         {/* Wraps rather than overflowing: award names are long and this must not
             force a horizontal scrollbar on a phone. */}
-        <ol className="m-0 flex list-none flex-wrap items-center gap-x-1.5 gap-y-1 p-0 text-[var(--font-size-sm)] text-[var(--muted)]">
+        <ol className="m-0 flex list-none flex-wrap items-center gap-x-1.5 gap-y-1 p-0 text-[length:var(--font-size-sm)] text-[var(--muted)]">
           {trail.map((crumb, i) => (
             <li key={i} className="flex min-w-0 items-center gap-1.5">
               {i > 0 && (

@@ -97,7 +97,7 @@ export default function RegisterPage() {
           {busy ? 'Creating account' : 'Create account'}
         </Button>
 
-        <p className="m-0 text-center text-[var(--font-size-xs)] leading-relaxed text-[var(--muted)]">
+        <p className="m-0 text-center text-[length:var(--font-size-xs)] leading-relaxed text-[var(--muted)]">
           By creating an account you agree to our{' '}
           <AuthLink to="/terms" inline>
             Terms

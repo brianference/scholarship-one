@@ -48,7 +48,7 @@ const COLUMNS: Column[] = [
 ]
 
 const LINK_CLASS =
-  'inline-flex min-h-[28px] items-center rounded-sm text-[var(--font-size-sm)] text-[var(--muted)] ' +
+  'inline-flex min-h-[28px] items-center rounded-sm text-[length:var(--font-size-sm)] text-[var(--muted)] ' +
   'transition-colors hover:text-[var(--accent)] focus-visible:outline-2 focus-visible:outline-offset-2 ' +
   'focus-visible:outline-[var(--accent)]'
 
@@ -70,14 +70,14 @@ export function SiteFooter({ config }: { config: SiteConfig }) {
             >
               <BrandLogo />
             </Link>
-            <p className="m-0 max-w-xs text-[var(--font-size-sm)] leading-relaxed text-[var(--muted)]">
+            <p className="m-0 max-w-xs text-[length:var(--font-size-sm)] leading-relaxed text-[var(--muted)]">
               Real scholarships with official links. No sponsored listings, no selling your details, free to use.
             </p>
           </div>
 
           {COLUMNS.map((column) => (
             <nav key={column.heading} aria-label={column.heading} className="flex flex-col gap-2">
-              <h2 className="m-0 text-[var(--font-size-sm)] font-bold tracking-tight text-[var(--text)]">
+              <h2 className="m-0 text-[length:var(--font-size-sm)] font-bold tracking-tight text-[var(--text)]">
                 {column.heading}
               </h2>
               <ul className="m-0 flex list-none flex-col gap-0.5 p-0">
@@ -100,15 +100,15 @@ export function SiteFooter({ config }: { config: SiteConfig }) {
         </div>
 
         <div className="mt-10 flex flex-col gap-3 border-t border-[var(--border-strong)] pt-6 sm:flex-row sm:items-center sm:justify-between">
-          <p className="m-0 text-[var(--font-size-xs)] text-[var(--muted)]">
+          <p className="m-0 text-[length:var(--font-size-xs)] text-[var(--muted)]">
             © {year} Scholarship One. Built with TypeScript, React, Vite, and Cloudflare Pages.
           </p>
-          <p className="m-0 text-[var(--font-size-xs)] text-[var(--muted)]">
+          <p className="m-0 text-[length:var(--font-size-xs)] text-[var(--muted)]">
             {config.finePrint || 'Every award links to an official page. We do not invent scholarships.'}
           </p>
         </div>
 
-        <p className="mt-4 mb-0 text-[var(--font-size-xs)] leading-relaxed text-[var(--muted)]/80">
+        <p className="mt-4 mb-0 text-[length:var(--font-size-xs)] leading-relaxed text-[var(--muted)]/80">
           Scholarship One is not affiliated with the organisations that award these scholarships. Always confirm
           deadlines and eligibility on the official page before applying.
         </p>

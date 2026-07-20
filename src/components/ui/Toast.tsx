@@ -82,7 +82,7 @@ function ToastRow({ toast, onDismiss }: { toast: Toast; onDismiss: () => void })
   return (
     <div
       role={toast.tone === 'error' ? 'alert' : 'status'}
-      className={`pointer-events-auto flex w-full max-w-sm items-start gap-3 rounded-[var(--radius-sm)] border px-4 py-3 text-[var(--font-size-sm)] font-medium shadow-[0_12px_32px_rgba(0,0,0,0.22)] motion-safe:animate-[toast-in_180ms_ease-out] ${TONE_CLASS[toast.tone]}`}
+      className={`pointer-events-auto flex w-full max-w-sm items-start gap-3 rounded-[var(--radius-sm)] border px-4 py-3 text-[length:var(--font-size-sm)] font-medium shadow-[0_12px_32px_rgba(0,0,0,0.22)] motion-safe:animate-[toast-in_180ms_ease-out] ${TONE_CLASS[toast.tone]}`}
     >
       <span className="min-w-0 flex-1">{toast.message}</span>
       <button
