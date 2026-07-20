@@ -1,5 +1,64 @@
 # Changelog
 
+## 5.0.0 — 2026-07-19 — "Full stack"
+
+Major release. Password accounts, a scholarship detail page, the four required
+legal and marketing pages, prerendered HTML for search engines, and a mobile
+legibility fix reported from a real phone. Full notes: `docs/RELEASE-v5.0.0.md`.
+
+### Added
+
+- **Password accounts** — register and sign in with PBKDF2-SHA256 via Web Crypto
+  (bcrypt and jsonwebtoken are native Node modules and cannot run on Workers).
+  Magic-link sign-in is retained and doubles as the password-reset channel, so no
+  existing account is locked out.
+- **Scholarship detail page** at `/scholarship/:id` — eligibility, deadline,
+  checklist, notes, official apply link, breadcrumbs, and JSON-LD. Did not exist
+  before this release.
+- **Breadcrumbs**, with schema.org `BreadcrumbList` markup.
+- **About Us, Terms and Conditions, Privacy Policy, Contact Us** in plain
+  language. 13+ age floor, guardian consent under 18, Arizona governing law.
+- **Confirmation dialogs on every destructive action**, focused on Cancel so a
+  stray Enter cannot destroy data. Toasts on save and remove. Skeletons during
+  genuinely async work.
+- **Generated SVG artwork** per award, derived from its tags. No photography:
+  a photo beside a specific award implies a recipient we cannot stand behind.
+- **Tailwind v4**, layered so components can be ported one at a time.
+- **Sticky header with an SVG wordmark**, and a four-column footer.
+- **Search-engine visibility** — prerendered HTML for the content routes,
+  per-route metadata, a 217-URL sitemap generated from the catalog, robots.txt,
+  an OG card, and a real 404 page.
+- **Rate limiting** in D1, with a deliberately loose per-IP cap so shared school
+  and library networks do not lock each other out.
+- **Nine QA suites, 325 checks**, runnable against production with `BASE=`.
+
+### Fixed
+
+- **Passwords could not be created in production.** Workers rejects PBKDF2 above
+  100,000 iterations; `wrangler pages dev` accepts more, so 210,000 passed every
+  local test and returned a bare 1101 live.
+- **Invisible text**, twice: `.btn-primary` lost to unlayered legacy CSS inside a
+  cascade layer, and `text-[var(--font-size)]` was read by Tailwind as a *colour*,
+  emitting invalid CSS and dropping the real text colour in 45 places.
+- **Content read through the header and chat dock on mobile.** Both were 78%
+  transparent and depended on `backdrop-filter`, which minification had stripped.
+  Overlay surfaces are now opaque; legibility no longer depends on an effect that
+  Brave disables and mobile browsers drop under reduced-transparency.
+- **Scrolling janked on the results list** — all 209 cards carried a blur.
+- **The onboarding modal covered the legal pages** on a first visit.
+- **WCAG AA contrast failures** in the palette: the accent was 2.98:1 for white
+  text on it and 3.98:1 as link text.
+- **The health endpoint reported email as unconfigured** while it worked, probing
+  a leftover key from a previous provider — and CI used it as a deploy check.
+- **Successful sign-ins consumed rate-limit budget**, so signing in across
+  several devices could lock you out of your own account.
+
+### Upgrade notes
+
+Apply `migrations/0002_password_auth.sql` before deploying; it is additive.
+Deploy with `npm run build:prod` — the plain build does not generate the
+sitemap, robots.txt, OG image, or prerendered HTML.
+
 ## 4.0.1 — 2026-07-18
 
 ### Fixed
