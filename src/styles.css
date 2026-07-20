@@ -6,6 +6,12 @@
 [data-design='peach'] {
   --bg: #faf6f2;
   --bg-elev: rgba(255, 255, 255, 0.78);
+  /* Opaque surface for anything that overlaps content (sticky header, chat
+     dock, tab bar, modals). Legibility must never depend on backdrop-filter:
+     Brave disables it under fingerprinting protection, and mobile browsers drop
+     it under reduced-transparency or low-power mode. When that happens a 0.78
+     alpha pane stops hiding anything and the page reads through it. */
+  --bg-overlay: #ffffff;
   --bg-solid: #ffffff;
   --text: #2a1c14;
   --muted: #7a6458;
@@ -40,6 +46,7 @@
 [data-theme='dark'] {
   --bg: #14100e;
   --bg-elev: rgba(36, 28, 24, 0.82);
+  --bg-overlay: #1c1612;
   --bg-solid: #1c1612;
   --text: #f5ebe3;
   --muted: #b5a296;
@@ -138,6 +145,8 @@ a { color: var(--accent); }
   position: sticky;
   top: 0;
   z-index: 20;
+  /* Opaque: this scrolls over body copy, so it cannot be see-through. */
+  background: var(--bg-overlay);
   margin: 0 -4px 4px;
   border-radius: 0 0 var(--radius) var(--radius);
   border-top: none;
@@ -705,9 +714,11 @@ a { color: var(--accent); }
   z-index: 50;
   display: flex;
   flex-direction: column;
-  background: var(--bg-elev);
-  backdrop-filter: blur(var(--glass-blur)) saturate(1.2);
-  -webkit-backdrop-filter: blur(var(--glass-blur)) saturate(1.2);
+  /* Opaque for the same reason as .topbar: it sits directly over the results
+     list, and at 0.78 alpha with no blur the cards read straight through it. */
+  background: var(--bg-overlay);
+  /* No backdrop-filter: the surface is opaque, so a blur behind it composites
+     an expensive effect that renders nothing. */
   box-shadow: var(--shadow);
   padding-bottom: env(safe-area-inset-bottom, 0);
 }
@@ -1840,7 +1851,7 @@ a { color: var(--accent); }
   gap: 8px;
   justify-content: center;
   padding: 12px;
-  background: color-mix(in srgb, var(--bg-elev) 92%, transparent);
+  background: var(--bg-overlay);
   border: 1px solid var(--border-strong);
   border-radius: var(--radius);
   backdrop-filter: blur(8px);
@@ -1960,7 +1971,8 @@ a { color: var(--accent); }
     justify-content: space-around;
     align-items: stretch;
     padding: 8px 6px calc(8px + env(safe-area-inset-bottom, 0px));
-    background: color-mix(in srgb, var(--bg-solid) 86%, transparent);
+    /* Opaque: the tab bar sits over the end of every page. */
+    background: var(--bg-overlay);
     -webkit-backdrop-filter: blur(18px) saturate(180%);
     backdrop-filter: blur(18px) saturate(180%);
     border-top: 1px solid var(--border-strong);

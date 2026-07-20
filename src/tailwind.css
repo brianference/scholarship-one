@@ -112,23 +112,46 @@
    * converted file by file afterwards without a flag day.
    */
 
-  /* Frosted surfaces */
+  /*
+   * Frosted surfaces.
+   *
+   * .glass-bar and .chat-dock float over page content, so they take the opaque
+   * --bg-overlay rather than the translucent --bg-elev. The blur is decoration
+   * only: minification collapsed the pair below to just the -webkit- alias, and
+   * Brave disables backdrop-filter entirely under fingerprinting protection, so
+   * anything relying on it for legibility eventually renders see-through.
+   */
   .glass-bar,
-  .glass-panel,
-  .chat-dock,
-  .design-card {
-    background: var(--bg-elev);
+  .chat-dock {
+    background: var(--bg-overlay);
     border: 1px solid var(--border);
-    backdrop-filter: blur(var(--glass-blur)) saturate(1.35);
-    -webkit-backdrop-filter: blur(var(--glass-blur)) saturate(1.35);
     box-shadow: var(--shadow);
   }
 
+  /* These sit inline in the flow, so translucency is safe here. */
+  .glass-panel,
+  .design-card {
+    background: var(--bg-elev);
+    border: 1px solid var(--border);
+    -webkit-backdrop-filter: blur(var(--glass-blur)) saturate(1.35);
+    /* Unprefixed last: minification was collapsing the pair down to the
+       -webkit- alias, and Firefox implements only the standard property. */
+    backdrop-filter: blur(var(--glass-blur)) saturate(1.35);
+    box-shadow: var(--shadow);
+  }
+
+  /*
+   * No backdrop-filter on .card.
+   *
+   * /results renders 209 of these. backdrop-filter is among the most expensive
+   * effects a browser can composite, and a list of 200 blurring panes janks
+   * scrolling on a phone for an effect nobody can see behind an opaque-ish
+   * card anyway. Minification was also dropping the unprefixed property here,
+   * so Firefox never rendered it regardless.
+   */
   .card {
     background: var(--bg-elev);
     border: 1px solid var(--border);
-    backdrop-filter: blur(var(--glass-blur)) saturate(1.35);
-    -webkit-backdrop-filter: blur(var(--glass-blur)) saturate(1.35);
     @apply rounded-[var(--radius)] px-[18px] py-4 shadow-card;
   }
   .card-slim {
