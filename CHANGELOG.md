@@ -1,5 +1,47 @@
 # Changelog
 
+## 5.1.0 — 2026-07-19
+
+### Fixed
+
+- **Content read through the header and chat dock on mobile.** Both surfaces
+  were 78% transparent and relied on `backdrop-filter` to hide what sat behind
+  them; minification had collapsed the property pair down to the `-webkit-`
+  alias, so no blur rendered at all. Overlay surfaces now use an opaque
+  `--bg-overlay` token. Legibility must not depend on an effect Brave disables
+  under fingerprinting protection and mobile browsers drop under
+  reduced-transparency or low-power mode.
+- **Scroll jank on the results list** — each of the 209 cards carried a
+  `backdrop-filter` blur, one of the most expensive effects a browser
+  composites, for something invisible behind the card.
+- **Frosted surfaces rendered nothing in Firefox.** Minification dropped the
+  unprefixed `backdrop-filter` in three rules, and Firefox implements only the
+  standard property. Zero webkit-only rules remain.
+- **Footer brand link failed contrast** at 3.82:1 — its own text nodes
+  inherited the legacy `a { color: var(--accent) }` rule against the new dark
+  band.
+
+### Changed
+
+- **Premium dark footer**, built against the live FlowBoard reference rather
+  than from memory: wide brand column beside narrow link columns, 11.5px
+  uppercase headings, and a separate darker base strip for the fine print. Dark
+  in both themes, using warm near-black to sit with the peach palette.
+
+### Added
+
+- **`scripts/qa-overlay.mjs`** — forces the assistant dock open and asserts that
+  anything overlapping text is opaque, across 390/360/768 and four routes, plus
+  reachability hit-testing after `scrollIntoView`. Verified to catch the
+  original bug by reverting the fix.
+
+### Notes
+
+The mobile transparency bug reached production because the text-overlap check
+ran only on the static content pages, never on `/` or `/matches`, and because
+the chat dock is a bottom sheet **only when open** — it defaults closed below
+900px, so every automated pass measured it at 0×0.
+
 ## 5.0.0 — 2026-07-19 — "Full stack"
 
 Major release. Password accounts, a scholarship detail page, the four required
