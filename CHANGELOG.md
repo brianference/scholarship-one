@@ -1,5 +1,30 @@
 # Changelog
 
+## 5.2.0 — 2026-07-19
+
+### Fixed
+
+- **Desktop content occupied roughly a third of a wide screen**, with large
+  empty margins, and the dark footer stopped short of the page edges. `.shell`
+  was doing two jobs: page wrapper *and* 1100px reading-width container, with
+  the AI dock's rail reserved by subtracting padding from that same capped box.
+  On a 1900px display: a 400px empty left margin, 684px of content, then the
+  dock. Split into a full-width wrapper plus a separate reading column.
+  Measured at 1900px, content went from 684px to 1100px and the footer from
+  1100px to 1520px.
+- **A strip of page background rendered below the dark footer** — the wrapper's
+  96px bottom padding applied after its last child. Moved to the content
+  column, along with the mobile reservation for the bottom sheet and tab bar.
+- **A 20px gap between the footer edge and the dock rail** — the reservation
+  was `min(400px, 44vw)` while the dock is 380px wide. Both now read a single
+  `--dock-w` token so they cannot drift.
+
+### Added
+
+- Nine wide-desktop assertions in `qa-chrome`, covering 1900 and 1440 with the
+  dock open and closed: the footer spans the full available width, nothing
+  renders below it, and the reading column is not squeezed by the rail.
+
 ## 5.1.0 — 2026-07-19
 
 ### Fixed
