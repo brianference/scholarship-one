@@ -78,6 +78,48 @@ for (const [label, w, h] of [['desktop', 1280, 900], ['tablet', 768, 900], ['mob
   await p.close()
 }
 
+console.log('\n-- wide-desktop layout --')
+for (const [w, dockOpen, label] of [[1900, '1', 'dock open'], [1900, '0', 'dock closed'], [1440, '1', '1440 dock open']]) {
+  const c = await browser.newContext({ viewport: { width: w, height: 1000 } })
+  await c.addInitScript((d) => {
+    localStorage.setItem('scholarship-one-onboarding-v1', JSON.stringify({ completed: true, skipped: true, completedAt: 0 }))
+    localStorage.setItem('scholarship-one-chat-open', d)
+  }, dockOpen)
+  const pg = await c.newPage()
+  pg.on('console', (m) => { if (m.type() === 'error') errors.push(`${label}: ${m.text()}`) })
+  await pg.goto(`${BASE}/about`, { waitUntil: 'domcontentloaded' })
+  await pg.waitForTimeout(1400)
+  await pg.evaluate(() => window.scrollTo(0, document.body.scrollHeight))
+  await pg.waitForTimeout(500)
+
+  const m = await pg.evaluate(() => {
+    const f = document.querySelector('footer')
+    const fr = f.getBoundingClientRect()
+    const main = document.querySelector('main').getBoundingClientRect()
+    const dock = document.querySelector('.chat-dock')
+    const dr = dock ? dock.getBoundingClientRect() : null
+    const dockW = dr && dr.width > 8 ? dr.width : 0
+    return {
+      footerLeft: Math.round(fr.left),
+      footerWidth: Math.round(fr.width),
+      available: Math.round(window.innerWidth - dockW),
+      mainWidth: Math.round(main.width),
+      gapBelow: Math.round(document.documentElement.scrollHeight - (fr.bottom + window.scrollY)),
+    }
+  })
+
+  // The footer band must span everything the dock does not occupy.
+  check(`${label}: footer spans the full available width (${m.footerWidth}/${m.available})`,
+    m.footerLeft === 0 && Math.abs(m.footerWidth - m.available) <= 2, JSON.stringify(m))
+  // Page background beneath the dark band means stray padding on the wrapper.
+  check(`${label}: nothing renders below the footer (${m.gapBelow}px)`, m.gapBelow === 0, JSON.stringify(m))
+  // The reading column previously collapsed to ~684px on a 1900px display,
+  // because the dock's rail was subtracted from the already-capped 1100px box.
+  check(`${label}: reading column is not squeezed by the dock (${m.mainWidth}px)`,
+    m.mainWidth >= Math.min(1100, m.available) - 4, JSON.stringify(m))
+  await c.close()
+}
+
 console.log('\n-- brand mark --')
 const narrow = await browser.newPage({ viewport: { width: 360, height: 780 } })
 await narrow.goto(`${BASE}/`, { waitUntil: 'networkidle' })

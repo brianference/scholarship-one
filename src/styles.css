@@ -12,6 +12,9 @@
      it under reduced-transparency or low-power mode. When that happens a 0.78
      alpha pane stops hiding anything and the page reads through it. */
   --bg-overlay: #ffffff;
+  /* Width of the AI dock rail. Used by the dock AND by the space the shell
+     reserves for it — a single value so the two cannot drift apart. */
+  --dock-w: 380px;
   --bg-solid: #ffffff;
   --text: #2a1c14;
   --muted: #7a6458;
@@ -84,17 +87,64 @@ button, input, select, textarea {
   letter-spacing: inherit;
 }
 a { color: var(--accent); }
-.shell { max-width: 1100px; margin: 0 auto; padding: 0 16px 96px; }
-/* AI panel is always open — reserve space on desktop */
-.shell--chat-open { padding-right: min(400px, 44vw); }
-.shell--chat-collapsed { padding-right: 16px; }
+/*
+ * .shell is the full-width page wrapper. It carries ONLY the reservation for
+ * the AI dock rail; it must not also be the reading-width container.
+ *
+ * It previously did both: max-width 1100px with `margin: 0 auto`, and the dock's
+ * 400px was subtracted from that same 1100px. On a 1900px display that left a
+ * 400px empty margin, 684px of content, and the 400px dock — content occupying
+ * roughly a third of the screen with dead space beside it. Keeping the wrapper
+ * full width lets the reading column centre inside the space that actually
+ * remains, and lets the footer span edge to edge.
+ */
+.shell {
+  /* No bottom padding: the footer is the last child, so padding here renders a
+     strip of page background *below* the dark band. The spacing belongs above
+     the footer, on the content column. */
+  padding: 0;
+}
+.shell--chat-open {
+  padding-right: min(var(--dock-w), 44vw);
+}
+.shell--chat-collapsed {
+  padding-right: 0;
+}
+
+/* The reading column. Everything except the footer is constrained here. */
+.shell > header.topbar,
+.shell > main {
+  max-width: 1100px;
+  margin-inline: auto;
+  padding-inline: 16px;
+}
+
+/* Breathing room between the last content and the footer band. */
+.shell > main {
+  padding-bottom: 96px;
+}
+
+/* The footer spans the full wrapper and constrains its own contents, so the
+   dark band runs edge to edge instead of stopping at the reading width. */
+.shell > footer {
+  width: 100%;
+}
 @media (max-width: 900px) {
+  /* The dock becomes a bottom sheet here, so no right rail is reserved. Padding
+     stays 0 on the wrapper: horizontal spacing belongs to the reading column,
+     and any inset here would stop the footer band reaching the screen edges. */
   .shell--chat-open {
-    padding-right: 16px;
-    padding-bottom: calc(46vh + env(safe-area-inset-bottom, 0px));
+    padding-right: 0;
   }
   .shell--chat-collapsed {
-    padding-right: 16px;
+    padding-right: 0;
+  }
+  /* Reservation for the bottom sheet / tab bar lives on the content column now,
+     so the footer band still reaches the bottom of the page. */
+  .shell--chat-open > main {
+    padding-bottom: calc(46vh + env(safe-area-inset-bottom, 0px));
+  }
+  .shell--chat-collapsed > main {
     padding-bottom: calc(72px + env(safe-area-inset-bottom, 0px));
   }
 }
@@ -706,7 +756,7 @@ a { color: var(--accent); }
   position: fixed;
   top: 0;
   right: 0;
-  width: min(380px, 100vw);
+  width: min(var(--dock-w), 100vw);
   height: 100%;
   height: 100dvh;
   border-left: 1px solid var(--border-strong);
