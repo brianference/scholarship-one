@@ -5,7 +5,8 @@
  *
  * Run: npx tsx scripts/run-finder.ts [--dry-run]
  * Env: CRON_SECRET (required), FIND_URL (default: the production endpoint), QUERIES_PER_RUN (default 8),
- *      FIND_QUERIES (optional: queries separated by |, replaces the daily list for a targeted run)
+ *      FIND_QUERIES (optional: queries separated by |, replaces the daily list for a targeted run),
+ *      FIND_URLS (optional: result links separated by spaces; skips searching and sends these to the site)
  */
 import { IDENTITY_OPTIONS, LEVEL_OPTIONS, MAJOR_OPTIONS } from '../src/lib/profileOptions'
 import { yearSpan } from '../functions/_lib/finder/queries'
@@ -41,7 +42,8 @@ export function todaysQueries(now = new Date(), perRun = PER_RUN): string[] {
 
 async function main() {
   const custom = (process.env.FIND_QUERIES || '').split('|').map((q) => q.trim()).filter((q) => q.length >= 8)
-  const queries = custom.length ? custom.slice(0, 20) : todaysQueries()
+  const manualUrls = (process.env.FIND_URLS || '').split(/\s+/).filter((u) => u.startsWith('https://')).slice(0, 8)
+  const queries = manualUrls.length ? [custom[0] || 'manually supplied scholarship pages official'] : custom.length ? custom.slice(0, 20) : todaysQueries()
   console.log(`[finder] ${queries.length} queries${DRY ? ' (dry run)' : ''}`)
   if (DRY) {
     for (const q of queries) console.log(`  ${q}`)
@@ -59,9 +61,14 @@ async function main() {
   let added = 0
   for (const query of queries) {
     try {
-      const found = await searchWeb(searchEnv, query)
-      const urls = found.hits.map((h) => h.url).slice(0, 8)
-      console.log(`  search: ${found.provider}, ${urls.length} link(s)${found.errors.length ? ' (' + found.errors.join(' | ') + ')' : ''}`)
+      let urls = manualUrls
+      if (!manualUrls.length) {
+        const found = await searchWeb(searchEnv, query)
+        urls = found.hits.map((h) => h.url).slice(0, 8)
+        console.log(`  search: ${found.provider}, ${urls.length} link(s)${found.errors.length ? ' (' + found.errors.join(' | ') + ')' : ''}`)
+      } else {
+        console.log(`  using ${urls.length} supplied link(s), no search`)
+      }
       const res = await fetch(FIND_URL, {
         method: 'POST',
         headers: { 'Content-Type': 'application/json', 'X-Cron-Secret': SECRET },

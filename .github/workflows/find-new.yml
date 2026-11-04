@@ -13,6 +13,10 @@ on:
         description: 'Optional: your own queries separated by | (replaces the daily list)'
         type: string
         default: ''
+      urls:
+        description: 'Optional: result links separated by spaces. Skips searching; the site reads and verifies them.'
+        type: string
+        default: ''
 
 jobs:
   find:
@@ -37,3 +41,4 @@ jobs:
           FIRECRAWL_API_KEY: ${{ secrets.FIRECRAWL_API_KEY }}
           BRAVE_API_KEY: ${{ secrets.BRAVE_API_KEY }}
           FIND_QUERIES: ${{ github.event_name == 'workflow_dispatch' && inputs.queries || '' }}
+          FIND_URLS: ${{ github.event_name == 'workflow_dispatch' && inputs.urls || '' }}
