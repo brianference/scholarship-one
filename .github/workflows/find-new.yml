@@ -1,0 +1,31 @@
+name: Find new scholarships
+
+on:
+  schedule:
+    - cron: '30 14 * * *' # daily 14:30 UTC, after the 13:00 reminder job
+  workflow_dispatch:
+    inputs:
+      dry_run:
+        description: 'List the queries only, do not call the site'
+        type: boolean
+        default: false
+
+jobs:
+  find:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-node@v4
+        with:
+          node-version: '22'
+          cache: npm
+      - name: Install
+        run: npm ci
+      - name: Verification rules unit test
+        run: npx tsx scripts/qa-finder-verify.ts
+      - name: Finder pipeline test
+        run: npx tsx scripts/qa-finder-run.ts
+      - name: Run today's queries
+        run: npx tsx scripts/run-finder.ts ${{ (github.event_name == 'workflow_dispatch' && inputs.dry_run) && '--dry-run' || '' }}
+        env:
+          CRON_SECRET: ${{ secrets.CRON_SECRET }}

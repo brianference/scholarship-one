@@ -13,11 +13,14 @@
 import { useEffect, useRef } from 'react'
 import { useAccount } from '../state/account'
 import { useScholarship } from '../state/ScholarshipContext'
-import { CATALOG } from '../data/catalog'
+import { findAward } from '../lib/awards'
+import { mergeFindState, type FindState } from '../lib/newForYou'
 import {
   addHiddenIds,
   deleteSave,
   getAccountProfile,
+  getFindState,
+  putFindState,
   getHiddenIds,
   getSaves,
   putAccountProfile,
@@ -29,7 +32,11 @@ import type { ApplyStatus } from '../lib/applyStatus'
 import { coerceProfile, isDefaultProfile } from '../lib/profile'
 import { isRemindDate } from '../lib/reminders'
 
-const DEADLINE_BY_ID = new Map<string, string>(CATALOG.map((c) => [c.id, c.deadline]))
+/**
+ * Deadline snapshot for the reminder job, from the catalog or a verified web find. Undefined when the
+ * award is unknown on this device, so the server keeps the deadline it already has.
+ */
+const deadlineOf = (id: string): string | undefined => findAward(id)?.deadline
 const MIRROR_DEBOUNCE_MS = 900
 /** Server limits for /api/hidden: slug-shaped ids, at most 500 per request. */
 const HIDDEN_ID_RE = /^[a-z0-9][a-z0-9_-]*$/i
@@ -44,6 +51,9 @@ export function AccountSync() {
   /** Profile edit time the server is known to hold; null when the profile channel is down. */
   const profileSyncedAtRef = useRef<number | null>(null)
   const timerRef = useRef<ReturnType<typeof setTimeout> | null>(null)
+  /** What the account is known to hold for find-state; null while that channel is down. */
+  const findSyncedRef = useRef<FindState | null>(null)
+  const findTimerRef = useRef<ReturnType<typeof setTimeout> | null>(null)
   /** Reminder map as of the last mirror, to tell "cleared here" from "never set here". */
   const lastRemindRef = useRef<Record<string, string>>({})
   const hiddenTimerRef = useRef<ReturnType<typeof setTimeout> | null>(null)
@@ -56,7 +66,7 @@ export function AccountSync() {
       notes: s.notes[id] || '',
       checklist: s.checklist[id] || [],
       apply_status: s.applyMap[id] || 'none',
-      deadline: DEADLINE_BY_ID.get(id) || '',
+      deadline: deadlineOf(id),
       // '' clears on the server; null keeps it. Only clear what this device cleared, so a
       // stale open tab cannot wipe a reminder set on another device.
       remind_on: s.remindMap[id] ?? (lastRemindRef.current[id] ? '' : undefined),
@@ -69,16 +79,18 @@ export function AccountSync() {
       hydratedRef.current = false
       hiddenSyncedRef.current = null
       profileSyncedAtRef.current = null
+      findSyncedRef.current = null
       return
     }
     if (hydratedRef.current) return
     let alive = true
     ;(async () => {
       try {
-        const [savesRes, profileRes, hiddenRes] = await Promise.allSettled([
+        const [savesRes, profileRes, hiddenRes, findRes] = await Promise.allSettled([
           getSaves(),
           getAccountProfile(),
           getHiddenIds(),
+          getFindState(),
         ])
         if (!alive) return
         // Saves are the core channel: without them nothing is mirrored this session.
@@ -138,6 +150,9 @@ export function AccountSync() {
           }
         }
 
+        // Find-new state: earliest first tap, latest tap, union of looked-at awards.
+        const mergedFind = findRes.status === 'fulfilled' ? mergeFindState(s.findState, findRes.value) : null
+
         s.applyAccountMerge({
           shortlist: mergedIds,
           applyMap,
@@ -148,13 +163,15 @@ export function AccountSync() {
           profile: profileOverride,
         })
 
+        if (mergedFind) s.applyFindStateMerge(mergedFind)
+
         await putSaves(
           mergedIds.map((id) => ({
             id,
             notes: notes[id] || '',
             checklist: checklist[id] || [],
             apply_status: applyMap[id] || 'none',
-            deadline: DEADLINE_BY_ID.get(id) || '',
+            deadline: deadlineOf(id),
             remind_on: remindMap[id] || '',
           })),
         )
@@ -178,6 +195,19 @@ export function AccountSync() {
           }
           // If the push failed, leave the synced set at what the server has so the next change retries.
           hiddenSyncedRef.current = new Set(pushed ? mergedHidden : acctHidden)
+        }
+        if (mergedFind && findRes.status === 'fulfilled') {
+          const server = findRes.value
+          const behind =
+            mergedFind.seenIds.some((id) => !server.seenIds.includes(id)) ||
+            mergedFind.checkedAt > server.checkedAt ||
+            (mergedFind.firstCheckedAt > 0 && mergedFind.firstCheckedAt !== server.firstCheckedAt)
+          try {
+            if (behind) await putFindState(mergedFind)
+            findSyncedRef.current = mergedFind
+          } catch {
+            findSyncedRef.current = server
+          }
         }
         if (pushProfileAt !== null && pushProfileAt > 0) {
           try {
@@ -244,6 +274,28 @@ export function AccountSync() {
     }
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [account.status, s.hidden])
+
+  // Mirror find-new state: the latest tap and any awards newly looked at.
+  useEffect(() => {
+    if (account.status !== 'signed-in' || !hydratedRef.current || !findSyncedRef.current) return
+    if (findTimerRef.current) clearTimeout(findTimerRef.current)
+    findTimerRef.current = setTimeout(() => {
+      const synced = findSyncedRef.current
+      if (!synced) return
+      const next = s.findState
+      const newSeen = next.seenIds.filter((id) => !synced.seenIds.includes(id))
+      if (!newSeen.length && next.checkedAt <= synced.checkedAt && next.firstCheckedAt === synced.firstCheckedAt) return
+      putFindState({ firstCheckedAt: next.firstCheckedAt || undefined, checkedAt: next.checkedAt || undefined, seenIds: newSeen })
+        .then(() => {
+          findSyncedRef.current = next
+        })
+        .catch(() => {})
+    }, MIRROR_DEBOUNCE_MS)
+    return () => {
+      if (findTimerRef.current) clearTimeout(findTimerRef.current)
+    }
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [account.status, s.findState])
 
   // Mirror profile edits. Only a stamped local edit newer than the server copy is sent.
   useEffect(() => {

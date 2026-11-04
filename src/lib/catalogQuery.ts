@@ -1,7 +1,8 @@
 /**
  * Pure catalog ranking / filtering — no React, easy to unit-test and reuse.
  */
-import { CATALOG } from '../data/catalog'
+import { CATALOG, type AwardBase } from '../data/catalog'
+import { allAwards } from './awards'
 import { BROWSE_CATEGORIES, itemMatchesCategory } from './categories'
 import { hasNoEssayTag, matchesAmountBucket, type AmountBucket } from './amountFilter'
 import { fitTips } from './fitTips'
@@ -11,7 +12,7 @@ import { scoreBreakdown } from './scoring'
 import { urgency } from './urgency'
 import type { EssayFilter, SortMode, UrgencyFilter } from '../features/matcher/MatcherFilters'
 
-export type RankedRow = (typeof CATALOG)[number] & {
+export type RankedRow = AwardBase & {
   score: number
   scoreParts: { label: string; points: number }[]
   scorePenalties: { label: string; points: number }[]
@@ -53,9 +54,24 @@ export function categoryCounts(): Record<string, number> {
   return counts
 }
 
+/** Score one award against a profile into the row shape the Matches list renders. */
+export function rankItem(item: AwardBase, profile: Profile, pinned = false): RankedRow {
+  const breakdown = scoreBreakdown(item.tags, profile)
+  return {
+    ...item,
+    score: breakdown.total,
+    scoreParts: breakdown.parts,
+    scorePenalties: breakdown.penalties,
+    urg: urgency(item.deadline),
+    pinned,
+    why: matchWhy(item.tags, profile),
+    tips: fitTips(item.tags, profile, breakdown.total),
+  }
+}
+
 /** Rank + filter the full catalog for the results list. */
 export function queryCatalog(q: CatalogQuery): RankedRow[] {
-  const rows = CATALOG.map((item) => {
+  const rows = allAwards().map((item) => {
     const breakdown = scoreBreakdown(item.tags, q.profile)
     return {
       ...item,

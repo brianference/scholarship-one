@@ -2424,3 +2424,106 @@ a { color: var(--accent); }
   min-width: 0;
   overflow-wrap: anywhere;
 }
+
+/* Find new scholarships: the big button */
+.find-new {
+  display: flex;
+  flex-direction: column;
+  gap: 8px;
+}
+.find-new__btn {
+  display: flex;
+  align-items: center;
+  gap: 16px;
+  width: 100%;
+  min-height: 84px;
+  padding: 16px 20px;
+  border: none;
+  border-radius: 20px;
+  background: linear-gradient(135deg, var(--accent), color-mix(in srgb, var(--accent) 70%, var(--accent-2)));
+  color: var(--accent-on);
+  font: inherit;
+  text-align: left;
+  cursor: pointer;
+  box-shadow: 0 10px 28px color-mix(in srgb, var(--accent) 35%, transparent);
+  transition: transform var(--transition), box-shadow var(--transition), opacity var(--transition);
+}
+.find-new__btn:hover:not(:disabled) {
+  transform: translateY(-1px);
+  box-shadow: 0 14px 34px color-mix(in srgb, var(--accent) 42%, transparent);
+}
+.find-new__btn:disabled {
+  opacity: 0.85;
+  cursor: progress;
+}
+.find-new__icon {
+  flex: none;
+  width: 34px;
+  height: 34px;
+}
+.find-new__text {
+  display: flex;
+  flex-direction: column;
+  gap: 3px;
+  min-width: 0;
+}
+.find-new__title {
+  font-size: 1.15rem;
+  font-weight: 800;
+  letter-spacing: -0.01em;
+}
+.find-new__sub {
+  font-size: 0.82rem;
+  font-weight: 600;
+  opacity: 0.92;
+}
+.find-new__status {
+  margin: 0 4px;
+}
+
+/* The separate "New for you" area */
+.new-area {
+  border-radius: 20px;
+  border: 2px solid var(--accent);
+  background: color-mix(in srgb, var(--accent) 7%, var(--bg-elev));
+  padding: 14px 12px 12px;
+  display: flex;
+  flex-direction: column;
+  gap: 10px;
+}
+.new-area__head {
+  padding: 0 6px;
+}
+.new-area__title {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  margin: 0;
+  font-size: 1.1rem;
+}
+.new-area__pill,
+.match-row__new {
+  display: inline-block;
+  padding: 2px 9px;
+  border-radius: 999px;
+  background: var(--accent);
+  color: var(--accent-on);
+  font-size: 0.64rem;
+  font-weight: 800;
+  letter-spacing: 0.06em;
+  text-transform: uppercase;
+  vertical-align: middle;
+}
+.match-row__new {
+  margin-right: 6px;
+}
+.new-area__hint {
+  margin: 4px 0 0;
+}
+.match-list--new {
+  border-color: color-mix(in srgb, var(--accent) 45%, var(--border-strong));
+}
+.match-row--new .match-row__lead {
+  border-left: 4px solid var(--accent);
+  padding-left: 10px;
+}

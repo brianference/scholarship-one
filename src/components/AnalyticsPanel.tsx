@@ -1,6 +1,6 @@
 import { useMemo, useState } from 'react'
 import { getAnalyticsSummary } from '../lib/analytics'
-import { CATALOG } from '../data/catalog'
+import { allAwards } from '../lib/awards'
 
 /**
  * Privacy-light activity insights (stored only on this device).
@@ -10,7 +10,7 @@ export function AnalyticsPanel({ defaultOpen = true }: { defaultOpen?: boolean }
   const summary = useMemo(() => getAnalyticsSummary(), [open])
 
   const nameById = useMemo(() => {
-    const m = new Map<string, string>(CATALOG.map((c) => [c.id, c.name]))
+    const m = new Map<string, string>(allAwards().map((c) => [c.id, c.name]))
     return m
   }, [])
 

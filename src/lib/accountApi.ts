@@ -123,6 +123,7 @@ export type SaveUpsert = {
   notes?: string
   checklist?: string[]
   apply_status?: string
+  /** Omit to leave the stored deadline alone. */
   deadline?: string
   /** YYYY-MM-DD to set, '' to clear, omit to leave the stored value. */
   remind_on?: string
@@ -134,6 +135,35 @@ export function putSaves(saves: SaveUpsert[]): Promise<{ ok: boolean; count: num
 
 export function deleteSave(id: string): Promise<{ ok: boolean }> {
   return req(`/api/saves?id=${encodeURIComponent(id)}`, { method: 'DELETE' })
+}
+
+export type FindStatePayload = { firstCheckedAt: number; checkedAt: number; seenIds: string[] }
+
+export function getFindState(): Promise<FindStatePayload> {
+  return req('/api/find-state')
+}
+
+/** Send any part of the find state; the server merges (earliest first tap, latest tap, seen union). */
+export function putFindState(patch: Partial<FindStatePayload>): Promise<{ ok: boolean }> {
+  return req('/api/find-state', { method: 'POST', body: JSON.stringify(patch) })
+}
+
+/** Awards the finder verified on the web. Public. */
+export function getDiscovered(): Promise<{ items: unknown[] }> {
+  return req('/api/discovered')
+}
+
+export type FindRun = {
+  provider: string
+  searched: number
+  read: number
+  added: { id: string; name: string }[]
+  errors: string[]
+}
+
+/** Run one web search pass for the signed-in student (variant 0 = field, 1 = background and place). */
+export function runFind(profile: AccountProfile, variant: 0 | 1): Promise<FindRun> {
+  return req('/api/find', { method: 'POST', body: JSON.stringify({ profile, variant }) })
 }
 
 export type AccountProfile = {

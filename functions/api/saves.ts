@@ -99,7 +99,7 @@ export async function onRequestPost({ request, env }: FnCtx) {
              notes = excluded.notes,
              checklist = excluded.checklist,
              apply_status = excluded.apply_status,
-             deadline = excluded.deadline,
+             deadline = coalesce(excluded.deadline, saved_scholarships.deadline),
              remind_sent_on = case when excluded.remind_on is not null
                                     and excluded.remind_on <> coalesce(saved_scholarships.remind_on, '')
                                    then null else saved_scholarships.remind_sent_on end,

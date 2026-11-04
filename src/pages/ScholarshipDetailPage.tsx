@@ -1,7 +1,7 @@
 /** /scholarship/:id — full detail view for a single award. */
 import { useEffect, useMemo, useState } from 'react'
 import { Link, useParams } from 'react-router-dom'
-import { CATALOG } from '../data/catalog'
+import { findAward } from '../lib/awards'
 import { Breadcrumbs } from './legal/LegalLayout'
 import { CategoryArt, themeForTags } from '../features/matcher/CategoryArt'
 import { Button } from '../components/ui/Button'
@@ -22,7 +22,7 @@ export function ScholarshipDetailPage() {
   const store = useScholarship()
   const { notify } = useToast()
 
-  const award = useMemo(() => CATALOG.find((item) => item.id === id), [id])
+  const award = useMemo(() => findAward(id), [id])
 
   const [draftNote, setDraftNote] = useState('')
   const [confirmUnsave, setConfirmUnsave] = useState(false)

@@ -23,6 +23,10 @@ jobs:
         run: npm run qa:hard
       - name: Case matrix (120 assertions)
         run: npm run qa:cases
+      - name: Finder verification, pipeline and New-for-you logic
+        run: npm run qa:finder
+      - name: Reminder selection
+        run: npx tsx scripts/qa-reminders.ts
       - name: Production build
         run: npm run build
       - name: Upload dist artifact

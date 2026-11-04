@@ -11,7 +11,7 @@ import { ProfilePanel } from '../features/matcher/ProfilePanel'
 import { MatcherFilters } from '../features/matcher/MatcherFilters'
 import { SavedSearchesPanel } from '../features/matcher/SavedSearchesPanel'
 import { ScholarshipCard } from '../features/matcher/ScholarshipCard'
-import { CATALOG } from '../data/catalog'
+import { findAward } from '../lib/awards'
 import { copyLinks, downloadCsv, downloadIcs, type ExportRow } from '../lib/exportTools'
 import { checklistProgress } from '../lib/checklist'
 import { APPLY_STATUS_LABEL } from '../lib/applyStatus'
@@ -143,7 +143,7 @@ export function ResultsPage() {
     () =>
       s.compareIds
         .map((id) => {
-          const item = CATALOG.find((c) => c.id === id)
+          const item = findAward(id)
           if (!item) return null
           return {
             id: item.id,

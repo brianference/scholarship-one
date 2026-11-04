@@ -18,6 +18,13 @@ export interface Env {
   DIGEST_FROM_EMAIL?: string
   SITE_URL?: string
   RATE_LIMIT_SALT?: string
+  /** Search providers for the scholarship finder, tried in this order; DuckDuckGo needs no key. */
+  FIRECRAWL_API_KEY?: string
+  BRAVE_API_KEY?: string
+  OPENAI_API_KEY?: string
+  AI_MODEL?: string
+  /** Shared secret for the daily finder job (X-Cron-Secret header). */
+  CRON_SECRET?: string
   /** When '1', /api/auth/request returns the magic link in the response (LOCAL DEV ONLY). */
   EXPOSE_DEV_MAGIC_LINK?: string
 }

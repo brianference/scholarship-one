@@ -1,5 +1,34 @@
 # Changelog
 
+## 5.4.0 — 2026-11-04
+
+### Added
+
+- **Find new scholarships**: a big button at the top of Matches. A tap checks for
+  awards that entered the app after your first tap and searches the web for new ones
+  when you are signed in. The first tap sets the baseline, so nothing is New until
+  something arrives after it.
+- **New for you**, a separate bordered area above Top matches. Each row carries a
+  New badge and the same match percentage as Top matches. A row loses its badge when
+  you open, save, hide or set a reminder on it, on every device (the first tap, the
+  last tap and the opened set sync to D1). A row you just opened stays put until you
+  close it.
+- **A verified web finder.** Search providers are tried in order: Firecrawl
+  (`FIRECRAWL_API_KEY`), Brave (`BRAVE_API_KEY`), then keyless DuckDuckGo. Each
+  official page is read by a model, but an award is listed only if its name, amount,
+  deadline and a description quote appear verbatim in the page text. Aggregator and
+  social hosts are never listed; unsafe URLs are never fetched; deadlines in the past
+  are dropped. Finds are stored in D1 and served at `/api/discovered`.
+- **A daily job** (`find-new.yml`, 14:30 UTC) runs eight queries a day through
+  `/api/find-cron`, protected by `CRON_SECRET`.
+- Catalog entries carry the date they were added (`addedAt`), backfilled from git
+  history. Saved web finds work in the tracker, reminders and the digest.
+
+### Database
+
+- Migration `0004_discovery.sql` (additive): `discovered_scholarships`,
+  `user_find_state`, `seen_scholarships`. Apply it before deploying the Functions.
+
 ## 5.3.0 — 2026-11-04
 
 ### Added

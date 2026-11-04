@@ -145,5 +145,82 @@ check("empty string clears the reminder", (await readGates())?.remindOn === '')
 const mine = await call('GET', '/api/saves', { cookie: b })
 check("another account sees none of my saves", mine.json?.saves?.length === 0)
 
+console.log('\n-- find state (first tap, last tap, seen) --')
+for (const [m, p] of [['GET', '/api/find-state'], ['POST', '/api/find-state'], ['POST', '/api/find']]) {
+  const noAuth = await call(m, p, { body: m === 'GET' ? undefined : {} })
+  check(`${m} ${p} without a cookie is 401`, noAuth.status === 401, String(noAuth.status))
+}
+r = await call('GET', '/api/find-state', { cookie: a })
+check('starts empty', r.json?.checkedAt === 0 && r.json?.firstCheckedAt === 0 && r.json?.seenIds?.length === 0, JSON.stringify(r.json))
+const F1 = Date.now() - 500_000
+const F2 = Date.now() - 100_000
+r = await call('POST', '/api/find-state', { cookie: a, body: { firstCheckedAt: F1, checkedAt: F1, seenIds: ['web-aaaa0001', 'pell'] } })
+check('POST stores the first tap and seen ids', r.status === 200, JSON.stringify(r.json))
+r = await call('POST', '/api/find-state', { cookie: a, body: { checkedAt: F2, seenIds: ['web-aaaa0002'] } })
+r = await call('GET', '/api/find-state', { cookie: a })
+check('latest tap moves forward', r.json?.checkedAt === F2, JSON.stringify(r.json))
+check('first tap stays the earliest', r.json?.firstCheckedAt === F1, JSON.stringify(r.json))
+check('seen ids accumulate', r.json?.seenIds?.length === 3, JSON.stringify(r.json))
+r = await call('POST', '/api/find-state', { cookie: a, body: { firstCheckedAt: F2 + 50_000, checkedAt: F1 } })
+r = await call('GET', '/api/find-state', { cookie: a })
+check('an older tap cannot move the latest tap back', r.json?.checkedAt === F2)
+check('a later first tap cannot move the first tap forward', r.json?.firstCheckedAt === F1)
+r = await call('GET', '/api/find-state', { cookie: b })
+check('another account sees none of it', r.json?.checkedAt === 0 && r.json?.seenIds?.length === 0)
+for (const [name, body] of [
+  ['future timestamp', { checkedAt: Date.now() + 5 * 86_400_000 }],
+  ['sql-ish seen id', { seenIds: ["x'; drop table users;--"] }],
+  ['non-array seen ids', { seenIds: 'pell' }],
+]) {
+  const bad = await call('POST', '/api/find-state', { cookie: a, body })
+  check(`rejects ${name}`, bad.status === 400, String(bad.status))
+}
+
+console.log('\n-- discovered awards and the finder endpoints --')
+r = await call('GET', '/api/discovered')
+check('discovered list is public and well formed', r.status === 200 && Array.isArray(r.json?.items), JSON.stringify(r.json)?.slice(0, 80))
+const goodProfile = { major: 'nursing', state: 'any', level: 'undergrad', identity: 'any', need: 'any' }
+for (const [name, body] of [
+  ['bad variant', { profile: goodProfile, variant: 2 }],
+  ['missing profile', { variant: 0 }],
+  ['oversize profile field', { profile: { ...goodProfile, major: 'x'.repeat(65) }, variant: 0 }],
+]) {
+  const bad = await call('POST', '/api/find', { cookie: a, body })
+  check(`find rejects ${name}`, bad.status === 400, String(bad.status))
+}
+const cronQuery = 'undergraduate nursing scholarship application official'
+r = await call('POST', '/api/find-cron', { body: { query: cronQuery } })
+check('find-cron with no secret is 403', r.status === 403, String(r.status))
+r = await call('POST', '/api/find-cron', { body: { query: cronQuery }, cookie: a })
+check('a user session is not a cron secret', r.status === 403)
+const wrong = await fetch(BASE + '/api/find-cron', {
+  method: 'POST',
+  headers: { 'Content-Type': 'application/json', 'X-Cron-Secret': 'wrong-secret-wrong-secret-wrong' },
+  body: JSON.stringify({ query: cronQuery }),
+})
+check('find-cron with a wrong secret is 403', wrong.status === 403, String(wrong.status))
+if (process.env.CRON_SECRET) {
+  const cronCall = (query) =>
+    fetch(BASE + '/api/find-cron', {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json', 'X-Cron-Secret': process.env.CRON_SECRET },
+      body: JSON.stringify({ query }),
+    })
+  const short = await cronCall('x')
+  check('find-cron validates the body even with the right secret', short.status === 400, String(short.status))
+  const real = await cronCall(cronQuery)
+  const body = await real.json().catch(() => null)
+  check('find-cron with the right secret runs a real search pass', real.status === 200 && typeof body?.searched === 'number', JSON.stringify(body)?.slice(0, 160))
+  // The keyless provider is rate limited by its host after many requests, so "no results" is an
+  // external condition. What must hold is that it is reported, not hidden.
+  const gotResults = !!body?.provider && body.provider !== 'none'
+  check(
+    gotResults ? 'the real search returned results from some provider' : 'an empty search is reported with its reason',
+    gotResults || (Array.isArray(body?.errors) && body.errors.length > 0),
+    JSON.stringify(body)?.slice(0, 160),
+  )
+  if (!gotResults) console.log('  note: no provider returned results this time (' + JSON.stringify(body?.errors) + ')')
+}
+
 console.log(`\n${fail === 0 ? 'ALL CLEAN' : fail + ' FAILURES'} (${pass} passed)`)
 process.exit(fail === 0 ? 0 : 1)

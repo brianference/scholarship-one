@@ -3,7 +3,7 @@
  */
 import { Link, useNavigate } from 'react-router-dom'
 import { WeeklyDigestPanel } from '../components/WeeklyDigest'
-import { CATALOG } from '../data/catalog'
+import { allAwards } from '../lib/awards'
 import { useScholarship } from '../state/ScholarshipContext'
 import { useMeta } from '../lib/seo'
 
@@ -23,7 +23,7 @@ export function DigestPage() {
         <Link to="/matches">Matches</Link> · <Link to="/results">Results</Link> · Deadlines
       </p>
       <WeeklyDigestPanel
-        catalog={CATALOG}
+        catalog={allAwards()}
         savedIds={shortlist}
         onFocusSaved={() => {
           setOnlyShort(true)

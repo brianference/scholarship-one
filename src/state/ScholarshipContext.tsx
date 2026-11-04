@@ -49,6 +49,27 @@ import type { EssayFilter, SortMode, UrgencyFilter } from '../features/matcher/M
 import { categoryCounts, queryCatalog } from '../lib/catalogQuery'
 import { CATALOG } from '../data/catalog'
 import { urgency } from '../lib/urgency'
+import { addedAtMs, allAwards, discoveredAwards, findAward, registerDiscovered } from '../lib/awards'
+import { ApiError, getDiscovered, runFind } from '../lib/accountApi'
+import {
+  countAddedSince,
+  loadFindState,
+  saveFindState,
+  selectNewForYou,
+  type FindState,
+} from '../lib/newForYou'
+import type { RankedRow } from '../lib/catalogQuery'
+
+/** What a tap on Find new scholarships found, for the message under the button. */
+export type FindSummary = {
+  /** True when this was the first tap, so the baseline was just set. */
+  firstTime: boolean
+  /** Awards added since the previous tap that are still unseen. */
+  added: number
+  /** Web finds this tap verified and stored. */
+  webAdded: number
+  errors: string[]
+}
 
 export type ScholarshipContextValue = {
   // profile + lists
@@ -66,6 +87,18 @@ export type ScholarshipContextValue = {
   remindMap: RemindMap
   /** Epoch ms of the last local profile edit (0 = never edited on this device). */
   profileUpdatedAt: number
+  /** Find-new state: first tap, latest tap, and awards already looked at. */
+  findState: FindState
+  /** Awards added since the first tap that the student has not opened, saved or hidden. */
+  newRows: RankedRow[]
+  /** True while a Find new scholarships pass is running. */
+  finding: boolean
+  /** Run a pass: web search (signed in only) then record the check. Resolves with a summary. */
+  findNew: (opts: { searchWeb: boolean }) => Promise<FindSummary>
+  /** Drop the New badge from one award (opened, saved or hidden). */
+  markSeen: (id: string) => void
+  /** Replace the find state with the sign-in merge of device and account. */
+  applyFindStateMerge: (next: FindState) => void
 
   // list UI filters
   listFilter: string
@@ -182,6 +215,11 @@ export function ScholarshipProvider({ children }: { children: ReactNode }) {
     setProfileUpdatedAt(Date.now())
   }, [])
   const [hidden, setHidden] = useState<string[]>(loadHidden)
+  const [discovered, setDiscovered] = useState<readonly unknown[]>(() => discoveredAwards())
+  const [findState, setFindStateRaw] = useState<FindState>(loadFindState)
+  const findStateRef = useRef(findState)
+  findStateRef.current = findState
+  const [finding, setFinding] = useState(false)
   const [remindMap, setRemindMap] = useState<RemindMap>(loadReminders)
   const [shortlist, setShortlist] = useState<string[]>(loadShortlist)
   const shortlistRef = useRef(shortlist)
@@ -218,6 +256,22 @@ export function ScholarshipProvider({ children }: { children: ReactNode }) {
     saveHidden(hidden)
   }, [hidden])
   useEffect(() => {
+    saveFindState(findState)
+  }, [findState])
+  useEffect(() => {
+    let alive = true
+    getDiscovered()
+      .then((r) => {
+        if (alive) setDiscovered(registerDiscovered(r.items))
+      })
+      .catch(() => {
+        /* offline or not deployed yet: the cached finds stay */
+      })
+    return () => {
+      alive = false
+    }
+  }, [])
+  useEffect(() => {
     saveReminders(remindMap)
   }, [remindMap])
   useEffect(() => {
@@ -253,6 +307,7 @@ export function ScholarshipProvider({ children }: { children: ReactNode }) {
         essayFilter,
       }).filter((row) => !hiddenSet.has(row.id)),
     [
+      discovered,
       hiddenSet,
       profile,
       listFilter,
@@ -282,12 +337,12 @@ export function ScholarshipProvider({ children }: { children: ReactNode }) {
   const dueSoonSaved = useMemo(
     () =>
       shortlist.filter((id) => {
-        const item = CATALOG.find((c) => c.id === id)
+        const item = findAward(id)
         if (!item) return false
         const u = urgency(item.deadline)
         return u.tone === 'chip-warn' || u.tone === 'chip-ok'
       }).length,
-    [shortlist],
+    [shortlist, discovered],
   )
 
   const inProgressCount = useMemo(
@@ -303,7 +358,7 @@ export function ScholarshipProvider({ children }: { children: ReactNode }) {
     () =>
       shortlist
         .map((id) => {
-          const item = CATALOG.find((c) => c.id === id)
+          const item = findAward(id)
           if (!item) return null
           return {
             id: item.id,
@@ -315,7 +370,7 @@ export function ScholarshipProvider({ children }: { children: ReactNode }) {
           }
         })
         .filter((x): x is NonNullable<typeof x> => Boolean(x)),
-    [shortlist, applyMap],
+    [shortlist, applyMap, discovered],
   )
 
   const clearFilters = useCallback(() => {
@@ -418,6 +473,17 @@ export function ScholarshipProvider({ children }: { children: ReactNode }) {
     [navigate],
   )
 
+  /** An award stops being New once it is opened, saved, hidden or given a reminder. */
+  const markSeen = useCallback((id: string) => {
+    setFindStateRaw((s) => {
+      if (!s.firstCheckedAt || s.seenIds.includes(id)) return s
+      const award = findAward(id)
+      // Only awards that could be New need remembering; this keeps the list from growing with every tap.
+      if (!award || addedAtMs(award) <= s.firstCheckedAt) return s
+      return { ...s, seenIds: [...s.seenIds, id] }
+    })
+  }, [])
+
   const toggleSave = useCallback((id: string) => {
     // Read synchronously: inside a state updater the ref could already be the next value.
     const wasSaved = shortlistRef.current.includes(id)
@@ -428,13 +494,15 @@ export function ScholarshipProvider({ children }: { children: ReactNode }) {
     })
     // The server deletes an unsaved row (and its reminder), so drop the local date too.
     if (wasSaved) setRemindMap((m) => setReminderFor(m, id, null))
-  }, [])
+    else markSeen(id)
+  }, [markSeen])
 
   const hideScholarship = useCallback((id: string) => {
+    markSeen(id)
     setHidden((prev) => (prev.includes(id) ? prev : [id, ...prev]))
     setCompareIds((prev) => prev.filter((x) => x !== id))
     track({ type: 'hide', id, at: Date.now() })
-  }, [])
+  }, [markSeen])
 
   const unhideScholarship = useCallback((id: string) => {
     setHidden((prev) => prev.filter((x) => x !== id))
@@ -442,6 +510,7 @@ export function ScholarshipProvider({ children }: { children: ReactNode }) {
   }, [])
 
   const setReminder = useCallback((id: string, date: string | null) => {
+    if (date) markSeen(id)
     setRemindMap((m) => setReminderFor(m, id, date))
     // A reminder lives on the saved row, so setting one saves the award too.
     if (date && !shortlistRef.current.includes(id)) {
@@ -449,7 +518,58 @@ export function ScholarshipProvider({ children }: { children: ReactNode }) {
       track({ type: 'save', id, at: Date.now() })
     }
     track({ type: date ? 'remind_set' : 'remind_clear', id, at: Date.now() })
-  }, [])
+  }, [markSeen])
+
+  const newRows = useMemo(
+    () => selectNewForYou(allAwards(), profile, findState, hiddenSet),
+    // discovered is a dependency because allAwards() changes when the finds do.
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+    [profile, findState, hiddenSet, discovered],
+  )
+
+  const findNew = useCallback(
+    async (opts: { searchWeb: boolean }): Promise<FindSummary> => {
+      setFinding(true)
+      // The baseline is the START of the first tap, so awards this very pass verifies are New.
+      const startedAt = Date.now()
+      const previous = findStateRef.current.checkedAt
+      const errors: string[] = []
+      let webAdded = 0
+      try {
+        if (opts.searchWeb) {
+          for (const variant of [0, 1] as const) {
+            try {
+              const run = await runFind(profile, variant)
+              webAdded += run.added.length
+              errors.push(...run.errors)
+            } catch (err) {
+              errors.push(err instanceof Error ? err.message : 'The search failed.')
+              // Rate limited: a second request would be refused too.
+              if (err instanceof ApiError && err.status === 429) break
+            }
+          }
+          try {
+            setDiscovered(registerDiscovered((await getDiscovered()).items))
+          } catch {
+            /* keep the cached finds */
+          }
+        }
+        setFindStateRaw((s) => ({ ...s, firstCheckedAt: s.firstCheckedAt || startedAt, checkedAt: Date.now() }))
+      } finally {
+        setFinding(false)
+      }
+      const seen = new Set(findStateRef.current.seenIds)
+      return {
+        firstTime: previous === 0,
+        added: previous === 0 ? webAdded : countAddedSince(allAwards(), previous, seen),
+        webAdded,
+        errors,
+      }
+    },
+    [profile],
+  )
+
+  const applyFindStateMerge = useCallback((next: FindState) => setFindStateRaw(next), [])
 
   const applyAccountMerge = useCallback<ScholarshipContextValue['applyAccountMerge']>(
     (merge) => {
@@ -499,6 +619,12 @@ export function ScholarshipProvider({ children }: { children: ReactNode }) {
     hidden,
     remindMap,
     profileUpdatedAt,
+    findState,
+    newRows,
+    finding,
+    findNew,
+    markSeen,
+    applyFindStateMerge,
     listFilter,
     setListFilter,
     categoryId,

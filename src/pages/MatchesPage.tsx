@@ -4,18 +4,20 @@
  * strip, a prominent "Save top 3" CTA, and compact Top-matches rows that expand to the
  * full action card. Ranking: score × urgency, demote irrelevant state grants.
  */
-import { useMemo, useState } from 'react'
+import { useEffect, useMemo, useState } from 'react'
 import { Link } from 'react-router-dom'
 import { PageAiActions } from '../components/PageAiActions'
 import { ComparePanel, type CompareRow } from '../components/ComparePanel'
 import { ScholarshipCard } from '../features/matcher/ScholarshipCard'
 import { RowActions } from '../features/matcher/RowActions'
-import { CATALOG } from '../data/catalog'
+import { findAward } from '../lib/awards'
 import { useToast } from '../components/ui/Toast'
 import { formatRemindOn } from '../lib/reminders'
 import { iconForTags, MatchRing } from '../features/matcher/cardVisuals'
 import { downloadIcs } from '../lib/exportTools'
 import { selectTopMatches } from '../lib/matchRanking'
+import type { RankedRow } from '../lib/catalogQuery'
+import { FindNewPanel } from '../features/matcher/FindNewPanel'
 import { urgency } from '../lib/urgency'
 import { checklistProgress } from '../lib/checklist'
 import { APPLY_STATUS_LABEL } from '../lib/applyStatus'
@@ -23,6 +25,8 @@ import { profileSummary } from '../lib/profile'
 import { buildSharePack, buildShareUrl } from '../lib/sharePack'
 import { useScholarship } from '../state/ScholarshipContext'
 import { useConfirmedSave } from '../lib/useConfirmedSave'
+import { useAccount } from '../state/account'
+import { SignInModal } from '../components/SignInModal'
 import { useMeta } from '../lib/seo'
 
 type MatchesSort = 'match' | 'deadline' | 'amount'
@@ -63,9 +67,29 @@ export function MatchesPage() {
   const [shareNote, setShareNote] = useState<string | null>(null)
   const [sort, setSort] = useState<MatchesSort>('match')
   const [openId, setOpenId] = useState<string | null>(null)
+  /** A New row the student just opened stays in the New area until they close it, so it does not vanish mid-read. */
+  const [lingerRow, setLingerRow] = useState<RankedRow | null>(null)
   const { notify } = useToast()
+  const account = useAccount()
+  const [signInOpen, setSignInOpen] = useState(false)
 
-  const baseMatches = useMemo(() => selectTopMatches(s.ranked, s.profile, 12), [s.ranked, s.profile])
+  // Once the opened row is closed (or another is opened) it is released from the New area.
+  useEffect(() => {
+    if (lingerRow && openId !== lingerRow.id) setLingerRow(null)
+  }, [openId, lingerRow])
+
+  /** Unseen new awards live in their own area, so they are left out of the main list. */
+  const newIds = useMemo(() => {
+    const ids = new Set(s.newRows.map((r) => r.id))
+    // The row being read in the New area must not also appear in Top matches.
+    if (lingerRow) ids.add(lingerRow.id)
+    return ids
+  }, [s.newRows, lingerRow])
+
+  const baseMatches = useMemo(
+    () => selectTopMatches(s.ranked, s.profile, 12).filter((r) => !newIds.has(r.id)),
+    [s.ranked, s.profile, newIds],
+  )
 
   const matches = useMemo(() => {
     const list = [...baseMatches]
@@ -145,8 +169,8 @@ export function MatchesPage() {
 
   /** Hidden awards that still exist in the catalog, newest hidden first. */
   const hiddenItems = s.hidden
-    .map((id) => CATALOG.find((c) => c.id === id))
-    .filter((c): c is (typeof CATALOG)[number] => Boolean(c))
+    .map((id) => findAward(id))
+    .filter((c): c is NonNullable<ReturnType<typeof findAward>> => Boolean(c))
 
   function compareTop3() {
     s.setCompareSelection(matches.slice(0, 3).map((m) => m.id))
@@ -178,12 +202,123 @@ export function MatchesPage() {
     ['amount', 'Amount'],
   ]
 
+  /** The New area's rows: the unseen ones, plus the one that was just opened (now seen, shown without a badge). */
+  const areaRows = useMemo(
+    () => (lingerRow && !s.newRows.some((r) => r.id === lingerRow.id) ? [...s.newRows, lingerRow] : s.newRows),
+    [s.newRows, lingerRow],
+  )
+
+  /** One match row: lead button, quick actions, and the expanded card. New rows get a badge and tint. */
+  function renderRow(item: RankedRow, index: number, isNew: boolean) {
+    const isOpen = openId === item.id
+    return (
+      <div key={item.id} className={`match-row${isOpen ? ' is-open' : ''}${item.pinned ? ' match-row--pinned' : ''}${isNew ? ' match-row--new' : ''}`}>
+        <button
+          type="button"
+          className="match-row__lead"
+          aria-expanded={isOpen}
+          onClick={() => {
+            if (!isOpen) {
+              s.markSeen(item.id)
+              if (isNew) setLingerRow(item)
+            }
+            setOpenId(isOpen ? null : item.id)
+          }}
+        >
+          <span className="card-lead__tile" aria-hidden="true">
+            {iconForTags(item.tags)}
+          </span>
+          <span className="match-row__body">
+            <span className="match-row__name">
+              {isNew ? <span className="match-row__new">New</span> : null}
+              {item.pinned ? <span className="match-row__pin">Suggested</span> : null}
+              {item.name}
+            </span>
+            <span className="match-row__sub">
+              {item.amount} · {dueShort(item.deadline)}
+              {item.id.startsWith('web-') ? ' · web find' : ''}
+            </span>
+          </span>
+          <MatchRing score={item.score} />
+          <span className={`match-row__chev${isOpen ? ' is-open' : ''}`} aria-hidden="true">
+            ⌄
+          </span>
+        </button>
+
+        <RowActions
+          name={item.name}
+          deadline={item.deadline}
+          remindOn={s.remindMap[item.id] || ''}
+          onSetReminder={(date) => setMatchReminder(item, date)}
+          onHide={() => hideMatch(item)}
+        />
+
+        {isOpen ? (
+          <div className="match-row__detail">
+            {item.id.startsWith('web-') ? (
+              <p className="meta web-find-note">
+                Found on the web and checked against the text of its own page. Confirm the amount, deadline and
+                eligibility on the official site before you apply.
+              </p>
+            ) : null}
+            <ScholarshipCard
+              item={item}
+              hideLead
+              saved={s.shortlist.includes(item.id)}
+              onToggleSave={() => requestToggle({ id: item.id, name: item.name })}
+              applyStatus={s.applyMap[item.id] || 'none'}
+              onApplyStatusChange={(status) => s.setApplyStatus(item.id, status)}
+              note={s.notes[item.id] || ''}
+              onNoteChange={(value) => s.setNoteFor(item.id, value)}
+              checklistDone={s.checklist[item.id] || []}
+              onToggleChecklistStep={(stepId) => s.toggleChecklistStep(item.id, stepId)}
+              compareSelected={s.compareIds.includes(item.id)}
+              onToggleCompare={() => s.toggleCompare(item.id)}
+              onOpenOfficial={() => s.markOfficialOpen(item.id)}
+              onAddToCalendar={() => downloadIcs([icsRow(item)], `${item.id}-deadline.ics`)}
+              onAskAi={() =>
+                s.askAi(
+                  `I am looking at match #${index + 1}: "${item.name}" (id ${item.id}, score ${item.score}, ${item.amount}, deadline ${item.deadline}, tags: ${item.tags.join(', ')}). My profile: ${profileBits}. Score parts: ${(item.scoreParts || []).map((p) => `${p.label}+${p.points}`).join(', ')}. Penalties: ${(item.scorePenalties || []).map((p) => `${p.label}${p.points}`).join(', ') || 'none'}.
+Explain fit honestly using only catalog facts. One concrete next step on the official site. If this is a weak match, say so.`,
+                )
+              }
+            />
+          </div>
+        ) : null}
+      </div>
+    )
+  }
+
   return (
     <div className="page-stack">
       {unsaveDialog}
+      {signInOpen ? <SignInModal onClose={() => setSignInOpen(false)} /> : null}
       <p className="meta page-crumb">
         <Link to="/results">Results</Link> · Matches for you
       </p>
+
+      <FindNewPanel
+        finding={s.finding}
+        signedIn={account.status === 'signed-in'}
+        accountsEnabled={account.enabled}
+        checkedAt={s.findState.checkedAt}
+        onFind={() => s.findNew({ searchWeb: account.status === 'signed-in' })}
+        onSignIn={() => setSignInOpen(true)}
+      />
+
+      {areaRows.length > 0 ? (
+        <section className="new-area" aria-labelledby="new-area-heading">
+          <div className="new-area__head">
+            <h2 id="new-area-heading" className="new-area__title">
+              <span className="new-area__pill">New</span> For you ({s.newRows.length})
+            </h2>
+            <p className="meta new-area__hint">Added since you started checking and not opened yet. Open one and the badge goes away.</p>
+          </div>
+          <div className="match-list match-list--new">
+            {areaRows.map((item, index) => renderRow(item, index, !lingerRow || item.id !== lingerRow.id))}
+          </div>
+        </section>
+      ) : null}
 
       <section className="panel matches-hero" aria-labelledby="matches-heading">
         <div className="matches-hero__head">
@@ -290,71 +425,7 @@ export function MatchesPage() {
             </Link>
           </div>
           <div className="match-list">
-            {matches.map((item, index) => {
-              const isOpen = openId === item.id
-              return (
-                <div key={item.id} className={`match-row${isOpen ? ' is-open' : ''}${item.pinned ? ' match-row--pinned' : ''}`}>
-                  <button
-                    type="button"
-                    className="match-row__lead"
-                    aria-expanded={isOpen}
-                    onClick={() => setOpenId(isOpen ? null : item.id)}
-                  >
-                    <span className="card-lead__tile" aria-hidden="true">
-                      {iconForTags(item.tags)}
-                    </span>
-                    <span className="match-row__body">
-                      <span className="match-row__name">
-                        {item.pinned ? <span className="match-row__pin">Suggested</span> : null}
-                        {item.name}
-                      </span>
-                      <span className="match-row__sub">
-                        {item.amount} · {dueShort(item.deadline)}
-                      </span>
-                    </span>
-                    <MatchRing score={item.score} />
-                    <span className={`match-row__chev${isOpen ? ' is-open' : ''}`} aria-hidden="true">
-                      ⌄
-                    </span>
-                  </button>
-
-                  <RowActions
-                    name={item.name}
-                    deadline={item.deadline}
-                    remindOn={s.remindMap[item.id] || ''}
-                    onSetReminder={(date) => setMatchReminder(item, date)}
-                    onHide={() => hideMatch(item)}
-                  />
-
-                  {isOpen ? (
-                    <div className="match-row__detail">
-                      <ScholarshipCard
-                        item={item}
-                        hideLead
-                        saved={s.shortlist.includes(item.id)}
-                        onToggleSave={() => requestToggle({ id: item.id, name: item.name })}
-                        applyStatus={s.applyMap[item.id] || 'none'}
-                        onApplyStatusChange={(status) => s.setApplyStatus(item.id, status)}
-                        note={s.notes[item.id] || ''}
-                        onNoteChange={(value) => s.setNoteFor(item.id, value)}
-                        checklistDone={s.checklist[item.id] || []}
-                        onToggleChecklistStep={(stepId) => s.toggleChecklistStep(item.id, stepId)}
-                        compareSelected={s.compareIds.includes(item.id)}
-                        onToggleCompare={() => s.toggleCompare(item.id)}
-                        onOpenOfficial={() => s.markOfficialOpen(item.id)}
-                        onAddToCalendar={() => downloadIcs([icsRow(item)], `${item.id}-deadline.ics`)}
-                        onAskAi={() =>
-                          s.askAi(
-                            `I am looking at match #${index + 1}: "${item.name}" (id ${item.id}, score ${item.score}, ${item.amount}, deadline ${item.deadline}, tags: ${item.tags.join(', ')}). My profile: ${profileBits}. Score parts: ${(item.scoreParts || []).map((p) => `${p.label}+${p.points}`).join(', ')}. Penalties: ${(item.scorePenalties || []).map((p) => `${p.label}${p.points}`).join(', ') || 'none'}.
-Explain fit honestly using only catalog facts. One concrete next step on the official site. If this is a weak match, say so.`,
-                          )
-                        }
-                      />
-                    </div>
-                  ) : null}
-                </div>
-              )
-            })}
+            {matches.map((item, index) => renderRow(item, index, false))}
           </div>
         </section>
       )}

@@ -117,3 +117,29 @@ export const remindOnSchema = z
   .string()
   .trim()
   .refine((v) => v === '' || isRealCalendarDay(v), 'Use a YYYY-MM-DD date.')
+
+/** Body for /api/find: the profile the query is built from, and which of the two searches to run. */
+export const findRequestSchema = z.object({
+  profile: profileSchema.shape.profile,
+  variant: z.union([z.literal(0), z.literal(1)]),
+})
+
+/** Body for /api/find-cron. */
+export const cronBodySchema = z.object({ query: z.string().trim().min(8).max(200) })
+
+/** Body for /api/find-state: both parts optional; ids are catalog or web-find slugs. */
+export const findStateSchema = z.object({
+  firstCheckedAt: z
+    .number()
+    .int()
+    .positive()
+    .refine((v) => v <= Date.now() + 86_400_000, 'Timestamp is in the future.')
+    .optional(),
+  checkedAt: z
+    .number()
+    .int()
+    .positive()
+    .refine((v) => v <= Date.now() + 86_400_000, 'Timestamp is in the future.')
+    .optional(),
+  seenIds: z.array(catalogId).max(1000).optional(),
+})

@@ -2,6 +2,7 @@
 export const CATALOG = [
   {
     id: 'uncf',
+    addedAt: '2026-07-10',
     name: 'UNCF Scholarships',
     amount: 'Varies by award',
     deadline: 'Rolling (check portal)',
@@ -11,6 +12,7 @@ export const CATALOG = [
   },
   {
     id: 'jackie-robinson',
+    addedAt: '2026-07-10',
     name: 'Jackie Robinson Foundation Scholarship',
     amount: 'Up to $30,000 over 4 years + mentoring',
     deadline: '2027-01-09',
@@ -20,6 +22,7 @@ export const CATALOG = [
   },
   {
     id: 'ron-brown',
+    addedAt: '2026-07-10',
     name: 'Ron Brown Scholar Program',
     amount: '$40,000 over 4 years',
     deadline: '2026-11-01',
@@ -29,6 +32,7 @@ export const CATALOG = [
   },
   {
     id: 'ama-foundation',
+    addedAt: '2026-07-10',
     name: 'AMA Foundation Scholarships',
     amount: 'Varies (marketing focus)',
     deadline: '2027-04-15',
@@ -38,6 +42,7 @@ export const CATALOG = [
   },
   {
     id: 'nbmbaa',
+    addedAt: '2026-07-10',
     name: 'National Black MBA Association Scholarships',
     amount: 'Varies by chapter / national',
     deadline: '2027-05-01',
@@ -47,6 +52,7 @@ export const CATALOG = [
   },
   {
     id: 'thurgood',
+    addedAt: '2026-07-10',
     name: 'Thurgood Marshall College Fund Scholarships',
     amount: 'Varies',
     deadline: 'Rolling (portal)',
@@ -56,6 +62,7 @@ export const CATALOG = [
   },
   {
     id: 'aicpa',
+    addedAt: '2026-07-10',
     name: 'AICPA Foundation Scholarships',
     amount: '$5,000–$10,000',
     deadline: '2027-03-15',
@@ -65,6 +72,7 @@ export const CATALOG = [
   },
   {
     id: 'deloitte',
+    addedAt: '2026-07-10',
     name: 'Deloitte Foundation scholarship programs',
     amount: 'Varies (undergrad programs)',
     deadline: '2027-03-01',
@@ -74,6 +82,7 @@ export const CATALOG = [
   },
   {
     id: 'cocacola',
+    addedAt: '2026-07-10',
     name: 'Coca-Cola Scholars Program',
     amount: '$20,000',
     deadline: '2026-10-31',
@@ -83,6 +92,7 @@ export const CATALOG = [
   },
   {
     id: 'gates',
+    addedAt: '2026-07-10',
     name: 'Gates Scholarship',
     amount: 'Full cost of attendance (last-dollar)',
     deadline: '2026-09-15',
@@ -92,6 +102,7 @@ export const CATALOG = [
   },
   {
     id: 'pell',
+    addedAt: '2026-07-10',
     name: 'Federal Pell Grant',
     amount: 'Up to annual federal max',
     deadline: 'FAFSA cycle',
@@ -101,6 +112,7 @@ export const CATALOG = [
   },
   {
     id: 'jack-kent',
+    addedAt: '2026-07-10',
     name: 'Jack Kent Cooke Foundation College Scholarship',
     amount: 'Up to $55,000/year',
     deadline: '2026-11-12',
@@ -110,6 +122,7 @@ export const CATALOG = [
   },
   {
     id: 'hispanic',
+    addedAt: '2026-07-10',
     name: 'Hispanic Scholarship Fund',
     amount: '$500–$5,000',
     deadline: '2027-02-15',
@@ -119,6 +132,7 @@ export const CATALOG = [
   },
   {
     id: 'fastweb-note',
+    addedAt: '2026-07-10',
     name: 'FAFSA (free application hub)',
     amount: 'Unlocks federal aid',
     deadline: 'State & federal deadlines vary',
@@ -129,6 +143,7 @@ export const CATALOG = [
   // --- STEM ---
   {
     id: 'smart-scholarship',
+    addedAt: '2026-07-10',
     name: 'DoD SMART Scholarship',
     amount: 'Full tuition + stipend (service commitment)',
     deadline: '2026-12-01',
@@ -138,6 +153,7 @@ export const CATALOG = [
   },
   {
     id: 'goldwater',
+    addedAt: '2026-07-10',
     name: 'Barry Goldwater Scholarship',
     amount: 'Up to $7,500/year',
     deadline: '2027-01-31',
@@ -147,6 +163,7 @@ export const CATALOG = [
   },
   {
     id: 'swe-scholarships',
+    addedAt: '2026-07-10',
     name: 'Society of Women Engineers Scholarships',
     amount: 'Varies by award',
     deadline: '2027-02-01',
@@ -156,6 +173,7 @@ export const CATALOG = [
   },
   {
     id: 'nsbe-scholarships',
+    addedAt: '2026-07-10',
     name: 'NSBE Scholarships',
     amount: 'Varies by award',
     deadline: 'Rolling (check portal)',
@@ -165,6 +183,7 @@ export const CATALOG = [
   },
   {
     id: 'shpe-scholarships',
+    addedAt: '2026-07-10',
     name: 'SHPE Scholarships',
     amount: 'Varies by award',
     deadline: '2027-04-30',
@@ -174,6 +193,7 @@ export const CATALOG = [
   },
   {
     id: 'generation-google',
+    addedAt: '2026-07-10',
     name: 'Generation Google Scholarship',
     amount: '$10,000 (US)',
     deadline: '2027-05-15',
@@ -184,6 +204,7 @@ export const CATALOG = [
   // --- Nursing ---
   {
     id: 'nurse-corps',
+    addedAt: '2026-07-10',
     name: 'NURSE Corps Scholarship Program',
     amount: 'Tuition + fees + stipend (service commitment)',
     deadline: '2027-05-01',
@@ -193,6 +214,7 @@ export const CATALOG = [
   },
   {
     id: 'aacn-nursing',
+    addedAt: '2026-07-10',
     name: 'AACN Nursing Scholarships & Funding',
     amount: 'Varies by partner award',
     deadline: 'Rolling (check portal)',
@@ -202,6 +224,7 @@ export const CATALOG = [
   },
   {
     id: 'nbna-scholarships',
+    addedAt: '2026-07-10',
     name: 'National Black Nurses Association Scholarships',
     amount: 'Varies by award',
     deadline: '2027-04-15',
@@ -211,6 +234,7 @@ export const CATALOG = [
   },
   {
     id: 'aftercollege-aacn',
+    addedAt: '2026-07-10',
     name: 'AfterCollege–AACN Scholarship Fund',
     amount: '$2,500',
     deadline: '2027-03-31',
@@ -221,6 +245,7 @@ export const CATALOG = [
   // --- Hispanic / Latina + sports / women athletics ---
   {
     id: 'lulac-scholarship',
+    addedAt: '2026-07-10',
     name: 'LULAC National Scholarship Fund',
     amount: 'Varies by local council',
     deadline: '2027-03-31',
@@ -230,6 +255,7 @@ export const CATALOG = [
   },
   {
     id: 'hsf-athletes',
+    addedAt: '2026-07-10',
     name: 'Hispanic Scholarship Fund (all majors, incl. student-athletes)',
     amount: '$500–$5,000',
     deadline: '2027-02-15',
@@ -239,6 +265,7 @@ export const CATALOG = [
   },
   {
     id: 'wsf-grants',
+    addedAt: '2026-07-10',
     name: 'Women’s Sports Foundation Grants & Awards',
     amount: 'Varies by fund',
     deadline: 'Rolling (check portal)',
@@ -248,6 +275,7 @@ export const CATALOG = [
   },
   {
     id: 'ncaa-postgrad',
+    addedAt: '2026-07-10',
     name: 'NCAA Postgraduate Scholarship',
     amount: '$10,000',
     deadline: '2027-01-15',
@@ -257,6 +285,7 @@ export const CATALOG = [
   },
   {
     id: 'la-raza-scholarships',
+    addedAt: '2026-07-10',
     name: 'UnidosUS (formerly NCLR) Scholarships',
     amount: 'Varies by partner program',
     deadline: 'Rolling (check portal)',
@@ -267,6 +296,7 @@ export const CATALOG = [
   // --- Disability / accessibility ---
   {
     id: 'google-lime',
+    addedAt: '2026-07-10',
     name: 'Google Lime Scholarship',
     amount: '$10,000 (US)',
     deadline: '2027-04-30',
@@ -288,6 +318,7 @@ export const CATALOG = [
   },
   {
     id: 'microsoft-disability',
+    addedAt: '2026-07-10',
     name: 'Microsoft Disability Scholarship',
     amount: 'Up to $20,000 over 4 years',
     deadline: '2027-03-15',
@@ -307,6 +338,7 @@ export const CATALOG = [
   },
   {
     id: 'aahd-krause',
+    addedAt: '2026-07-10',
     name: 'AAHD Frederick J. Krause Scholarship on Health and Disability',
     amount: '$1,000',
     deadline: '2027-03-01',
@@ -317,6 +349,7 @@ export const CATALOG = [
   },
   {
     id: 'incight-scholarship',
+    addedAt: '2026-07-10',
     name: 'Incight Scholarship',
     amount: 'Varies',
     deadline: '2027-04-01',
@@ -326,6 +359,7 @@ export const CATALOG = [
   },
   {
     id: 'nfb-scholarship',
+    addedAt: '2026-07-10',
     name: 'National Federation of the Blind Scholarships',
     amount: '$3,000–$12,000',
     deadline: '2027-03-31',
@@ -336,6 +370,7 @@ export const CATALOG = [
   // --- Broader coverage: first-gen, community college, arts, military, APIA, LGBTQ ---
   {
     id: 'dell-scholars',
+    addedAt: '2026-07-10',
     name: 'Dell Scholars Program',
     amount: '$20,000 + laptop + support',
     deadline: '2026-12-01',
@@ -345,6 +380,7 @@ export const CATALOG = [
   },
   {
     id: 'horatio-alger',
+    addedAt: '2026-07-10',
     name: 'Horatio Alger Scholarship Programs',
     amount: 'Up to $25,000',
     deadline: '2026-10-25',
@@ -354,6 +390,7 @@ export const CATALOG = [
   },
   {
     id: 'apia-scholarship',
+    addedAt: '2026-07-10',
     name: 'APIA Scholarship Program',
     amount: '$2,500–$20,000',
     deadline: '2027-01-14',
@@ -363,6 +400,7 @@ export const CATALOG = [
   },
   {
     id: 'point-foundation',
+    addedAt: '2026-07-10',
     name: 'Point Foundation Scholarships',
     amount: 'Varies (tuition support + mentoring)',
     deadline: '2027-01-27',
@@ -372,6 +410,7 @@ export const CATALOG = [
   },
   {
     id: 'aauw-fellowships',
+    addedAt: '2026-07-10',
     name: 'AAUW Fellowships and Grants',
     amount: 'Varies by program',
     deadline: 'Rolling (check portal)',
@@ -381,6 +420,7 @@ export const CATALOG = [
   },
   {
     id: 'elks-mvs',
+    addedAt: '2026-07-10',
     name: 'Elks Most Valuable Student Scholarship',
     amount: 'Up to $50,000 over 4 years',
     deadline: '2026-11-12',
@@ -390,6 +430,7 @@ export const CATALOG = [
   },
   {
     id: 'burger-king-scholars',
+    addedAt: '2026-07-10',
     name: 'Burger King Scholars Program',
     amount: '$1,000–$60,000',
     deadline: '2026-12-15',
@@ -399,6 +440,7 @@ export const CATALOG = [
   },
   {
     id: 'jack-kent-transfer',
+    addedAt: '2026-07-10',
     name: 'Jack Kent Cooke Undergraduate Transfer Scholarship',
     amount: 'Up to $55,000/year',
     deadline: '2027-01-08',
@@ -408,6 +450,7 @@ export const CATALOG = [
   },
   {
     id: 'acs-scholars',
+    addedAt: '2026-07-10',
     name: 'ACS Scholars Program',
     amount: 'Up to $5,000/year',
     deadline: '2027-03-01',
@@ -417,6 +460,7 @@ export const CATALOG = [
   },
   {
     id: 'nmfa-military',
+    addedAt: '2026-07-10',
     name: 'National Military Family Association Scholarships',
     amount: 'Varies by program',
     deadline: 'Rolling (check portal)',
@@ -426,6 +470,7 @@ export const CATALOG = [
   },
   {
     id: 'dream-us',
+    addedAt: '2026-07-10',
     name: "TheDream.US National Scholarship",
     amount: 'Up to full tuition at partner colleges',
     deadline: '2027-02-28',
@@ -435,6 +480,7 @@ export const CATALOG = [
   },
   {
     id: 'united-negro-college',
+    addedAt: '2026-07-10',
     name: 'UNCF Special Programs (STEM & career tracks)',
     amount: 'Varies by corporate partner',
     deadline: 'Rolling (check portal)',
@@ -445,6 +491,7 @@ export const CATALOG = [
   // --- State / regional awards ---
   {
     id: 'cal-grant',
+    addedAt: '2026-07-10',
     name: 'California Cal Grant',
     amount: 'Tuition support (varies by award type)',
     deadline: 'FAFSA / CADAA cycle',
@@ -454,6 +501,7 @@ export const CATALOG = [
   },
   {
     id: 'texas-grant',
+    addedAt: '2026-07-10',
     name: 'TEXAS Grant',
     amount: 'Toward tuition at public Texas colleges',
     deadline: 'School priority deadlines vary',
@@ -463,6 +511,7 @@ export const CATALOG = [
   },
   {
     id: 'excelsior-ny',
+    addedAt: '2026-07-10',
     name: 'New York Excelsior Scholarship',
     amount: 'Tuition at CUNY / SUNY (last-dollar)',
     deadline: '2027-07-31',
@@ -472,6 +521,7 @@ export const CATALOG = [
   },
   {
     id: 'bright-futures-fl',
+    addedAt: '2026-07-10',
     name: 'Florida Bright Futures Scholarship',
     amount: 'Varies by award level',
     deadline: '2027-08-31',
@@ -481,6 +531,7 @@ export const CATALOG = [
   },
   {
     id: 'illinois-map',
+    addedAt: '2026-07-10',
     name: 'Illinois Monetary Award Program (MAP)',
     amount: 'Need-based grant (varies)',
     deadline: 'FAFSA cycle (priority dates apply)',
@@ -491,6 +542,7 @@ export const CATALOG = [
   // Top-5 state audit companions (CA, TX, FL, NY, IL) — official portals
   {
     id: 'ca-middle-class',
+    addedAt: '2026-07-10',
     name: 'California Middle Class Scholarship',
     amount: 'Tuition support (income-based)',
     deadline: 'FAFSA / CADAA cycle',
@@ -500,6 +552,7 @@ export const CATALOG = [
   },
   {
     id: 'texas-tfg',
+    addedAt: '2026-07-10',
     name: 'Texas Public Educational Grant (TPEG) hub',
     amount: 'Campus need-based (varies)',
     deadline: 'Campus priority deadlines',
@@ -509,6 +562,7 @@ export const CATALOG = [
   },
   {
     id: 'florida-fsag',
+    addedAt: '2026-07-10',
     name: 'Florida Student Assistance Grant (FSAG)',
     amount: 'Need-based (varies by sector)',
     deadline: 'FAFSA cycle (priority dates apply)',
@@ -518,6 +572,7 @@ export const CATALOG = [
   },
   {
     id: 'ny-tap',
+    addedAt: '2026-07-10',
     name: 'New York Tuition Assistance Program (TAP)',
     amount: 'Need-based tuition grant (varies)',
     deadline: 'FAFSA + NYS TAP application cycle',
@@ -527,6 +582,7 @@ export const CATALOG = [
   },
   {
     id: 'illinois-aim-high',
+    addedAt: '2026-07-10',
     name: 'Illinois AIM HIGH Grant',
     amount: 'Merit + need hybrid (campus award)',
     deadline: 'Campus priority deadlines',
@@ -536,6 +592,7 @@ export const CATALOG = [
   },
   {
     id: 'wa-college-grant',
+    addedAt: '2026-07-10',
     name: 'Washington College Grant',
     amount: 'Need-based (up to full tuition at public colleges)',
     deadline: 'FAFSA / WASFA cycle',
@@ -545,6 +602,7 @@ export const CATALOG = [
   },
   {
     id: 'arizona-leap',
+    addedAt: '2026-07-10',
     name: 'Arizona LEAP / state grant hub',
     amount: 'Need-based (campus award)',
     deadline: 'Campus priority deadlines',
@@ -554,6 +612,7 @@ export const CATALOG = [
   },
   {
     id: 'hope-georgia',
+    addedAt: '2026-07-10',
     name: 'Georgia HOPE Scholarship',
     amount: 'Tuition support at eligible Georgia colleges',
     deadline: 'FAFSA recommended annually',
@@ -563,6 +622,7 @@ export const CATALOG = [
   },
   {
     id: 'ohio-ocog',
+    addedAt: '2026-07-10',
     name: 'Ohio College Opportunity Grant (OCOG)',
     amount: 'Need-based grant (varies)',
     deadline: 'FAFSA cycle',
@@ -572,6 +632,7 @@ export const CATALOG = [
   },
   {
     id: 'pa-state-grant',
+    addedAt: '2026-07-10',
     name: 'Pennsylvania State Grant Program',
     amount: 'Need-based (varies)',
     deadline: '2027-05-01',
@@ -581,6 +642,7 @@ export const CATALOG = [
   },
   {
     id: 'massgrant',
+    addedAt: '2026-07-10',
     name: 'Massachusetts MassGrant',
     amount: 'Need-based grant (varies)',
     deadline: 'FAFSA priority dates',
@@ -590,6 +652,7 @@ export const CATALOG = [
   },
   {
     id: 'oregon-opportunity',
+    addedAt: '2026-07-10',
     name: 'Oregon Opportunity Grant',
     amount: 'Need-based (varies)',
     deadline: 'FAFSA / ORSAA cycle',
@@ -599,6 +662,7 @@ export const CATALOG = [
   },
   {
     id: 'michigan-tuition-grant',
+    addedAt: '2026-07-10',
     name: 'Michigan Tuition Grant',
     amount: 'Need-based (private MI colleges)',
     deadline: 'FAFSA cycle',
@@ -608,6 +672,7 @@ export const CATALOG = [
   },
   {
     id: 'colorado-student-grant',
+    addedAt: '2026-07-10',
     name: 'Colorado Student Grant',
     amount: 'Need-based (campus award)',
     deadline: 'Campus priority deadlines',
@@ -617,6 +682,7 @@ export const CATALOG = [
   },
   {
     id: 'nc-need-based',
+    addedAt: '2026-07-10',
     name: 'North Carolina need-based aid hub',
     amount: 'Need-based (varies by program)',
     deadline: 'FAFSA cycle',
@@ -626,6 +692,7 @@ export const CATALOG = [
   },
   {
     id: 'virginia-schev',
+    addedAt: '2026-07-10',
     name: 'Virginia state financial aid (SCHEV)',
     amount: 'Need-based campus awards',
     deadline: 'Campus priority deadlines',
@@ -635,6 +702,7 @@ export const CATALOG = [
   },
   {
     id: 'nj-tag',
+    addedAt: '2026-07-10',
     name: 'New Jersey Tuition Aid Grant (TAG)',
     amount: 'Need-based (varies)',
     deadline: 'FAFSA / NJFAMS deadlines',
@@ -644,6 +712,7 @@ export const CATALOG = [
   },
   {
     id: 'minnesota-state-grant',
+    addedAt: '2026-07-10',
     name: 'Minnesota State Grant',
     amount: 'Need-based (varies)',
     deadline: 'FAFSA within 30 days of term start',
@@ -654,6 +723,7 @@ export const CATALOG = [
   // --- Accounting / women-in-profession / Big 4 / portals (from scholarship-hunt approaches) ---
   {
     id: 'ascpa-women',
+    addedAt: '2026-07-15',
     name: 'Arizona Society of CPAs Women’s Scholarship',
     amount: 'About $5,000 (varies by year)',
     deadline: '2027-03-15',
@@ -664,6 +734,7 @@ export const CATALOG = [
   },
   {
     id: 'efwa-women-accounting',
+    addedAt: '2026-07-15',
     name: 'Educational Foundation for Women in Accounting (EFWA)',
     amount: 'Varies by award',
     deadline: 'Rolling (check portal)',
@@ -673,6 +744,7 @@ export const CATALOG = [
   },
   {
     id: 'pwc-scholarships',
+    addedAt: '2026-07-15',
     name: 'PwC scholarships & campus programs',
     amount: '$2,500–$10,000 (program-dependent)',
     deadline: 'Rolling (campus / careers portal)',
@@ -682,6 +754,7 @@ export const CATALOG = [
   },
   {
     id: 'ey-access-potential',
+    addedAt: '2026-07-15',
     name: 'EY Access Your Potential / campus scholarships',
     amount: 'Varies (often includes internship pipeline)',
     deadline: 'Rolling (check EY careers)',
@@ -691,6 +764,7 @@ export const CATALOG = [
   },
   {
     id: 'kpmg-future-leaders',
+    addedAt: '2026-07-15',
     name: 'KPMG Future Leaders / campus scholarships',
     amount: 'Up to ~$10,000 (varies by program)',
     deadline: 'Rolling (check KPMG campus)',
@@ -700,6 +774,7 @@ export const CATALOG = [
   },
   {
     id: 'ima-scholarships',
+    addedAt: '2026-07-15',
     name: 'IMA (Institute of Management Accountants) Scholarships',
     amount: 'Varies',
     deadline: '2027-03-01',
@@ -709,6 +784,7 @@ export const CATALOG = [
   },
   {
     id: 'naba-scholarships',
+    addedAt: '2026-07-15',
     name: 'NABA (National Association of Black Accountants) Scholarships',
     amount: 'Varies by chapter / national',
     deadline: 'Rolling (check NABA)',
@@ -718,6 +794,7 @@ export const CATALOG = [
   },
   {
     id: 'acfe-ritchie-jennings',
+    addedAt: '2026-07-15',
     name: 'ACFE Ritchie-Jennings Memorial Scholarship',
     amount: 'Up to $10,000',
     deadline: '2027-02-01',
@@ -727,6 +804,7 @@ export const CATALOG = [
   },
   {
     id: 'beta-alpha-psi',
+    addedAt: '2026-07-15',
     name: 'Beta Alpha Psi chapter scholarships',
     amount: '$500–$3,000 (chapter-dependent)',
     deadline: 'Varies by campus chapter',
@@ -737,6 +815,7 @@ export const CATALOG = [
   },
   {
     id: 'bold-org-portal',
+    addedAt: '2026-07-15',
     name: 'Bold.org scholarship marketplace',
     amount: 'Many $500–$5,000 micro-awards',
     deadline: 'Rolling (hundreds of awards)',
@@ -747,6 +826,7 @@ export const CATALOG = [
   },
   {
     id: 'scholarships-com-portal',
+    addedAt: '2026-07-15',
     name: 'Scholarships.com search hub',
     amount: 'Varies by listing',
     deadline: 'Rolling',
@@ -756,6 +836,7 @@ export const CATALOG = [
   },
   {
     id: 'going-merry-portal',
+    addedAt: '2026-07-15',
     name: 'Going Merry scholarship applications',
     amount: 'Varies',
     deadline: 'Rolling',
@@ -765,6 +846,7 @@ export const CATALOG = [
   },
   {
     id: 'asu-scholarships-office',
+    addedAt: '2026-07-15',
     name: 'ASU / institutional scholarship offices',
     amount: 'Varies (departmental + university)',
     deadline: 'Campus cycles (often spring / fall)',
@@ -776,6 +858,7 @@ export const CATALOG = [
   // --- From lena-scholarships dashboard (accounting-focused list) ---
   {
     id: 'sallie-easy-apply',
+    addedAt: '2026-07-15',
     name: 'Sallie Mae Easy Apply scholarships',
     amount: 'About $2,000 (varies)',
     deadline: '2027-03-31',
@@ -785,6 +868,7 @@ export const CATALOG = [
   },
   {
     id: 'niche-no-essay',
+    addedAt: '2026-07-15',
     name: 'Niche no-essay scholarships',
     amount: 'Up to $25,000 (monthly drawings)',
     deadline: 'Rolling monthly',
@@ -794,6 +878,7 @@ export const CATALOG = [
   },
   {
     id: 'scholarships360-no-essay',
+    addedAt: '2026-07-15',
     name: 'Scholarships360 no-essay awards',
     amount: 'Up to $10,000 (varies by listing)',
     deadline: 'Rolling',
@@ -803,6 +888,7 @@ export const CATALOG = [
   },
   {
     id: 'bold-be-bold',
+    addedAt: '2026-07-15',
     name: 'Bold.org Be Bold / micro-scholarships',
     amount: 'Up to $25,000 (many smaller awards)',
     deadline: 'Rolling (many monthly)',
@@ -812,6 +898,7 @@ export const CATALOG = [
   },
   {
     id: 'arizona-community-foundation',
+    addedAt: '2026-07-15',
     name: 'Arizona Community Foundation scholarships',
     amount: 'Varies (150+ funds)',
     deadline: '2027-03-15',
@@ -821,6 +908,7 @@ export const CATALOG = [
   },
   {
     id: 'forte-future-leaders',
+    addedAt: '2026-07-15',
     name: 'Forté Future Leaders / women in business',
     amount: 'About $5,000 (program-dependent)',
     deadline: '2027-05-01',
@@ -830,6 +918,7 @@ export const CATALOG = [
   },
   {
     id: 'pcaob-scholars',
+    addedAt: '2026-07-15',
     name: 'PCAOB Scholars Program',
     amount: 'About $15,000',
     deadline: '2027-03-01',
@@ -839,6 +928,7 @@ export const CATALOG = [
   },
   {
     id: 'moss-adams-ignite',
+    addedAt: '2026-07-15',
     name: 'Moss Adams Ignite Scholarship',
     amount: 'About $2,500',
     deadline: '2027-03-31',
@@ -848,6 +938,7 @@ export const CATALOG = [
   },
   {
     id: 'afwa-foundation',
+    addedAt: '2026-07-15',
     name: 'AFWA Foundation scholarships',
     amount: 'Varies',
     deadline: '2027-04-15',
@@ -857,6 +948,7 @@ export const CATALOG = [
   },
   {
     id: 'rsm-power-education',
+    addedAt: '2026-07-15',
     name: 'RSM Power Your Education Scholarship',
     amount: 'About $5,000',
     deadline: '2027-04-15',
@@ -866,6 +958,7 @@ export const CATALOG = [
   },
   {
     id: 'rsm-first-gen',
+    addedAt: '2026-07-15',
     name: 'RSM First Generation Scholarship',
     amount: 'About $5,000',
     deadline: '2027-04-15',
@@ -875,6 +968,7 @@ export const CATALOG = [
   },
   {
     id: 'aga-scholarships',
+    addedAt: '2026-07-15',
     name: 'AGA Academic Scholarships',
     amount: 'About $3,000',
     deadline: '2027-03-15',
@@ -884,6 +978,7 @@ export const CATALOG = [
   },
   {
     id: 'gfoa-scholarships',
+    addedAt: '2026-07-15',
     name: 'GFOA Scholarships',
     amount: '$5,000–$30,000 (program-dependent)',
     deadline: '2027-02-28',
@@ -893,6 +988,7 @@ export const CATALOG = [
   },
   {
     id: 'becker-cpa',
+    addedAt: '2026-07-15',
     name: 'Becker CPA scholarships / discounts',
     amount: 'About $2,500 value (varies)',
     deadline: '2027-04-30',
@@ -902,6 +998,7 @@ export const CATALOG = [
   },
   {
     id: 'iia-internal-audit',
+    addedAt: '2026-07-15',
     name: 'IIA Internal Audit Foundation scholarships',
     amount: '$1,000–$5,000',
     deadline: '2027-04-15',
@@ -911,6 +1008,7 @@ export const CATALOG = [
   },
   {
     id: 'nsa-foundation',
+    addedAt: '2026-07-15',
     name: 'NSA Foundation scholarships',
     amount: '$500–$2,500',
     deadline: '2027-03-31',
@@ -920,6 +1018,7 @@ export const CATALOG = [
   },
   {
     id: 'cla-foundation',
+    addedAt: '2026-07-15',
     name: 'CLA Foundation Opportunity Scholarship',
     amount: 'About $3,000',
     deadline: '2027-04-01',
@@ -929,6 +1028,7 @@ export const CATALOG = [
   },
   {
     id: 'larry-ludden',
+    addedAt: '2026-07-15',
     name: 'Larry Ludden Jr. Memorial Scholarship',
     amount: 'About $2,500',
     deadline: '2027-04-15',
@@ -938,6 +1038,7 @@ export const CATALOG = [
   },
   {
     id: 'furst-honors-asu',
+    addedAt: '2026-07-15',
     name: 'Furst Honors Scholarship (ASU W. P. Carey)',
     amount: 'About $10,000',
     deadline: '2027-02-01',
@@ -947,6 +1048,7 @@ export const CATALOG = [
   },
   {
     id: 'alpfa-scholarships',
+    addedAt: '2026-07-15',
     name: 'ALPFA Scholarships',
     amount: 'Varies',
     deadline: '2027-04-15',
@@ -956,6 +1058,7 @@ export const CATALOG = [
   },
   {
     id: 'ascend-leadership',
+    addedAt: '2026-07-15',
     name: 'Ascend Leadership scholarships',
     amount: 'About $2,500',
     deadline: '2027-04-30',
@@ -969,6 +1072,7 @@ export const CATALOG = [
   // --- STEM pack ---
   {
     id: 'nasa-space-grant',
+    addedAt: '2026-07-15',
     name: 'NASA Space Grant Consortium scholarships',
     amount: 'Varies by state consortium',
     deadline: 'Rolling (state consortiums)',
@@ -978,6 +1082,7 @@ export const CATALOG = [
   },
   {
     id: 'nsf-s-stem',
+    addedAt: '2026-07-15',
     name: 'NSF S-STEM campus scholarships',
     amount: 'Varies by campus grant',
     deadline: 'Campus-specific',
@@ -987,6 +1092,7 @@ export const CATALOG = [
   },
   {
     id: 'microsoft-scholarship',
+    addedAt: '2026-07-15',
     name: 'Microsoft disability / diversity STEM scholarships',
     amount: 'Varies by program year',
     deadline: 'Rolling (check Microsoft careers/education)',
@@ -996,6 +1102,7 @@ export const CATALOG = [
   },
   {
     id: 'amazon-future-engineer',
+    addedAt: '2026-07-15',
     name: 'Amazon Future Engineer Scholarship',
     amount: 'Up to $40,000 + internship pathway',
     deadline: '2027-01-31',
@@ -1005,6 +1112,7 @@ export const CATALOG = [
   },
   {
     id: 'actua-scholarship',
+    addedAt: '2026-07-15',
     name: 'ACM / computing society student awards',
     amount: 'Varies',
     deadline: 'Rolling',
@@ -1014,6 +1122,7 @@ export const CATALOG = [
   },
   {
     id: 'ieee-scholarships',
+    addedAt: '2026-07-15',
     name: 'IEEE student scholarships & grants',
     amount: 'Varies by award',
     deadline: 'Rolling (IEEE portal)',
@@ -1023,6 +1132,7 @@ export const CATALOG = [
   },
   {
     id: 'asme-scholarships',
+    addedAt: '2026-07-15',
     name: 'ASME scholarships',
     amount: 'Varies',
     deadline: '2027-03-01',
@@ -1032,6 +1142,7 @@ export const CATALOG = [
   },
   {
     id: 'asce-scholarships',
+    addedAt: '2026-07-15',
     name: 'ASCE student scholarships',
     amount: 'Varies',
     deadline: '2027-02-10',
@@ -1041,6 +1152,7 @@ export const CATALOG = [
   },
   {
     id: 'aiche-scholarships',
+    addedAt: '2026-07-15',
     name: 'AIChE scholarships',
     amount: 'Varies',
     deadline: '2027-06-15',
@@ -1050,6 +1162,7 @@ export const CATALOG = [
   },
   {
     id: 'sae-scholarships',
+    addedAt: '2026-07-15',
     name: 'SAE International scholarships',
     amount: 'Varies',
     deadline: '2027-03-15',
@@ -1059,6 +1172,7 @@ export const CATALOG = [
   },
   {
     id: 'siam-math',
+    addedAt: '2026-07-15',
     name: 'SIAM student support & awards',
     amount: 'Varies',
     deadline: 'Rolling',
@@ -1068,6 +1182,7 @@ export const CATALOG = [
   },
   {
     id: 'maa-math',
+    addedAt: '2026-07-15',
     name: 'MAA math student awards',
     amount: 'Varies',
     deadline: 'Rolling',
@@ -1077,6 +1192,7 @@ export const CATALOG = [
   },
   {
     id: 'afcea-stem',
+    addedAt: '2026-07-15',
     name: 'AFCEA STEM scholarships',
     amount: 'Varies',
     deadline: '2027-04-30',
@@ -1086,6 +1202,7 @@ export const CATALOG = [
   },
   {
     id: 'taulbee-women-cs',
+    addedAt: '2026-07-15',
     name: 'CRA / NCWIT computing awards for women',
     amount: 'Varies by partner',
     deadline: 'Rolling',
@@ -1095,6 +1212,7 @@ export const CATALOG = [
   },
   {
     id: 'out-to-innovate',
+    addedAt: '2026-07-15',
     name: 'Out to Innovate STEM scholarships',
     amount: 'Varies',
     deadline: '2027-06-01',
@@ -1104,6 +1222,7 @@ export const CATALOG = [
   },
   {
     id: 'brown-rudnick-stem',
+    addedAt: '2026-07-15',
     name: 'HENAAC / Great Minds in STEM scholarships',
     amount: 'Varies',
     deadline: '2027-04-30',
@@ -1113,6 +1232,7 @@ export const CATALOG = [
   },
   {
     id: 'unlocking-potential-stem',
+    addedAt: '2026-07-15',
     name: 'SME Education Foundation scholarships',
     amount: 'Varies',
     deadline: '2027-02-01',
@@ -1122,6 +1242,7 @@ export const CATALOG = [
   },
   {
     id: 'tsa-stem',
+    addedAt: '2026-07-15',
     name: 'Technology Student Association scholarships',
     amount: 'Varies',
     deadline: 'Rolling',
@@ -1133,6 +1254,7 @@ export const CATALOG = [
   // --- Nursing / healthcare pack ---
   {
     id: 'nln-foundation',
+    addedAt: '2026-07-15',
     name: 'NLN Foundation nursing scholarships',
     amount: 'Varies',
     deadline: 'Rolling',
@@ -1142,6 +1264,7 @@ export const CATALOG = [
   },
   {
     id: 'nsna-scholarships',
+    addedAt: '2026-07-15',
     name: 'NSNA Foundation scholarships',
     amount: 'Varies',
     deadline: '2027-01-15',
@@ -1151,6 +1274,7 @@ export const CATALOG = [
   },
   {
     id: 'aanp-scholarships',
+    addedAt: '2026-07-15',
     name: 'AANP grants & scholarships',
     amount: 'Varies',
     deadline: 'Rolling',
@@ -1160,6 +1284,7 @@ export const CATALOG = [
   },
   {
     id: 'oncology-nursing',
+    addedAt: '2026-07-15',
     name: 'Oncology Nursing Foundation scholarships',
     amount: 'Varies',
     deadline: '2027-02-01',
@@ -1169,6 +1294,7 @@ export const CATALOG = [
   },
   {
     id: 'tylenol-future-care',
+    addedAt: '2026-07-15',
     name: 'Tylenol Future Care Scholarship',
     amount: 'Up to $10,000',
     deadline: '2027-08-01',
@@ -1178,6 +1304,7 @@ export const CATALOG = [
   },
   {
     id: 'hurst-review',
+    addedAt: '2026-07-15',
     name: 'Hurst Review / nursing NCLEX scholarships',
     amount: 'Varies',
     deadline: 'Rolling',
@@ -1187,6 +1314,7 @@ export const CATALOG = [
   },
   {
     id: 'daughters-american-nursing',
+    addedAt: '2026-07-15',
     name: 'DAR nursing & medical scholarships',
     amount: 'Varies by DAR award',
     deadline: '2027-01-31',
@@ -1196,6 +1324,7 @@ export const CATALOG = [
   },
   {
     id: 'hrsa-nhsc',
+    addedAt: '2026-07-15',
     name: 'NHSC Scholarship Program',
     amount: 'Tuition + stipend (service commitment)',
     deadline: '2027-05-01',
@@ -1205,6 +1334,7 @@ export const CATALOG = [
   },
   {
     id: 'ena-foundation',
+    addedAt: '2026-07-15',
     name: 'ENA Foundation emergency nursing scholarships',
     amount: 'Varies',
     deadline: 'Rolling',
@@ -1214,6 +1344,7 @@ export const CATALOG = [
   },
   {
     id: 'aan-nursing',
+    addedAt: '2026-07-15',
     name: 'American Nurses Foundation scholarships',
     amount: 'Varies',
     deadline: 'Rolling',
@@ -1223,6 +1354,7 @@ export const CATALOG = [
   },
   {
     id: 'march-of-dimes-nursing',
+    addedAt: '2026-07-15',
     name: 'March of Dimes graduate nursing scholarships',
     amount: 'Varies',
     deadline: 'Rolling',
@@ -1232,6 +1364,7 @@ export const CATALOG = [
   },
   {
     id: 'minority-nurse',
+    addedAt: '2026-07-15',
     name: 'MinorityNurse.com scholarship listings',
     amount: 'Varies by partner',
     deadline: 'Rolling',
@@ -1241,6 +1374,7 @@ export const CATALOG = [
   },
   {
     id: 'nurses-educational-funds',
+    addedAt: '2026-07-15',
     name: 'Nurses Educational Funds (NEF)',
     amount: 'Varies',
     deadline: '2027-02-01',
@@ -1250,6 +1384,7 @@ export const CATALOG = [
   },
   {
     id: 'fnf-nursing',
+    addedAt: '2026-07-15',
     name: 'Foundation of the National Student Nurses Association partners',
     amount: 'Varies',
     deadline: 'Rolling',
@@ -1261,6 +1396,7 @@ export const CATALOG = [
   // --- Sports / athletics pack ---
   {
     id: 'ncaa-eligibility-center',
+    addedAt: '2026-07-15',
     name: 'NCAA college-bound athlete resources',
     amount: 'Athletic aid via institutions',
     deadline: 'Rolling (eligibility center)',
@@ -1270,6 +1406,7 @@ export const CATALOG = [
   },
   {
     id: 'naia-scholarships',
+    addedAt: '2026-07-15',
     name: 'NAIA athletic & academic awards',
     amount: 'Varies by campus',
     deadline: 'Rolling',
@@ -1279,6 +1416,7 @@ export const CATALOG = [
   },
   {
     id: 'njcaa-athletics',
+    addedAt: '2026-07-15',
     name: 'NJCAA community college athletics aid',
     amount: 'Varies by campus',
     deadline: 'Rolling',
@@ -1288,6 +1426,7 @@ export const CATALOG = [
   },
   {
     id: 'wrestler-scholarships',
+    addedAt: '2026-07-15',
     name: 'National Wrestling Coaches Association awards',
     amount: 'Varies',
     deadline: 'Rolling',
@@ -1297,6 +1436,7 @@ export const CATALOG = [
   },
   {
     id: 'usga-caddie',
+    addedAt: '2026-07-15',
     name: 'USGA / Evans Scholars (caddie) path',
     amount: 'Full tuition (Evans) / USGA awards vary',
     deadline: '2026-10-31',
@@ -1306,6 +1446,7 @@ export const CATALOG = [
   },
   {
     id: 'special-olympics-athlete',
+    addedAt: '2026-07-15',
     name: 'Special Olympics athlete leadership scholarships',
     amount: 'Varies by program',
     deadline: 'Rolling',
@@ -1315,6 +1456,7 @@ export const CATALOG = [
   },
   {
     id: 'women-sports-foundation-travel',
+    addedAt: '2026-07-15',
     name: 'Women’s Sports Foundation Travel & Training Fund',
     amount: 'Varies by fund',
     deadline: 'Rolling',
@@ -1324,6 +1466,7 @@ export const CATALOG = [
   },
   {
     id: 'ncaa-ethnic-minority',
+    addedAt: '2026-07-15',
     name: 'NCAA Ethnic Minority and Women’s Enhancement',
     amount: 'Varies',
     deadline: '2027-02-15',
@@ -1333,6 +1476,7 @@ export const CATALOG = [
   },
   {
     id: 'csf-college-sports',
+    addedAt: '2026-07-15',
     name: 'College Sports Communicators / SID scholarships',
     amount: 'Varies',
     deadline: 'Rolling',
@@ -1342,6 +1486,7 @@ export const CATALOG = [
   },
   {
     id: 'play-like-girl',
+    addedAt: '2026-07-15',
     name: 'Girls in sports foundation awards',
     amount: 'Varies',
     deadline: 'Rolling',
@@ -1351,6 +1496,7 @@ export const CATALOG = [
   },
   {
     id: 'adaptive-sports-usa',
+    addedAt: '2026-07-15',
     name: 'Adaptive Sports USA / paralympic pathways',
     amount: 'Varies by org',
     deadline: 'Rolling',
@@ -1360,6 +1506,7 @@ export const CATALOG = [
   },
   {
     id: 'athlete-network',
+    addedAt: '2026-07-15',
     name: 'Athlete Network / former athlete scholarships',
     amount: 'Varies',
     deadline: 'Rolling',
@@ -1371,6 +1518,7 @@ export const CATALOG = [
   // --- Disability pack ---
   {
     id: 'disaboom-scholarships',
+    addedAt: '2026-07-15',
     name: 'Disability scholarship directories (ULS / partners)',
     amount: 'Varies by listing',
     deadline: 'Rolling',
@@ -1380,6 +1528,7 @@ export const CATALOG = [
   },
   {
     id: 'aapt-disability',
+    addedAt: '2026-07-15',
     name: 'American Association of People with Disabilities awards',
     amount: 'Varies',
     deadline: 'Rolling',
@@ -1389,6 +1538,7 @@ export const CATALOG = [
   },
   {
     id: 'nfb-scholarship-extra',
+    addedAt: '2026-07-15',
     name: 'National Federation of the Blind scholarship program',
     amount: 'Up to $12,000',
     deadline: '2027-03-31',
@@ -1398,6 +1548,7 @@ export const CATALOG = [
   },
   {
     id: 'ag-bell',
+    addedAt: '2026-07-15',
     name: 'AG Bell College Scholarship Program',
     amount: 'Varies',
     deadline: '2027-03-01',
@@ -1407,6 +1558,7 @@ export const CATALOG = [
   },
   {
     id: 'sertoma-hard-hearing',
+    addedAt: '2026-07-15',
     name: 'Sertoma scholarships for hard of hearing / communicative disorders',
     amount: 'Varies',
     deadline: '2027-05-01',
@@ -1416,6 +1568,7 @@ export const CATALOG = [
   },
   {
     id: 'mobility-international',
+    addedAt: '2026-07-15',
     name: 'Mobility International USA resources',
     amount: 'Varies by partner',
     deadline: 'Rolling',
@@ -1425,6 +1578,7 @@ export const CATALOG = [
   },
   {
     id: 'chairscholars',
+    addedAt: '2026-07-15',
     name: 'ChairScholars Foundation',
     amount: 'Varies',
     deadline: '2027-04-15',
@@ -1434,6 +1588,7 @@ export const CATALOG = [
   },
   {
     id: 'hydrocephalus-association',
+    addedAt: '2026-07-15',
     name: 'Hydrocephalus Association scholarships',
     amount: 'Varies',
     deadline: 'Rolling',
@@ -1443,6 +1598,7 @@ export const CATALOG = [
   },
   {
     id: 'cystic-fibrosis-scholars',
+    addedAt: '2026-07-15',
     name: 'Cystic Fibrosis scholarship partners',
     amount: 'Varies',
     deadline: 'Rolling',
@@ -1452,6 +1608,7 @@ export const CATALOG = [
   },
   {
     id: 'epilepsy-foundation',
+    addedAt: '2026-07-15',
     name: 'Epilepsy Foundation scholarships',
     amount: 'Varies',
     deadline: 'Rolling',
@@ -1461,6 +1618,7 @@ export const CATALOG = [
   },
   {
     id: 'autism-society',
+    addedAt: '2026-07-15',
     name: 'Autism Society / partner education awards',
     amount: 'Varies',
     deadline: 'Rolling',
@@ -1470,6 +1628,7 @@ export const CATALOG = [
   },
   {
     id: 'disabilities-rights-education',
+    addedAt: '2026-07-15',
     name: 'Disability Rights Education scholarship lists',
     amount: 'Varies',
     deadline: 'Rolling',
@@ -1481,6 +1640,7 @@ export const CATALOG = [
   // --- Black student pack ---
   {
     id: 'cbm-scholarships',
+    addedAt: '2026-07-15',
     name: 'Congressional Black Caucus Foundation scholarships',
     amount: 'Varies',
     deadline: '2027-04-30',
@@ -1490,6 +1650,7 @@ export const CATALOG = [
   },
   {
     id: 'naacp-scholarships',
+    addedAt: '2026-07-15',
     name: 'NAACP scholarships & partners',
     amount: 'Varies',
     deadline: 'Rolling',
@@ -1499,6 +1660,7 @@ export const CATALOG = [
   },
   {
     id: 'tom-joyner',
+    addedAt: '2026-07-15',
     name: 'Tom Joyner Foundation scholarships',
     amount: 'Varies',
     deadline: 'Rolling',
@@ -1508,6 +1670,7 @@ export const CATALOG = [
   },
   {
     id: 'ron-brown-extra',
+    addedAt: '2026-07-15',
     name: 'Ron Brown Scholar Program (full cycle)',
     amount: '$40,000 over 4 years',
     deadline: '2026-11-01',
@@ -1517,6 +1680,7 @@ export const CATALOG = [
   },
   {
     id: 'black-excel',
+    addedAt: '2026-07-15',
     name: 'Black Excel scholarship directory',
     amount: 'Varies by listing',
     deadline: 'Rolling',
@@ -1526,6 +1690,7 @@ export const CATALOG = [
   },
   {
     id: 'the-black-collegian',
+    addedAt: '2026-07-15',
     name: 'IMDiversity / Black Collegian resources',
     amount: 'Varies',
     deadline: 'Rolling',
@@ -1535,6 +1700,7 @@ export const CATALOG = [
   },
   {
     id: 'hbcu-scholarship-directory',
+    addedAt: '2026-07-15',
     name: 'UNCF HBCU and partner awards hub',
     amount: 'Varies',
     deadline: 'Rolling',
@@ -1544,6 +1710,7 @@ export const CATALOG = [
   },
   {
     id: 'national-urban-league',
+    addedAt: '2026-07-15',
     name: 'National Urban League education programs',
     amount: 'Varies by affiliate',
     deadline: 'Rolling',
@@ -1553,6 +1720,7 @@ export const CATALOG = [
   },
   {
     id: 'jack-and-jill',
+    addedAt: '2026-07-15',
     name: 'Jack and Jill of America Foundation scholarships',
     amount: 'Varies',
     deadline: 'Rolling',
@@ -1562,6 +1730,7 @@ export const CATALOG = [
   },
   {
     id: 'divine-nine-scholarships',
+    addedAt: '2026-07-15',
     name: 'Divine Nine / NPHC organization scholarships',
     amount: 'Varies by organization',
     deadline: 'Rolling',
@@ -1573,6 +1742,7 @@ export const CATALOG = [
   // --- Hispanic / Latino pack ---
   {
     id: 'hacu-scholarships',
+    addedAt: '2026-07-15',
     name: 'HACU scholarships',
     amount: 'Varies',
     deadline: 'Rolling',
@@ -1582,6 +1752,7 @@ export const CATALOG = [
   },
   {
     id: 'chci-scholarships',
+    addedAt: '2026-07-15',
     name: 'Congressional Hispanic Caucus Institute scholarships',
     amount: 'Varies',
     deadline: '2027-03-01',
@@ -1591,6 +1762,7 @@ export const CATALOG = [
   },
   {
     id: 'la-unidad-latina',
+    addedAt: '2026-07-15',
     name: 'La Unidad Latina Foundation scholarships',
     amount: 'Varies',
     deadline: 'Rolling',
@@ -1600,6 +1772,7 @@ export const CATALOG = [
   },
   {
     id: 'hispanic-scholarship-directory',
+    addedAt: '2026-07-15',
     name: 'ScholarshipsA-Z / DACA-friendly listings',
     amount: 'Varies',
     deadline: 'Rolling',
@@ -1609,6 +1782,7 @@ export const CATALOG = [
   },
   {
     id: 'prospanica',
+    addedAt: '2026-07-15',
     name: 'Prospanica scholarships',
     amount: 'Varies',
     deadline: 'Rolling',
@@ -1618,6 +1792,7 @@ export const CATALOG = [
   },
   {
     id: 'latinamerican-edu',
+    addedAt: '2026-07-15',
     name: 'Latino College Dollars directory',
     amount: 'Varies by listing',
     deadline: 'Rolling',
@@ -1627,6 +1802,7 @@ export const CATALOG = [
   },
   {
     id: 'mexican-american-legal',
+    addedAt: '2026-07-15',
     name: 'MALDEF scholarship resources',
     amount: 'Varies',
     deadline: 'Rolling',
@@ -1636,6 +1812,7 @@ export const CATALOG = [
   },
   {
     id: 'cafamerica',
+    addedAt: '2026-07-15',
     name: 'CAF America / partner Latino education funds',
     amount: 'Varies',
     deadline: 'Rolling',
@@ -1645,6 +1822,7 @@ export const CATALOG = [
   },
   {
     id: 'telacu',
+    addedAt: '2026-07-15',
     name: 'TELACU Education Foundation scholarships',
     amount: 'Varies',
     deadline: '2027-03-15',
@@ -1654,6 +1832,7 @@ export const CATALOG = [
   },
   {
     id: 'hispanic-scholarship-fund-extra',
+    addedAt: '2026-07-15',
     name: 'HSF Scholar Program (full application)',
     amount: '$500–$5,000',
     deadline: '2027-02-15',
@@ -1665,6 +1844,7 @@ export const CATALOG = [
   // --- Women pack ---
   {
     id: 'patsy-mink',
+    addedAt: '2026-07-15',
     name: 'Patsy Takemoto Mink Education Foundation',
     amount: 'Up to $5,000',
     deadline: '2027-08-01',
@@ -1674,6 +1854,7 @@ export const CATALOG = [
   },
   {
     id: 'jeannette-rankin',
+    addedAt: '2026-07-15',
     name: 'Jeannette Rankin Women’s Scholarship Fund',
     amount: 'Varies',
     deadline: '2027-02-15',
@@ -1683,6 +1864,7 @@ export const CATALOG = [
   },
   {
     id: 'live-your-dream',
+    addedAt: '2026-07-15',
     name: 'Soroptimist Live Your Dream Awards',
     amount: 'Up to $16,000',
     deadline: '2026-11-15',
@@ -1692,6 +1874,7 @@ export const CATALOG = [
   },
   {
     id: 'women-of-the-elca',
+    addedAt: '2026-07-15',
     name: 'Women of the ELCA scholarships',
     amount: 'Varies',
     deadline: 'Rolling',
@@ -1701,6 +1884,7 @@ export const CATALOG = [
   },
   {
     id: 'zonta-women',
+    addedAt: '2026-07-15',
     name: 'Zonta International young women awards',
     amount: 'Varies',
     deadline: 'Rolling',
@@ -1710,6 +1894,7 @@ export const CATALOG = [
   },
   {
     id: 'educational-foundation-uwc',
+    addedAt: '2026-07-15',
     name: 'American Association of University Women local branches',
     amount: 'Varies by branch',
     deadline: 'Rolling',
@@ -1719,6 +1904,7 @@ export const CATALOG = [
   },
   {
     id: 'girls-who-code',
+    addedAt: '2026-07-15',
     name: 'Girls Who Code community / partner awards',
     amount: 'Varies',
     deadline: 'Rolling',
@@ -1728,6 +1914,7 @@ export const CATALOG = [
   },
   {
     id: 'society-women-accountants',
+    addedAt: '2026-07-15',
     name: 'AWSCPA / women CPA society awards',
     amount: 'Varies',
     deadline: 'Rolling',
@@ -1737,6 +1924,7 @@ export const CATALOG = [
   },
   {
     id: 'palmer-women-engineers',
+    addedAt: '2026-07-15',
     name: 'Society of Women Engineers corporate partners',
     amount: 'Varies',
     deadline: '2027-02-01',
@@ -1748,6 +1936,7 @@ export const CATALOG = [
   // --- First-gen pack ---
   {
     id: 'first-gen-scholars-network',
+    addedAt: '2026-07-15',
     name: 'Center for First-generation Student Success resources',
     amount: 'Varies by campus',
     deadline: 'Rolling',
@@ -1757,6 +1946,7 @@ export const CATALOG = [
   },
   {
     id: 'questbridge',
+    addedAt: '2026-07-15',
     name: 'QuestBridge National College Match',
     amount: 'Full four-year scholarships (partners)',
     deadline: '2026-09-26',
@@ -1766,6 +1956,7 @@ export const CATALOG = [
   },
   {
     id: 'pos-se',
+    addedAt: '2026-07-15',
     name: 'Posse Foundation scholars',
     amount: 'Full-tuition leadership scholarships',
     deadline: '2026-09-15',
@@ -1775,6 +1966,7 @@ export const CATALOG = [
   },
   {
     id: 'i-am-first',
+    addedAt: '2026-07-15',
     name: 'I’m First / Center for Student Opportunity',
     amount: 'Varies',
     deadline: 'Rolling',
@@ -1784,6 +1976,7 @@ export const CATALOG = [
   },
   {
     id: 'tmcf-first-gen',
+    addedAt: '2026-07-15',
     name: 'TMCF first-gen & HBCU awards',
     amount: 'Varies',
     deadline: 'Rolling',
@@ -1793,6 +1986,7 @@ export const CATALOG = [
   },
   {
     id: 'csac-first-gen',
+    addedAt: '2026-07-15',
     name: 'State first-gen campus grants (example hubs)',
     amount: 'Varies by state/campus',
     deadline: 'Rolling',
@@ -1802,6 +1996,7 @@ export const CATALOG = [
   },
   {
     id: 'haas-business-first-gen',
+    addedAt: '2026-07-15',
     name: 'Business school first-gen initiatives',
     amount: 'Varies',
     deadline: 'Rolling',
@@ -1811,6 +2006,7 @@ export const CATALOG = [
   },
   {
     id: 'scholarship-america-first',
+    addedAt: '2026-07-15',
     name: 'Scholarship America Dream Award',
     amount: 'Renewable multi-year',
     deadline: '2027-04-15',
@@ -1822,6 +2018,7 @@ export const CATALOG = [
   // --- High school senior pack ---
   {
     id: 'equitable-excellence',
+    addedAt: '2026-07-15',
     name: 'Equitable Excellence Scholarship',
     amount: 'Up to $20,000',
     deadline: '2026-12-15',
@@ -1831,6 +2028,7 @@ export const CATALOG = [
   },
   {
     id: 'axa-achievement',
+    addedAt: '2026-07-15',
     name: 'AXA Achievement Scholarship (historical partner cycles)',
     amount: 'Varies',
     deadline: 'Rolling (confirm current sponsor)',
@@ -1840,6 +2038,7 @@ export const CATALOG = [
   },
   {
     id: 'ge-reagan',
+    addedAt: '2026-07-15',
     name: 'GE-Reagan Foundation Scholarship Program',
     amount: 'Up to $40,000',
     deadline: '2027-01-05',
@@ -1849,6 +2048,7 @@ export const CATALOG = [
   },
   {
     id: 'foot-locker-scholars',
+    addedAt: '2026-07-15',
     name: 'Foot Locker Scholar Athletes',
     amount: 'Up to $20,000',
     deadline: '2026-12-15',
@@ -1858,6 +2058,7 @@ export const CATALOG = [
   },
   {
     id: 'heisman-high-school',
+    addedAt: '2026-07-15',
     name: 'Heisman High School Scholarship',
     amount: 'Varies',
     deadline: '2026-10-18',
@@ -1867,6 +2068,7 @@ export const CATALOG = [
   },
   {
     id: 'elks-most-valuable-extra',
+    addedAt: '2026-07-15',
     name: 'Elks Most Valuable Student (national)',
     amount: 'Up to $50,000 over 4 years',
     deadline: '2026-11-12',
@@ -1876,6 +2078,7 @@ export const CATALOG = [
   },
   {
     id: 'sam-walton-community',
+    addedAt: '2026-07-15',
     name: 'Walmart Associate / community scholarships',
     amount: 'Varies',
     deadline: 'Rolling',
@@ -1885,6 +2088,7 @@ export const CATALOG = [
   },
   {
     id: 'local-rotary-hs',
+    addedAt: '2026-07-15',
     name: 'Rotary club local senior scholarships',
     amount: '$500–$5,000 typical',
     deadline: 'Local spring cycles',
@@ -1894,6 +2098,7 @@ export const CATALOG = [
   },
   {
     id: 'local-kiwanis-hs',
+    addedAt: '2026-07-15',
     name: 'Kiwanis / Key Club senior scholarships',
     amount: 'Varies',
     deadline: 'Local spring cycles',
@@ -1903,6 +2108,7 @@ export const CATALOG = [
   },
   {
     id: 'national-honor-society',
+    addedAt: '2026-07-15',
     name: 'National Honor Society scholarships',
     amount: 'Varies',
     deadline: '2027-01-15',
@@ -1914,6 +2120,7 @@ export const CATALOG = [
   // --- Need / FAFSA extra portals ---
   {
     id: 'css-profile-note',
+    addedAt: '2026-07-15',
     name: 'CSS Profile (institutional aid gateway)',
     amount: 'Unlocks college aid',
     deadline: 'Campus priority dates',
@@ -1923,6 +2130,7 @@ export const CATALOG = [
   },
   {
     id: 'fafsa-state-deadlines',
+    addedAt: '2026-07-15',
     name: 'State FAFSA deadline tracker',
     amount: 'State grant access',
     deadline: 'Varies by state',
@@ -1932,6 +2140,7 @@ export const CATALOG = [
   },
   {
     id: 'appalachian-need',
+    addedAt: '2026-07-15',
     name: 'Appalachian regional education funds',
     amount: 'Varies',
     deadline: 'Rolling',
@@ -1946,7 +2155,19 @@ export const CATALOG = [
  * consumers can look items up by arbitrary string id and test membership with
  * `tags.includes(...)`/`tags.some(...)` without literal-union narrowing errors.
  */
-export type CatalogItem = Omit<(typeof CATALOG)[number], 'id' | 'tags'> & {
+export type CatalogItem = AwardBase
+
+/** The fields every award needs, whether it is in the catalog or was found on the web. */
+export type AwardBase = {
   id: string
+  name: string
+  amount: string
+  deadline: string
   tags: readonly string[]
+  url: string
+  summary: string
+  /** YYYY-MM-DD the award entered the catalog or was verified from the web. */
+  addedAt: string
+  /** Epoch ms the web find was verified; absent for catalog entries. Orders same-day finds. */
+  foundAtMs?: number
 }

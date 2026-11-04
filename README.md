@@ -66,6 +66,10 @@ npx wrangler pages deploy dist --project-name scholarship-one --branch main
 
 Set `OPENAI_API_KEY` on the Pages project for live chat.
 
+`CRON_SECRET` (Pages secret and GitHub Actions secret of the same value) lets the daily
+`Find new scholarships` workflow call `/api/find-cron`. `FIRECRAWL_API_KEY` and `BRAVE_API_KEY`
+are optional search providers; without them the finder uses keyless DuckDuckGo.
+
 `git push` updates GitHub only â€” deploy is a separate step.
 
 ## Privacy
