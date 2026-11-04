@@ -7,6 +7,10 @@ export type AnalyticsEvent =
   | { type: 'search'; q: string; at: number }
   | { type: 'save'; id: string; at: number }
   | { type: 'unsave'; id: string; at: number }
+  | { type: 'hide'; id: string; at: number }
+  | { type: 'unhide'; id: string; at: number }
+  | { type: 'remind_set'; id: string; at: number }
+  | { type: 'remind_clear'; id: string; at: number }
   | { type: 'official_click'; id: string; at: number }
   | { type: 'category'; id: string; at: number }
   | { type: 'onboarding_complete'; at: number }

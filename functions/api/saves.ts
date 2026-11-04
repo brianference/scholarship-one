@@ -8,6 +8,7 @@
 import type { FnCtx, D1Database } from '../_lib/types'
 import { json } from '../_lib/http'
 import { getSession } from '../_lib/auth'
+import { remindOnSchema } from '../_lib/validate'
 
 type SaveInput = {
   id?: string
@@ -16,6 +17,8 @@ type SaveInput = {
   checklist?: string[]
   apply_status?: string
   deadline?: string | null
+  /** YYYY-MM-DD to set, '' to clear, omitted/null to leave the stored value alone. */
+  remind_on?: string | null
 }
 
 type SaveRow = {
@@ -27,6 +30,7 @@ type SaveRow = {
   apply_status: string
   deadline: string | null
   reminder_sent: string
+  remind_on: string | null
 }
 
 function mapRow(r: SaveRow) {
@@ -45,7 +49,15 @@ function mapRow(r: SaveRow) {
     applyStatus: r.apply_status || 'none',
     deadline: r.deadline || '',
     reminderSent: r.reminder_sent ? r.reminder_sent.split(',').filter(Boolean) : [],
+    remindOn: r.remind_on || '',
   }
+}
+
+/** Bind value for remind_on: null keeps the stored date, '' clears it, a valid date sets it. */
+function remindOnValue(input: string | null | undefined): string | null {
+  if (input === undefined || input === null) return null
+  const parsed = remindOnSchema.safeParse(input)
+  return parsed.success ? parsed.data : null
 }
 
 export async function onRequestGet({ request, env }: FnCtx) {
@@ -53,7 +65,7 @@ export async function onRequestGet({ request, env }: FnCtx) {
   if (!session) return json({ error: 'auth required' }, 401)
   const rows = (
     await env.DB.prepare(
-      `select scholarship_id as id, saved_at, updated_at, notes, checklist, apply_status, deadline, reminder_sent
+      `select scholarship_id as id, saved_at, updated_at, notes, checklist, apply_status, deadline, reminder_sent, remind_on
          from saved_scholarships where user_id = ? order by saved_at desc`,
     )
       .bind(session.userId)
@@ -80,14 +92,19 @@ export async function onRequestPost({ request, env }: FnCtx) {
       db
         .prepare(
           `insert into saved_scholarships
-             (user_id, scholarship_id, saved_at, updated_at, notes, checklist, apply_status, deadline)
-           values (?, ?, ?, ?, ?, ?, ?, ?)
+             (user_id, scholarship_id, saved_at, updated_at, notes, checklist, apply_status, deadline, remind_on)
+           values (?, ?, ?, ?, ?, ?, ?, ?, ?)
            on conflict(user_id, scholarship_id) do update set
              updated_at = excluded.updated_at,
              notes = excluded.notes,
              checklist = excluded.checklist,
              apply_status = excluded.apply_status,
-             deadline = excluded.deadline`,
+             deadline = excluded.deadline,
+             remind_sent_on = case when excluded.remind_on is not null
+                                    and excluded.remind_on <> coalesce(saved_scholarships.remind_on, '')
+                                   then null else saved_scholarships.remind_sent_on end,
+             remind_on = case when excluded.remind_on is null
+                              then saved_scholarships.remind_on else excluded.remind_on end`,
         )
         .bind(
           session.userId,
@@ -98,6 +115,7 @@ export async function onRequestPost({ request, env }: FnCtx) {
           JSON.stringify(Array.isArray(it.checklist) ? it.checklist : []),
           String(it.apply_status || 'none'),
           it.deadline ?? null,
+          remindOnValue(it.remind_on),
         ),
     )
   if (stmts.length) await db.batch(stmts)

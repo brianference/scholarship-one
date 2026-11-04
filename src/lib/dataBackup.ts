@@ -13,6 +13,9 @@ export type BackupPayload = {
   checklist: ChecklistState
   savedSearches: SavedSearch[]
   recentlyViewed: string[]
+  /** Added in v5.3.0; absent in older backup files. */
+  hidden?: string[]
+  reminders?: Record<string, string>
 }
 
 export function buildBackup(data: Omit<BackupPayload, 'version' | 'exportedAt'>): BackupPayload {

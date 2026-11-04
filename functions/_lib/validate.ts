@@ -75,3 +75,45 @@ export async function parseBody<T>(request: Request, schema: z.ZodType<T>): Prom
   }
   return { ok: true, data: result.data }
 }
+
+/** The five profile fields that drive ranking. Short strings only. */
+const profileField = z.string().trim().min(1).max(64)
+
+export const profileSchema = z.object({
+  profile: z.object({
+    major: profileField,
+    state: profileField,
+    level: profileField,
+    identity: profileField,
+    need: profileField,
+  }),
+  /** Epoch ms of the edit on the device; the newer write wins when devices disagree. */
+  updatedAt: z
+    .number()
+    .int()
+    .positive()
+    // A device with a wrong clock must not win every future write: allow at most a day ahead.
+    .refine((v) => v <= Date.now() + 86_400_000, 'Timestamp is in the future.'),
+})
+
+/** Catalog ids are short slugs; this stops arbitrary text landing in D1. */
+const catalogId = z.string().trim().min(1).max(80).regex(/^[a-z0-9][a-z0-9_-]*$/i)
+
+export const hiddenAddSchema = z.object({
+  ids: z.array(catalogId).min(1).max(500),
+})
+
+export const hiddenIdSchema = z.object({ id: catalogId })
+
+/** True for a YYYY-MM-DD that exists on the calendar (rejects 2026-02-31, which Date.parse rolls over). */
+function isRealCalendarDay(v: string): boolean {
+  if (!/^\d{4}-\d{2}-\d{2}$/.test(v)) return false
+  const t = Date.parse(v)
+  return !Number.isNaN(t) && new Date(t).toISOString().slice(0, 10) === v
+}
+
+/** A calendar day, YYYY-MM-DD. Empty string clears the reminder. */
+export const remindOnSchema = z
+  .string()
+  .trim()
+  .refine((v) => v === '' || isRealCalendarDay(v), 'Use a YYYY-MM-DD date.')

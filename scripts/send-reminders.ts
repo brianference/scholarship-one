@@ -7,7 +7,12 @@
  * Env: CF_ACCOUNT_ID, D1_DATABASE_ID, CLOUDFLARE_API_TOKEN, BREVO_API_KEY, DIGEST_FROM_EMAIL
  */
 import { CATALOG } from '../src/data/catalog'
-import { selectDueReminders, type ReminderRow } from './reminderSelect'
+import {
+  selectDueCustomReminders,
+  selectDueReminders,
+  type CustomReminderRow,
+  type ReminderRow,
+} from './reminderSelect'
 
 const {
   CF_ACCOUNT_ID,
@@ -49,6 +54,80 @@ async function sendBrevo(to: string, subject: string, html: string): Promise<voi
     body: JSON.stringify({ sender, to: [{ email: to }], subject, htmlContent: html }),
   })
   if (!res.ok) throw new Error(`brevo ${res.status}: ${(await res.text()).slice(0, 160)}`)
+}
+
+/**
+ * Remind-to-apply: emails each student on the day they picked, once per chosen date.
+ * Submitted applications are skipped; the row is marked only after the email is accepted.
+ */
+async function sendCustomReminders(): Promise<void> {
+  const raw = await d1(
+    `select ss.user_id as userId, u.email as email, ss.scholarship_id as scholarshipId,
+            ss.remind_on as remindOn, coalesce(ss.remind_sent_on, '') as remindSentOn
+       from saved_scholarships ss join users u on u.id = ss.user_id
+      where ss.remind_on is not null and ss.remind_on <> '' and ss.apply_status <> 'submitted'`,
+  )
+  const rows: CustomReminderRow[] = raw.map((r) => ({
+    userId: String(r.userId),
+    email: String(r.email),
+    scholarshipId: String(r.scholarshipId),
+    remindOn: String(r.remindOn || ''),
+    remindSentOn: String(r.remindSentOn || ''),
+  }))
+  const groups = selectDueCustomReminders(rows, Date.now())
+  console.log(`[remind-to-apply] ${rows.length} reminder(s) set · ${groups.length} user(s) due${DRY ? ' · DRY RUN' : ''}`)
+
+  let sent = 0
+  for (const group of groups) {
+    const items = group.items
+      .map((it) => {
+        const c = catalogById.get(it.scholarshipId)
+        return c
+          ? { ...it, name: c.name as string, amount: c.amount as string, deadline: c.deadline as string, url: c.url as string }
+          : null
+      })
+      .filter((x): x is NonNullable<typeof x> => x !== null)
+    if (!items.length) continue
+
+    const li = items
+      .map(
+        (i) =>
+          `<li style="margin:0 0 10px"><strong>${esc(i.name)}</strong> · ${esc(i.amount)} · deadline: ${esc(i.deadline)}<br/><a href="${esc(i.url)}" style="color:#c45c26">Apply on the official site</a></li>`,
+      )
+      .join('')
+    const html = `<div style="font-family:system-ui,sans-serif;max-width:520px;margin:0 auto;color:#2a1c14">
+      <h2 style="color:#c45c26">Time to apply</h2>
+      <p>You asked us to remind you about ${items.length === 1 ? 'this scholarship' : 'these scholarships'} today.</p>
+      <ul style="padding-left:18px">${li}</ul>
+      <p><a href="https://scholarship-one.pages.dev/tracker" style="color:#c45c26">Open your tracker</a></p></div>`
+    const subject = items.length === 1 ? `Time to apply: ${items[0].name}` : `Time to apply: ${items.length} scholarships you flagged`
+
+    if (DRY) {
+      console.log(`  [dry] ${group.email}: ${items.map((i) => `${i.scholarshipId}(${i.remindOn})`).join(', ')}`)
+      continue
+    }
+    try {
+      await sendBrevo(group.email, subject, html)
+      for (const i of items) {
+        // Per-item so one failed update cannot leave the rest unmarked (and re-sent tomorrow).
+        // Guarded on the date so a reminder re-dated during the run is not marked as sent.
+        try {
+          await d1(
+            `update saved_scholarships set remind_sent_on = ?
+              where user_id = ? and scholarship_id = ? and remind_on = ?`,
+            [i.remindOn, i.userId, i.scholarshipId, i.remindOn],
+          )
+        } catch (markErr) {
+          console.error(`  WARN could not mark ${i.scholarshipId} sent: ${(markErr as Error).message}`)
+        }
+      }
+      sent++
+      console.log(`  sent ${group.email}: ${items.length} item(s)`)
+    } catch (err) {
+      console.error(`  FAILED ${group.email}: ${(err as Error).message}`)
+    }
+  }
+  console.log(`[remind-to-apply] done. ${DRY ? 'dry-run (no email sent)' : `${sent} email(s) sent`}.`)
 }
 
 async function main() {
@@ -118,7 +197,24 @@ async function main() {
   console.log(`[reminders] done. ${DRY ? 'dry-run (no email sent)' : `${sent} email(s) sent`}.`)
 }
 
-main().catch((err) => {
-  console.error('[reminders] fatal:', (err as Error).message)
-  process.exit(1)
-})
+async function run() {
+  let failed = false
+  try {
+    await main()
+  } catch (err) {
+    failed = true
+    console.error('[reminders] fatal:', (err as Error).message)
+  }
+  // Independent of the deadline emails: a failure above must not skip these.
+  if (CF_ACCOUNT_ID && D1_DATABASE_ID && CLOUDFLARE_API_TOKEN) {
+    try {
+      await sendCustomReminders()
+    } catch (err) {
+      failed = true
+      console.error('[remind-to-apply] fatal:', (err as Error).message)
+    }
+  }
+  if (failed) process.exit(1)
+}
+
+void run()

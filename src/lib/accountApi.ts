@@ -12,6 +12,8 @@ export type AccountSave = {
   applyStatus: string
   deadline: string
   reminderSent: string[]
+  /** Remind-to-apply day (YYYY-MM-DD), '' when none. */
+  remindOn: string
 }
 
 /**
@@ -122,6 +124,8 @@ export type SaveUpsert = {
   checklist?: string[]
   apply_status?: string
   deadline?: string
+  /** YYYY-MM-DD to set, '' to clear, omit to leave the stored value. */
+  remind_on?: string
 }
 
 export function putSaves(saves: SaveUpsert[]): Promise<{ ok: boolean; count: number }> {
@@ -130,4 +134,35 @@ export function putSaves(saves: SaveUpsert[]): Promise<{ ok: boolean; count: num
 
 export function deleteSave(id: string): Promise<{ ok: boolean }> {
   return req(`/api/saves?id=${encodeURIComponent(id)}`, { method: 'DELETE' })
+}
+
+export type AccountProfile = {
+  major: string
+  state: string
+  level: string
+  identity: string
+  need: string
+}
+
+export function getAccountProfile(): Promise<{ profile: AccountProfile | null; updatedAt: number }> {
+  return req('/api/profile')
+}
+
+export function putAccountProfile(
+  profile: AccountProfile,
+  updatedAt: number,
+): Promise<{ ok: boolean; updatedAt: number; applied: boolean }> {
+  return req('/api/profile', { method: 'PUT', body: JSON.stringify({ profile, updatedAt }) })
+}
+
+export function getHiddenIds(): Promise<{ ids: string[] }> {
+  return req('/api/hidden')
+}
+
+export function addHiddenIds(ids: string[]): Promise<{ ok: boolean; count: number }> {
+  return req('/api/hidden', { method: 'POST', body: JSON.stringify({ ids }) })
+}
+
+export function removeHiddenId(id: string): Promise<{ ok: boolean }> {
+  return req(`/api/hidden?id=${encodeURIComponent(id)}`, { method: 'DELETE' })
 }

@@ -3,14 +3,16 @@ import { createContext, useCallback, useContext, useEffect, useMemo, useRef, use
 import { createPortal } from 'react-dom'
 
 type Tone = 'success' | 'error' | 'info'
-type Toast = { id: number; tone: Tone; message: string }
+/** Optional single button on a toast, e.g. Undo. Runs once, then the toast closes. */
+export type ToastAction = { label: string; onClick: () => void }
+type Toast = { id: number; tone: Tone; message: string; action?: ToastAction }
 
 const DEFAULT_MS = 4500
-/** Errors linger: they usually carry something the reader must act on. */
-const ERROR_MS = 8000
+/** Errors and toasts with an Undo linger: the reader has something to act on. */
+const LINGER_MS = 8000
 
 type ToastContextValue = {
-  notify: (message: string, tone?: Tone) => void
+  notify: (message: string, tone?: Tone, action?: ToastAction) => void
   dismiss: (id: number) => void
 }
 
@@ -31,12 +33,12 @@ export function ToastProvider({ children }: { children: ReactNode }) {
   }, [])
 
   const notify = useCallback(
-    (message: string, tone: Tone = 'info') => {
+    (message: string, tone: Tone = 'info', action?: ToastAction) => {
       const id = nextId.current++
-      setToasts((list) => [...list.slice(-2), { id, tone, message }])
+      setToasts((list) => [...list.slice(-2), { id, tone, message, action }])
       timers.current.set(
         id,
-        setTimeout(() => dismiss(id), tone === 'error' ? ERROR_MS : DEFAULT_MS),
+        setTimeout(() => dismiss(id), tone === 'error' || action ? LINGER_MS : DEFAULT_MS),
       )
     },
     [dismiss],
@@ -85,6 +87,18 @@ function ToastRow({ toast, onDismiss }: { toast: Toast; onDismiss: () => void })
       className={`pointer-events-auto flex w-full max-w-sm items-start gap-3 rounded-[var(--radius-sm)] border px-4 py-3 text-[length:var(--font-size-sm)] font-medium shadow-[0_12px_32px_rgba(0,0,0,0.22)] motion-safe:animate-[toast-in_180ms_ease-out] ${TONE_CLASS[toast.tone]}`}
     >
       <span className="min-w-0 flex-1">{toast.message}</span>
+      {toast.action ? (
+        <button
+          type="button"
+          onClick={() => {
+            toast.action?.onClick()
+            onDismiss()
+          }}
+          className="-my-1 shrink-0 rounded px-2 py-1 font-bold underline underline-offset-2 focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-current"
+        >
+          {toast.action.label}
+        </button>
+      ) : null}
       <button
         type="button"
         onClick={onDismiss}

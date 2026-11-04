@@ -8,6 +8,7 @@ import {
   useContext,
   useEffect,
   useMemo,
+  useRef,
   useState,
   type ReactNode,
 } from 'react'
@@ -24,7 +25,17 @@ import type { BackupPayload } from '../lib/dataBackup'
 import { loadChecklist, saveChecklist, toggleCheckStep } from '../lib/checklist'
 import { loadNotes, saveNotes, setNote } from '../lib/notes'
 import { shouldShowOnboarding } from '../lib/onboarding'
-import { loadProfile, saveProfile, saveShortlist, loadShortlist, type Profile } from '../lib/profile'
+import {
+  loadProfile,
+  loadProfileUpdatedAt,
+  saveProfile,
+  saveProfileUpdatedAt,
+  saveShortlist,
+  loadShortlist,
+  type Profile,
+} from '../lib/profile'
+import { loadHidden, saveHidden } from '../lib/hidden'
+import { loadReminders, saveReminders, setReminderFor, type RemindMap } from '../lib/reminders'
 import { loadRecentlyViewed, pushRecentlyViewed } from '../lib/recentlyViewed'
 import {
   deleteSavedSearch,
@@ -49,6 +60,12 @@ export type ScholarshipContextValue = {
   checklist: ReturnType<typeof loadChecklist>
   recent: string[]
   savedSearches: SavedSearch[]
+  /** Awards marked "not interested"; excluded from Matches and Results. */
+  hidden: string[]
+  /** Remind-to-apply day per award id (YYYY-MM-DD). */
+  remindMap: RemindMap
+  /** Epoch ms of the last local profile edit (0 = never edited on this device). */
+  profileUpdatedAt: number
 
   // list UI filters
   listFilter: string
@@ -102,6 +119,23 @@ export type ScholarshipContextValue = {
   applyProfileSearch: (next: Profile, options?: { to?: string }) => void
   handlePinMatches: (ids: string[], saveToList?: boolean) => void
   toggleSave: (id: string) => void
+  hideScholarship: (id: string) => void
+  unhideScholarship: (id: string) => void
+  /** Set (YYYY-MM-DD) or clear (null) a remind-to-apply day. Setting one also saves the award. */
+  setReminder: (id: string, date: string | null) => void
+  /**
+   * Apply the result of the sign-in merge in one step. Unlike restoreBackup it never
+   * stamps the profile as edited now, so a server copy keeps its own timestamp.
+   */
+  applyAccountMerge: (merge: {
+    shortlist: string[]
+    applyMap: Record<string, ApplyStatus>
+    notes: Record<string, string>
+    checklist: ReturnType<typeof loadChecklist>
+    hidden: string[]
+    remindMap: RemindMap
+    profile?: { value: Profile; updatedAt: number }
+  }) => void
   toggleCompare: (id: string) => void
   clearCompare: () => void
   removeCompare: (id: string) => void
@@ -136,8 +170,22 @@ const ScholarshipContext = createContext<ScholarshipContextValue | null>(null)
 export function ScholarshipProvider({ children }: { children: ReactNode }) {
   const navigate = useNavigate()
 
-  const [profile, setProfileState] = useState<Profile>(loadProfile)
+  const [profile, setProfileRaw] = useState<Profile>(loadProfile)
+  const profileRef = useRef(profile)
+  const [profileUpdatedAt, setProfileUpdatedAt] = useState<number>(loadProfileUpdatedAt)
+  /** Every local edit goes through here so it is stamped; an unchanged value is a no-op. */
+  const setProfileState = useCallback((next: Profile) => {
+    const cur = profileRef.current
+    if ((Object.keys(next) as (keyof Profile)[]).every((k) => next[k] === cur[k])) return
+    profileRef.current = next
+    setProfileRaw(next)
+    setProfileUpdatedAt(Date.now())
+  }, [])
+  const [hidden, setHidden] = useState<string[]>(loadHidden)
+  const [remindMap, setRemindMap] = useState<RemindMap>(loadReminders)
   const [shortlist, setShortlist] = useState<string[]>(loadShortlist)
+  const shortlistRef = useRef(shortlist)
+  shortlistRef.current = shortlist
   const [applyMap, setApplyMap] = useState<Record<string, ApplyStatus>>(loadApplyStatus)
   const [notes, setNotes] = useState<Record<string, string>>(loadNotes)
   const [checklist, setChecklist] = useState(loadChecklist)
@@ -164,6 +212,15 @@ export function ScholarshipProvider({ children }: { children: ReactNode }) {
     saveProfile(profile)
   }, [profile])
   useEffect(() => {
+    if (profileUpdatedAt > 0) saveProfileUpdatedAt(profileUpdatedAt)
+  }, [profileUpdatedAt])
+  useEffect(() => {
+    saveHidden(hidden)
+  }, [hidden])
+  useEffect(() => {
+    saveReminders(remindMap)
+  }, [remindMap])
+  useEffect(() => {
     saveShortlist(shortlist)
   }, [shortlist])
   useEffect(() => {
@@ -176,7 +233,9 @@ export function ScholarshipProvider({ children }: { children: ReactNode }) {
     saveChecklist(checklist)
   }, [checklist])
 
-  const setProfile = useCallback((p: Profile) => setProfileState(p), [])
+  const setProfile = useCallback((p: Profile) => setProfileState(p), [setProfileState])
+
+  const hiddenSet = useMemo(() => new Set(hidden), [hidden])
 
   const ranked = useMemo(
     () =>
@@ -192,8 +251,9 @@ export function ScholarshipProvider({ children }: { children: ReactNode }) {
         sort,
         amountBucket,
         essayFilter,
-      }),
+      }).filter((row) => !hiddenSet.has(row.id)),
     [
+      hiddenSet,
       profile,
       listFilter,
       categoryId,
@@ -305,7 +365,7 @@ export function ScholarshipProvider({ children }: { children: ReactNode }) {
         document.getElementById('main-content')?.scrollTo?.(0, 0)
       })
     },
-    [navigate, profile],
+    [navigate, profile, setProfileState],
   )
 
   /**
@@ -341,7 +401,7 @@ export function ScholarshipProvider({ children }: { children: ReactNode }) {
         document.getElementById('main-content')?.scrollTo?.(0, 0)
       })
     },
-    [navigate],
+    [navigate, setProfileState],
   )
 
   const handlePinMatches = useCallback(
@@ -359,12 +419,54 @@ export function ScholarshipProvider({ children }: { children: ReactNode }) {
   )
 
   const toggleSave = useCallback((id: string) => {
+    // Read synchronously: inside a state updater the ref could already be the next value.
+    const wasSaved = shortlistRef.current.includes(id)
     setShortlist((prev) => {
       const saved = prev.includes(id)
       track({ type: saved ? 'unsave' : 'save', id, at: Date.now() })
       return saved ? prev.filter((x) => x !== id) : [...prev, id]
     })
+    // The server deletes an unsaved row (and its reminder), so drop the local date too.
+    if (wasSaved) setRemindMap((m) => setReminderFor(m, id, null))
   }, [])
+
+  const hideScholarship = useCallback((id: string) => {
+    setHidden((prev) => (prev.includes(id) ? prev : [id, ...prev]))
+    setCompareIds((prev) => prev.filter((x) => x !== id))
+    track({ type: 'hide', id, at: Date.now() })
+  }, [])
+
+  const unhideScholarship = useCallback((id: string) => {
+    setHidden((prev) => prev.filter((x) => x !== id))
+    track({ type: 'unhide', id, at: Date.now() })
+  }, [])
+
+  const setReminder = useCallback((id: string, date: string | null) => {
+    setRemindMap((m) => setReminderFor(m, id, date))
+    // A reminder lives on the saved row, so setting one saves the award too.
+    if (date && !shortlistRef.current.includes(id)) {
+      setShortlist((prev) => (prev.includes(id) ? prev : [...prev, id]))
+      track({ type: 'save', id, at: Date.now() })
+    }
+    track({ type: date ? 'remind_set' : 'remind_clear', id, at: Date.now() })
+  }, [])
+
+  const applyAccountMerge = useCallback<ScholarshipContextValue['applyAccountMerge']>(
+    (merge) => {
+      setShortlist(merge.shortlist)
+      setApplyMap(merge.applyMap)
+      setNotes(merge.notes)
+      setChecklist(merge.checklist)
+      setHidden(merge.hidden)
+      setRemindMap(merge.remindMap)
+      if (merge.profile) {
+        profileRef.current = merge.profile.value
+        setProfileRaw(merge.profile.value)
+        setProfileUpdatedAt(merge.profile.updatedAt)
+      }
+    },
+    [],
+  )
 
   const toggleCompare = useCallback((id: string) => {
     setCompareIds((prev) => {
@@ -394,6 +496,9 @@ export function ScholarshipProvider({ children }: { children: ReactNode }) {
     checklist,
     recent,
     savedSearches,
+    hidden,
+    remindMap,
+    profileUpdatedAt,
     listFilter,
     setListFilter,
     categoryId,
@@ -440,6 +545,10 @@ export function ScholarshipProvider({ children }: { children: ReactNode }) {
     applyProfileSearch,
     handlePinMatches,
     toggleSave,
+    hideScholarship,
+    unhideScholarship,
+    setReminder,
+    applyAccountMerge,
     toggleCompare,
     clearCompare: () => setCompareIds([]),
     removeCompare: (id) => setCompareIds((prev) => prev.filter((x) => x !== id)),
@@ -492,6 +601,9 @@ export function ScholarshipProvider({ children }: { children: ReactNode }) {
       setChecklist(data.checklist || {})
       setSavedSearches(data.savedSearches || [])
       setRecent(data.recentlyViewed || [])
+      // Backups from before v5.3.0 carry neither field; keep what is here rather than wipe it.
+      if (Array.isArray(data.hidden)) setHidden(data.hidden)
+      if (data.reminders) setRemindMap(data.reminders)
     },
     restoreSharePack: (pack) => {
       setProfileState(pack.profile)

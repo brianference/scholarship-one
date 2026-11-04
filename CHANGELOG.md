@@ -1,5 +1,29 @@
 # Changelog
 
+## 5.3.0 — 2026-11-04
+
+### Added
+
+- **Remind me** on every match row: tomorrow, in 3 days, in a week, a week before
+  the deadline, or a date you pick. Setting one also saves the award. When signed
+  in, the daily job emails you that morning (once per chosen date; changing the
+  date re-arms it).
+- **Not interested** on every match row. The award leaves Matches and Results, the
+  list refills, and a toast offers Undo. A "Hidden scholarships" list at the
+  bottom of Matches restores any of them.
+- **Profile, hidden awards and reminders now sync to D1.** Before this, only saved
+  awards (notes, checklist, status) did, so a cleared browser or a new device lost
+  the profile. Sign-in merges instead of replacing: saves and hidden awards are
+  unioned and the newer profile edit wins. D1 keeps the previous profile value too.
+- Manual JSON backups include hidden awards and reminders; older backup files still
+  restore without wiping them.
+
+### Database
+
+- Migration `0003_profile_hidden_reminders.sql` (additive): `user_profiles`,
+  `hidden_scholarships`, `saved_scholarships.remind_on` and `remind_sent_on`.
+  Apply it before deploying the Functions.
+
 ## 5.2.0 — 2026-07-19
 
 ### Fixed

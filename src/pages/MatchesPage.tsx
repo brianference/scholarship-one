@@ -9,6 +9,10 @@ import { Link } from 'react-router-dom'
 import { PageAiActions } from '../components/PageAiActions'
 import { ComparePanel, type CompareRow } from '../components/ComparePanel'
 import { ScholarshipCard } from '../features/matcher/ScholarshipCard'
+import { RowActions } from '../features/matcher/RowActions'
+import { CATALOG } from '../data/catalog'
+import { useToast } from '../components/ui/Toast'
+import { formatRemindOn } from '../lib/reminders'
 import { iconForTags, MatchRing } from '../features/matcher/cardVisuals'
 import { downloadIcs } from '../lib/exportTools'
 import { selectTopMatches } from '../lib/matchRanking'
@@ -59,6 +63,7 @@ export function MatchesPage() {
   const [shareNote, setShareNote] = useState<string | null>(null)
   const [sort, setSort] = useState<MatchesSort>('match')
   const [openId, setOpenId] = useState<string | null>(null)
+  const { notify } = useToast()
 
   const baseMatches = useMemo(() => selectTopMatches(s.ranked, s.profile, 12), [s.ranked, s.profile])
 
@@ -123,6 +128,25 @@ export function MatchesPage() {
     setShareNote(`Saved top ${ids.length} to your list (Tracker).`)
     window.setTimeout(() => setShareNote(null), 2500)
   }
+
+  function hideMatch(item: { id: string; name: string }) {
+    s.hideScholarship(item.id)
+    if (openId === item.id) setOpenId(null)
+    notify(`Hidden ${item.name}.`, 'info', { label: 'Undo', onClick: () => s.unhideScholarship(item.id) })
+  }
+
+  function setMatchReminder(item: { id: string; name: string }, date: string | null) {
+    s.setReminder(item.id, date)
+    notify(
+      date ? `Reminder set for ${formatRemindOn(date)}. ${item.name} is saved to your list.` : 'Reminder cleared.',
+      'success',
+    )
+  }
+
+  /** Hidden awards that still exist in the catalog, newest hidden first. */
+  const hiddenItems = s.hidden
+    .map((id) => CATALOG.find((c) => c.id === id))
+    .filter((c): c is (typeof CATALOG)[number] => Boolean(c))
 
   function compareTop3() {
     s.setCompareSelection(matches.slice(0, 3).map((m) => m.id))
@@ -294,6 +318,14 @@ export function MatchesPage() {
                     </span>
                   </button>
 
+                  <RowActions
+                    name={item.name}
+                    deadline={item.deadline}
+                    remindOn={s.remindMap[item.id] || ''}
+                    onSetReminder={(date) => setMatchReminder(item, date)}
+                    onHide={() => hideMatch(item)}
+                  />
+
                   {isOpen ? (
                     <div className="match-row__detail">
                       <ScholarshipCard
@@ -326,6 +358,22 @@ Explain fit honestly using only catalog facts. One concrete next step on the off
           </div>
         </section>
       )}
+
+      {hiddenItems.length ? (
+        <details className="hidden-panel">
+          <summary>Hidden scholarships ({hiddenItems.length})</summary>
+          <ul className="hidden-panel__list">
+            {hiddenItems.map((c) => (
+              <li key={c.id} className="hidden-panel__item">
+                <span className="hidden-panel__name">{c.name}</span>
+                <button type="button" className="btn btn-ghost" onClick={() => s.unhideScholarship(c.id)}>
+                  Restore
+                </button>
+              </li>
+            ))}
+          </ul>
+        </details>
+      ) : null}
 
       <PageAiActions
         title="AI match coach"

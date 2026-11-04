@@ -1,5 +1,6 @@
 import { useEffect, useState } from 'react'
 import type { Profile } from '../../lib/profile'
+import { useAccount } from '../../state/account'
 import { profileCompleteness } from '../../lib/profileCompleteness'
 import {
   IDENTITY_OPTIONS,
@@ -21,6 +22,8 @@ export type ProfilePanelProps = {
  * Ranking inputs — draft until the user hits Save & rank (or Rank scholarships).
  */
 export function ProfilePanel({ profile, onChange, onApply }: ProfilePanelProps) {
+  const account = useAccount()
+  const signedIn = account.status === 'signed-in'
   const [draft, setDraft] = useState<Profile>(profile)
   const [savedNote, setSavedNote] = useState<string | null>(null)
   const complete = profileCompleteness(draft)
@@ -39,7 +42,13 @@ export function ProfilePanel({ profile, onChange, onApply }: ProfilePanelProps) 
   function apply(andSearch: boolean) {
     onChange(draft)
     if (andSearch) onApply?.(draft)
-    setSavedNote(andSearch ? 'Rankings updated — best fits are listed below' : 'Profile saved on this device')
+    setSavedNote(
+      andSearch
+        ? 'Rankings updated — best fits are listed below'
+        : signedIn
+          ? 'Profile saved to your account'
+          : 'Profile saved on this device',
+    )
     window.setTimeout(() => setSavedNote(null), 2500)
   }
 
@@ -47,8 +56,8 @@ export function ProfilePanel({ profile, onChange, onApply }: ProfilePanelProps) 
     <div className="card profile-strip">
       <h3 className="h2-tight">About you</h3>
       <p className="meta profile-hint">
-        Choose your school level, field, background, and state, then save to re-rank scholarships. Saved only on this
-        device.
+        Choose your school level, field, background, and state, then save to re-rank scholarships.{' '}
+        {signedIn ? 'Saved to your account, so it follows you to any device.' : 'Saved only on this device until you sign in.'}
       </p>
       <div className="profile-complete" aria-label={`Profile ${complete.percent}% complete`}>
         <div className="profile-complete__bar" aria-hidden="true">

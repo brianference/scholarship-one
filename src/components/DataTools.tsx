@@ -15,6 +15,8 @@ export type DataToolsProps = {
   checklist: ChecklistState
   savedSearches: SavedSearch[]
   recentlyViewed: string[]
+  hidden?: string[]
+  reminders?: Record<string, string>
   onRestore: (data: BackupPayload) => void
 }
 
@@ -34,6 +36,8 @@ export function DataTools(props: DataToolsProps) {
       checklist: props.checklist,
       savedSearches: props.savedSearches,
       recentlyViewed: props.recentlyViewed,
+      hidden: props.hidden,
+      reminders: props.reminders,
     })
     downloadBackupJson(payload)
     setStatus('Backup downloaded')

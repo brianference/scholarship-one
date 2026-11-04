@@ -1,5 +1,12 @@
 /** Unit test for the reminder selection date math. Run: npx tsx scripts/qa-reminders.ts */
-import { selectDueReminders, fixedDeadlineMs, type ReminderRow } from './reminderSelect'
+import {
+  selectDueReminders,
+  selectDueCustomReminders,
+  fixedDeadlineMs,
+  CUSTOM_REMINDER_MAX_AGE_DAYS,
+  type ReminderRow,
+  type CustomReminderRow,
+} from './reminderSelect'
 
 const DAY = 86_400_000
 const now = Date.UTC(2026, 6, 18, 13, 0, 0) // fixed reference; no Date.now()
@@ -33,6 +40,30 @@ check('rolling excluded', !b?.items.find((i) => i.scholarshipId === 'rolling'))
 check('b7 due for d7 despite d1 sent', !!b?.items.find((i) => i.scholarshipId === 'b7' && i.mark === 'd7'))
 check('rolling deadline is not fixed', fixedDeadlineMs('Rolling (check portal)') === null)
 check('ISO deadline is fixed', fixedDeadlineMs('2027-05-01') !== null)
+
+// --- custom remind-to-apply rows ---
+const custom: CustomReminderRow[] = [
+  { userId: 'u1', email: 'a@x.com', scholarshipId: 'today', remindOn: iso(0), remindSentOn: '' },
+  { userId: 'u1', email: 'a@x.com', scholarshipId: 'missed2', remindOn: iso(-2), remindSentOn: '' }, // cron missed a day
+  { userId: 'u1', email: 'a@x.com', scholarshipId: 'future', remindOn: iso(1), remindSentOn: '' }, // skip
+  { userId: 'u1', email: 'a@x.com', scholarshipId: 'sent', remindOn: iso(0), remindSentOn: iso(0) }, // skip
+  { userId: 'u1', email: 'a@x.com', scholarshipId: 'rearmed', remindOn: iso(0), remindSentOn: iso(-5) }, // date changed
+  { userId: 'u2', email: 'b@x.com', scholarshipId: 'ancient', remindOn: iso(-(CUSTOM_REMINDER_MAX_AGE_DAYS + 1)), remindSentOn: '' }, // skip
+  { userId: 'u2', email: 'b@x.com', scholarshipId: 'edge', remindOn: iso(-CUSTOM_REMINDER_MAX_AGE_DAYS), remindSentOn: '' },
+  { userId: 'u2', email: 'b@x.com', scholarshipId: 'junk', remindOn: 'next tuesday', remindSentOn: '' }, // skip
+  { userId: 'u2', email: 'b@x.com', scholarshipId: 'blank', remindOn: '', remindSentOn: '' }, // skip
+]
+const cg = selectDueCustomReminders(custom, now)
+const ca = cg.find((g) => g.email === 'a@x.com')
+const cb = cg.find((g) => g.email === 'b@x.com')
+const ids = (g?: { items: { scholarshipId: string }[] }) =>
+  (g?.items || []).map((i) => i.scholarshipId).sort().join(',')
+check('custom: a gets today + missed2 + rearmed', ids(ca) === 'missed2,rearmed,today')
+check('custom: future day not sent early', !ca?.items.find((i) => i.scholarshipId === 'future'))
+check('custom: already-sent same date not repeated', !ca?.items.find((i) => i.scholarshipId === 'sent'))
+check('custom: only the 14-day-old row sent for b', ids(cb) === 'edge')
+check('custom: 15-day-old row dropped', !cb?.items.find((i) => i.scholarshipId === 'ancient'))
+check('custom: junk and blank dates dropped', !cb?.items.find((i) => i.scholarshipId === 'junk' || i.scholarshipId === 'blank'))
 
 console.log(`\n${failures === 0 ? 'ALL CLEAN' : failures + ' FAILURES'}`)
 process.exit(failures === 0 ? 0 : 1)

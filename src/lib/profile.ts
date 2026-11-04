@@ -17,6 +17,7 @@ export const DEFAULT_PROFILE: Profile = {
 
 const PROFILE_KEY = 'scholarship-one-profile'
 const SHORTLIST_KEY = 'scholarship-one-shortlist'
+const PROFILE_UPDATED_KEY = 'scholarship-one-profile-updated'
 
 function normalizeProfile(raw: Partial<Profile> | null): Profile {
   return {
@@ -44,6 +45,38 @@ export function saveProfile(profile: Profile): void {
   } catch {
     /* ignore */
   }
+}
+
+/** Epoch ms of the last local profile edit, 0 when the profile was never edited here. */
+export function loadProfileUpdatedAt(): number {
+  try {
+    const n = Number(localStorage.getItem(PROFILE_UPDATED_KEY))
+    return Number.isFinite(n) && n > 0 ? n : 0
+  } catch {
+    return 0
+  }
+}
+
+export function saveProfileUpdatedAt(at: number): void {
+  try {
+    localStorage.setItem(PROFILE_UPDATED_KEY, String(at))
+  } catch {
+    /* ignore */
+  }
+}
+
+/** True when every field is still the default, i.e. the student never set one. */
+export function isDefaultProfile(profile: Profile): boolean {
+  return (Object.keys(DEFAULT_PROFILE) as (keyof Profile)[]).every((k) => profile[k] === DEFAULT_PROFILE[k])
+}
+
+/** Validate a profile that came from the server or a file before trusting it. */
+export function coerceProfile(raw: unknown): Profile | null {
+  if (!raw || typeof raw !== 'object') return null
+  const o = raw as Record<string, unknown>
+  const keys = Object.keys(DEFAULT_PROFILE) as (keyof Profile)[]
+  if (!keys.every((k) => typeof o[k] === 'string' && (o[k] as string).length > 0)) return null
+  return normalizeProfile(o as Partial<Profile>)
 }
 
 export function loadShortlist(): string[] {

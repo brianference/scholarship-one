@@ -44,3 +44,45 @@ export function selectDueReminders(rows: ReminderRow[], nowMs: number): DueGroup
   }
   return [...byEmail.entries()].map(([email, items]) => ({ email, items }))
 }
+
+/** A student-chosen "remind me to apply" day on a saved award. */
+export type CustomReminderRow = {
+  userId: string
+  email: string
+  scholarshipId: string
+  /** YYYY-MM-DD */
+  remindOn: string
+  /** The remind_on value already emailed, or ''. Changing the date re-arms the reminder. */
+  remindSentOn: string
+}
+
+export type CustomDueItem = { userId: string; scholarshipId: string; remindOn: string }
+export type CustomDueGroup = { email: string; items: CustomDueItem[] }
+
+/** A reminder this far past its day is dropped rather than emailed late. */
+export const CUSTOM_REMINDER_MAX_AGE_DAYS = 14
+
+const DATE_ONLY = /^\d{4}-\d{2}-\d{2}$/
+
+/**
+ * Pick custom remind-to-apply rows that are due: the day is today or earlier (so a missed
+ * cron run still sends), no more than CUSTOM_REMINDER_MAX_AGE_DAYS old, and not already
+ * emailed for this exact date. Grouped by email so each user gets one message.
+ */
+export function selectDueCustomReminders(rows: CustomReminderRow[], nowMs: number): CustomDueGroup[] {
+  const today = utcDay(nowMs)
+  const byEmail = new Map<string, CustomDueItem[]>()
+  for (const row of rows) {
+    if (!DATE_ONLY.test(row.remindOn)) continue
+    const t = Date.parse(row.remindOn)
+    if (Number.isNaN(t)) continue
+    const age = today - utcDay(t)
+    if (age < 0 || age > CUSTOM_REMINDER_MAX_AGE_DAYS) continue
+    if (row.remindSentOn === row.remindOn) continue
+    const item: CustomDueItem = { userId: row.userId, scholarshipId: row.scholarshipId, remindOn: row.remindOn }
+    const list = byEmail.get(row.email)
+    if (list) list.push(item)
+    else byEmail.set(row.email, [item])
+  }
+  return [...byEmail.entries()].map(([email, items]) => ({ email, items }))
+}

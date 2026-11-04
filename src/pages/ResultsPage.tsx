@@ -326,6 +326,8 @@ export function ResultsPage() {
                 checklist={s.checklist}
                 savedSearches={s.savedSearches}
                 recentlyViewed={s.recent}
+                hidden={s.hidden}
+                reminders={s.remindMap}
                 onRestore={s.restoreBackup}
               />
               {copyNote ? (
