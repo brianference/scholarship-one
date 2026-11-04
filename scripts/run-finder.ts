@@ -62,6 +62,7 @@ async function main() {
         searched?: number
         read?: number
         added?: { name: string; url: string }[]
+        rejected?: { url: string; reason: string }[]
         errors?: string[]
       } | null
       if (!res.ok || !body) {
@@ -71,6 +72,8 @@ async function main() {
         added += body.added?.length ?? 0
         console.log(`  ${body.provider} searched ${body.searched} read ${body.read} added ${body.added?.length ?? 0} :: ${query}`)
         for (const a of body.added ?? []) console.log(`     + ${a.name}  ${a.url}`)
+        // Why pages were not listed is the evidence that verification is working, so it is always shown.
+        for (const r of body.rejected ?? []) console.log(`     - ${r.reason} :: ${r.url}`)
         if (body.errors?.length) console.log(`     notes: ${body.errors.join(' | ')}`)
       }
     } catch (err) {
