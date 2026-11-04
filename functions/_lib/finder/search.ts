@@ -11,7 +11,11 @@ import type { Env } from '../types'
 import { isSafePublicUrl } from './verify'
 
 export type SearchHit = { url: string; title: string }
-export type SearchOutcome = { provider: 'firecrawl' | 'brave' | 'duckduckgo' | 'none'; hits: SearchHit[]; errors: string[] }
+export type SearchOutcome = {
+  provider: 'firecrawl' | 'brave' | 'duckduckgo' | 'supplied' | 'none'
+  hits: SearchHit[]
+  errors: string[]
+}
 
 const USER_AGENT = 'Mozilla/5.0 (compatible; ScholarshipOneFinder/1.0; +https://scholarship-one.pages.dev)'
 const SEARCH_TIMEOUT_MS = 12_000

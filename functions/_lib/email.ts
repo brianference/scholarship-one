@@ -9,6 +9,28 @@ function parseSender(from: string): { name: string; email: string } {
   return { name: 'Scholarship One', email: from }
 }
 
+/**
+ * Derive a plain-text alternative from the HTML body. An HTML-only message with no
+ * text/plain part is a well-known spam-filter penalty, so every send ships both.
+ */
+function htmlToText(html: string): string {
+  return html
+    .replace(/<style[\s\S]*?<\/style>/gi, '')
+    .replace(/<a [^>]*href="([^"]+)"[^>]*>([\s\S]*?)<\/a>/gi, '$2 ($1)')
+    .replace(/<br\s*\/?>/gi, '\n')
+    .replace(/<\/(p|div|h\d|li|tr)>/gi, '\n')
+    .replace(/<[^>]+>/g, '')
+    .replace(/&nbsp;/g, ' ')
+    .replace(/&amp;/g, '&')
+    .replace(/&lt;/g, '<')
+    .replace(/&gt;/g, '>')
+    .replace(/&quot;/g, '"')
+    .replace(/&#39;/g, "'")
+    .replace(/[ \t]+/g, ' ')
+    .replace(/\n{3,}/g, '\n\n')
+    .trim()
+}
+
 export async function sendEmail(env: Env, to: string, subject: string, html: string): Promise<SendResult> {
   const key = env.BREVO_API_KEY
   const from = env.DIGEST_FROM_EMAIL || 'Scholarship One <no-reply@scholarship-one.pages.dev>'
@@ -21,11 +43,15 @@ export async function sendEmail(env: Env, to: string, subject: string, html: str
   const res = await fetch('https://api.brevo.com/v3/smtp/email', {
     method: 'POST',
     headers: { 'api-key': key, 'Content-Type': 'application/json', Accept: 'application/json' },
-    body: JSON.stringify({ sender, to: [{ email: to }], subject, htmlContent: html }),
+    body: JSON.stringify({ sender, to: [{ email: to }], subject, htmlContent: html, textContent: htmlToText(html) }),
   })
   if (!res.ok) {
     const text = await res.text()
-    return { sent: false, error: `brevo ${res.status}: ${text.slice(0, 200)}` }
+    const error = `brevo ${res.status}: ${text.slice(0, 200)}`
+    // Callers deliberately return 200 regardless (account-enumeration defence), so a
+    // failed send is otherwise invisible. Surface it in `wrangler pages deployment tail`.
+    console.error(`[email] send failed to=${to} subject=${subject} ${error}`)
+    return { sent: false, error }
   }
   return { sent: true }
 }

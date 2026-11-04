@@ -10,6 +10,7 @@ import { fetchPageHtml, MAX_PAGE_CHARS, searchWeb } from './search'
 import {
   htmlToText,
   isAggregatorUrl,
+  isSafePublicUrl,
   nameKey,
   normalizeUrlKey,
   verifyCandidate,
@@ -50,9 +51,22 @@ export function todayIso(now = Date.now()): string {
 }
 
 /** Run one search query end to end. Never throws: problems are returned in the report. */
-export async function runFinder(env: Env, query: string, fetchFn: typeof fetch = fetch): Promise<FinderReport> {
+export async function runFinder(
+  env: Env,
+  query: string,
+  fetchFn: typeof fetch = fetch,
+  suppliedUrls?: readonly string[],
+): Promise<FinderReport> {
   const report: FinderReport = { query, provider: 'none', searched: 0, read: 0, added: [], rejected: [], errors: [] }
-  const search = await searchWeb(env, query, fetchFn)
+  // Supplied links skip the search; everything after (safety, fetch, model, verification) is unchanged.
+  const search =
+    suppliedUrls && suppliedUrls.length
+      ? {
+          provider: 'supplied' as const,
+          hits: Array.from(new Set(suppliedUrls)).filter(isSafePublicUrl).map((url) => ({ url, title: '' })),
+          errors: [] as string[],
+        }
+      : await searchWeb(env, query, fetchFn)
   report.provider = search.provider
   report.errors.push(...search.errors)
   report.searched = search.hits.length

@@ -208,6 +208,16 @@ if (process.env.CRON_SECRET) {
     })
   const short = await cronCall('x')
   check('find-cron validates the body even with the right secret', short.status === 400, String(short.status))
+  const withUrls = (urls) =>
+    fetch(BASE + '/api/find-cron', {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json', 'X-Cron-Secret': process.env.CRON_SECRET },
+      body: JSON.stringify({ query: cronQuery, urls }),
+    })
+  check('find-cron rejects a non-URL in urls', (await withUrls(['not a url'])).status === 400)
+  check('find-cron rejects more than 8 urls', (await withUrls(Array.from({ length: 9 }, (_, i) => `https://a${i}.example.org/x`))).status === 400)
+  const supplied = await (await withUrls(['http://insecure.example.org/a', 'https://localhost/a'])).json().catch(() => null)
+  check('find-cron drops unsafe supplied urls', supplied?.provider === 'supplied' && supplied?.searched === 0, JSON.stringify(supplied)?.slice(0, 160))
   const real = await cronCall(cronQuery)
   const body = await real.json().catch(() => null)
   check('find-cron with the right secret runs a real search pass', real.status === 200 && typeof body?.searched === 'number', JSON.stringify(body)?.slice(0, 160))

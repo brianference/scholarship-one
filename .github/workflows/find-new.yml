@@ -33,4 +33,7 @@ jobs:
         run: npx tsx scripts/run-finder.ts ${{ (github.event_name == 'workflow_dispatch' && inputs.dry_run) && '--dry-run' || '' }}
         env:
           CRON_SECRET: ${{ secrets.CRON_SECRET }}
+          # Optional better search; without them the keyless DuckDuckGo fallback is used.
+          FIRECRAWL_API_KEY: ${{ secrets.FIRECRAWL_API_KEY }}
+          BRAVE_API_KEY: ${{ secrets.BRAVE_API_KEY }}
           FIND_QUERIES: ${{ github.event_name == 'workflow_dispatch' && inputs.queries || '' }}

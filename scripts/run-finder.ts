@@ -9,6 +9,8 @@
  */
 import { IDENTITY_OPTIONS, LEVEL_OPTIONS, MAJOR_OPTIONS } from '../src/lib/profileOptions'
 import { yearSpan } from '../functions/_lib/finder/queries'
+import { searchWeb } from '../functions/_lib/finder/search'
+import type { Env } from '../functions/_lib/types'
 
 const FIND_URL = process.env.FIND_URL || 'https://scholarship-one.pages.dev/api/find-cron'
 const SECRET = process.env.CRON_SECRET || ''
@@ -49,14 +51,22 @@ async function main() {
     console.error('[finder] CRON_SECRET is not set (or too short). Nothing was run.')
     process.exit(1)
   }
+  // Search from this machine: search engines throttle Cloudflare's network but not GitHub's. Optional
+  // FIRECRAWL_API_KEY / BRAVE_API_KEY here are tried first, then keyless DuckDuckGo. The site still reads
+  // and verifies every page itself; this job only supplies the links.
+  const searchEnv = { FIRECRAWL_API_KEY: process.env.FIRECRAWL_API_KEY, BRAVE_API_KEY: process.env.BRAVE_API_KEY } as Env
   let ok = 0
   let added = 0
   for (const query of queries) {
     try {
+      const found = await searchWeb(searchEnv, query)
+      const urls = found.hits.map((h) => h.url).slice(0, 8)
+      console.log(`  search: ${found.provider}, ${urls.length} link(s)${found.errors.length ? ' (' + found.errors.join(' | ') + ')' : ''}`)
       const res = await fetch(FIND_URL, {
         method: 'POST',
         headers: { 'Content-Type': 'application/json', 'X-Cron-Secret': SECRET },
-        body: JSON.stringify({ query }),
+        // With no links the site falls back to its own search.
+        body: JSON.stringify(urls.length ? { query, urls } : { query }),
         signal: AbortSignal.timeout(120_000),
       })
       const body = (await res.json().catch(() => null)) as {

@@ -25,7 +25,7 @@ export async function onRequestPost({ request, env }: FnCtx) {
   if (!expected || expected.length < 24 || !safeEqual(sent, expected)) return json({ error: 'forbidden' }, 403)
   const parsed = await parseBody(request, cronBodySchema)
   if (!parsed.ok) return parsed.response
-  const report = await runFinder(env, parsed.data.query)
+  const report = await runFinder(env, parsed.data.query, fetch, parsed.data.urls)
   return json({
     provider: report.provider,
     searched: report.searched,

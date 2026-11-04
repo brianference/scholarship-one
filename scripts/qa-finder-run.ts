@@ -250,6 +250,23 @@ const searchOnly = (hits: string[], pageFor: (url: string) => Response | undefin
   check('at most 4 pages are fetched per call even with 10 results', reads <= 4, String(reads))
 }
 
+// links supplied by the caller skip the search but not the checks
+{
+  const dbSupplied = fakeDb()
+  let searched = false
+  const noSearch: typeof fetch = async (input, init) => {
+    const url = typeof input === 'string' ? input : input instanceof URL ? input.href : input.url
+    if (url.startsWith('https://html.duckduckgo.com')) searched = true
+    return fakeFetch(input, init)
+  }
+  const supplied = [GOOD_URL, 'https://liar.example.org/awards/park-stem', 'http://insecure.example.org/a', 'https://localhost/a', 'https://10.0.0.5/a']
+  const r = await runFinder({ DB: dbSupplied, OPENAI_API_KEY: 'k' } as unknown as Env, 'supplied links query', noSearch, supplied)
+  check('supplied links do not trigger a search', !searched && r.provider === 'supplied')
+  check('unsafe supplied links are dropped before any fetch', r.searched === 2, String(r.searched))
+  check('a supplied good page is verified and listed', r.added.length === 1 && r.added[0].name === 'Lopez Nursing Scholarship')
+  check('a supplied page with an invented figure is still rejected', r.rejected.some((x) => /liar/.test(x.url) && x.reason === 'amount not on page'), JSON.stringify(r.rejected))
+}
+
 // no model key: nothing can be listed
 const noModel = await runFinder({ DB: fakeDb(), } as unknown as Env, 'undergraduate nursing scholarship application', fakeFetch)
 check('without a model key nothing is listed', noModel.added.length === 0 && noModel.rejected.some((r) => /OPENAI_API_KEY/.test(r.reason)))

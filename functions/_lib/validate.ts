@@ -124,8 +124,15 @@ export const findRequestSchema = z.object({
   variant: z.union([z.literal(0), z.literal(1)]),
 })
 
-/** Body for /api/find-cron. */
-export const cronBodySchema = z.object({ query: z.string().trim().min(8).max(200) })
+/**
+ * Body for /api/find-cron. `urls` are result links the caller already found (the daily job searches
+ * from GitHub's network, because search engines throttle Cloudflare's); they get the same checks and
+ * the same page verification as links from the site's own search.
+ */
+export const cronBodySchema = z.object({
+  query: z.string().trim().min(8).max(200),
+  urls: z.array(z.string().trim().url().max(500)).max(8).optional(),
+})
 
 /** Body for /api/find-state: both parts optional; ids are catalog or web-find slugs. */
 export const findStateSchema = z.object({
