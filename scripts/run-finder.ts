@@ -4,7 +4,8 @@
  * keys, so this job needs only the shared secret.
  *
  * Run: npx tsx scripts/run-finder.ts [--dry-run]
- * Env: CRON_SECRET (required), FIND_URL (default: the production endpoint), QUERIES_PER_RUN (default 8)
+ * Env: CRON_SECRET (required), FIND_URL (default: the production endpoint), QUERIES_PER_RUN (default 8),
+ *      FIND_QUERIES (optional: queries separated by |, replaces the daily list for a targeted run)
  */
 import { IDENTITY_OPTIONS, LEVEL_OPTIONS, MAJOR_OPTIONS } from '../src/lib/profileOptions'
 import { yearSpan } from '../functions/_lib/finder/queries'
@@ -37,7 +38,8 @@ export function todaysQueries(now = new Date(), perRun = PER_RUN): string[] {
 }
 
 async function main() {
-  const queries = todaysQueries()
+  const custom = (process.env.FIND_QUERIES || '').split('|').map((q) => q.trim()).filter((q) => q.length >= 8)
+  const queries = custom.length ? custom.slice(0, 20) : todaysQueries()
   console.log(`[finder] ${queries.length} queries${DRY ? ' (dry run)' : ''}`)
   if (DRY) {
     for (const q of queries) console.log(`  ${q}`)

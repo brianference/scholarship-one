@@ -9,6 +9,10 @@ on:
         description: 'List the queries only, do not call the site'
         type: boolean
         default: false
+      queries:
+        description: 'Optional: your own queries separated by | (replaces the daily list)'
+        type: string
+        default: ''
 
 jobs:
   find:
@@ -29,3 +33,4 @@ jobs:
         run: npx tsx scripts/run-finder.ts ${{ (github.event_name == 'workflow_dispatch' && inputs.dry_run) && '--dry-run' || '' }}
         env:
           CRON_SECRET: ${{ secrets.CRON_SECRET }}
+          FIND_QUERIES: ${{ github.event_name == 'workflow_dispatch' && inputs.queries || '' }}
