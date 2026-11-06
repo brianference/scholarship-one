@@ -11,3 +11,19 @@ binding = "DB"
 database_name = "scholarship-one-db"
 database_id = "df213333-9c8a-4943-9015-c594462ace85"
 migrations_dir = "migrations"
+
+# Production only. Workers AI is the free fallback that reads award pages when OpenAI is unavailable.
+# It is kept out of the top level on purpose: `wrangler pages dev` cannot start with an AI binding in a
+# non-interactive shell (AI always talks to the remote account), and the top level is what runs locally.
+# Cloudflare's rule for non-inheritable bindings: once an environment overrides one, it must repeat
+# all of them, so the D1 binding is repeated here, identical to the top-level one.
+[env.production]
+
+[[env.production.d1_databases]]
+binding = "DB"
+database_name = "scholarship-one-db"
+database_id = "df213333-9c8a-4943-9015-c594462ace85"
+migrations_dir = "migrations"
+
+[env.production.ai]
+binding = "AI"

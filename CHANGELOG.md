@@ -20,9 +20,23 @@
   social hosts are never listed; unsafe URLs are never fetched; deadlines in the past
   are dropped. Finds are stored in D1 and served at `/api/discovered`.
 - **A daily job** (`find-new.yml`, 14:30 UTC) runs eight queries a day through
-  `/api/find-cron`, protected by `CRON_SECRET`.
+  `/api/find-cron`, protected by `CRON_SECRET`. The job searches from GitHub's network and
+  sends the links to the site, because search engines return nothing to requests from
+  Cloudflare. The site still fetches, reads and verifies every page itself. A manual run
+  can take its own `queries` or a list of `urls`.
+- **Two page readers.** OpenAI first; when it is unavailable (no key, no credits, an HTTP
+  error) the free Cloudflare Workers AI binding reads the page instead. Both feed the same
+  verification, so a weaker reader cannot list anything the page does not say.
 - Catalog entries carry the date they were added (`addedAt`), backfilled from git
   history. Saved web finds work in the tracker, reminders and the digest.
+
+### Known limits
+
+- Keyless DuckDuckGo search is throttled from datacenter addresses (Cloudflare and GitHub both
+  got no results), so reliable daily finds need `FIRECRAWL_API_KEY` or `BRAVE_API_KEY` as a
+  GitHub Actions secret.
+- The provider check (.edu, .gov, .org, .mil, or a name in the domain) is a heuristic, not proof.
+  Every web find is labeled and tells the student to confirm on the official site.
 
 ### Database
 

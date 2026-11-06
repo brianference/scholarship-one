@@ -267,6 +267,52 @@ const searchOnly = (hits: string[], pageFor: (url: string) => Response | undefin
   check('a supplied page with an invented figure is still rejected', r.rejected.some((x) => /liar/.test(x.url) && x.reason === 'amount not on page'), JSON.stringify(r.rejected))
 }
 
+// ---- the free Workers AI fallback ----
+{
+  const openAi429: typeof fetch = async (input, init) => {
+    const url = typeof input === 'string' ? input : input instanceof URL ? input.href : input.url
+    if (url === 'https://api.openai.com/v1/chat/completions') return new Response('{"error":{"message":"You have no credits remaining."}}', { status: 429 })
+    return fakeFetch(input, init)
+  }
+  let aiCalls = 0
+  /** A stand-in for env.AI: answers per page, once as an object and once as a JSON string. */
+  const fakeAi = (asString: boolean) => ({
+    async run(_model: string, input: Record<string, unknown>) {
+      aiCalls++
+      const messages = input.messages as { content: string }[]
+      const text = messages[1].content
+      let out: Record<string, unknown> = { isScholarship: false }
+      if (text.includes('Lopez Nursing Scholarship')) {
+        out = { isScholarship: true, name: 'Lopez Nursing Scholarship', amount: '$4,500 per year', deadline: `March 1, ${YEAR}`, summaryQuote: 'supports undergraduate nursing students who demonstrate financial need', tags: ['undergrad', 'nursing', 'need-based'] }
+      } else if (text.includes('Park STEM Scholarship')) {
+        out = { isScholarship: true, name: 'Park STEM Scholarship', amount: '$20,000', deadline: `April 10, ${YEAR}`, summaryQuote: 'supports undergraduate engineering students who live in Arizona', tags: ['undergrad', 'engineering', 'arizona'] }
+      }
+      return { response: asString ? JSON.stringify(out) : out }
+    },
+  })
+
+  for (const asString of [false, true]) {
+    const db2 = fakeDb()
+    const r = await runFinder({ DB: db2, OPENAI_API_KEY: 'k', AI: fakeAi(asString) } as unknown as Env, 'workers ai fallback query', openAi429, [GOOD_URL, 'https://liar.example.org/awards/park-stem'])
+    check(`OpenAI out of credits -> Workers AI reads the page (${asString ? 'JSON string' : 'JSON object'} response)`, r.added.length === 1 && r.added[0].name === 'Lopez Nursing Scholarship', JSON.stringify({ added: r.added.length, rejected: r.rejected }))
+    check(`the fallback model's invented amount is still rejected (${asString ? 'string' : 'object'})`, r.rejected.some((x) => /liar/.test(x.url) && x.reason === 'amount not on page'), JSON.stringify(r.rejected))
+  }
+  check('the fallback was actually called', aiCalls >= 4, String(aiCalls))
+
+  // an answer is not an outage: OpenAI saying "not an award" must not trigger the fallback
+  const before = aiCalls
+  await runFinder({ DB: fakeDb(), OPENAI_API_KEY: 'k', AI: fakeAi(false) } as unknown as Env, 'not an award query', fakeFetch, ['https://list.example.org/all-awards'])
+  check('a "not an award" answer from OpenAI does not call the fallback', aiCalls === before, `${aiCalls - before} extra calls`)
+
+  // both unavailable: the reason names both, and nothing is listed
+  const brokenAi = { async run() { throw new Error('model unavailable') } }
+  const both = await runFinder({ DB: fakeDb(), OPENAI_API_KEY: 'k', AI: brokenAi } as unknown as Env, 'both down query', openAi429, [GOOD_URL])
+  check('both readers down -> nothing listed, reason names both', both.added.length === 0 && both.rejected.some((x) => /openai http 429/.test(x.reason) && /workers-ai failed/.test(x.reason)), JSON.stringify(both.rejected))
+  const garbage = { async run() { return { response: 'this is not json' } } }
+  const bad = await runFinder({ DB: fakeDb(), AI: garbage } as unknown as Env, 'garbage query', fakeFetch, [GOOD_URL])
+  check('unreadable fallback output lists nothing', bad.added.length === 0)
+}
+
 // no model key: nothing can be listed
 const noModel = await runFinder({ DB: fakeDb(), } as unknown as Env, 'undergraduate nursing scholarship application', fakeFetch)
 check('without a model key nothing is listed', noModel.added.length === 0 && noModel.rejected.some((r) => /OPENAI_API_KEY/.test(r.reason)))

@@ -14,6 +14,8 @@ export interface D1Database {
 
 export interface Env {
   DB: D1Database
+  /** Cloudflare Workers AI binding (wrangler.toml [ai]); the free fallback reader for the finder. */
+  AI?: { run(model: string, input: Record<string, unknown>): Promise<unknown> }
   BREVO_API_KEY?: string
   DIGEST_FROM_EMAIL?: string
   SITE_URL?: string
