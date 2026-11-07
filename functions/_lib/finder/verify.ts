@@ -10,7 +10,7 @@
  * near the award's name, tags must be supported by the page, and the host must look like the
  * award's provider. See ground.ts.
  */
-import { appearsAsToken, appearsNearName, looksLikeProviderHost, tagSupported } from './ground'
+import { appearsAsToken, appearsNearName, looksLikeProviderHost, tagSupported, tokenIndexes } from './ground'
 
 /** Hosts that list other organizations' awards. An award is only listed from its provider's own page. */
 export const AGGREGATOR_HOSTS = [
@@ -241,7 +241,11 @@ export function verifyCandidate(
   const name = c.name.trim()
   if (name.length < 4 || name.length > 140) return { ok: false, reason: 'name length' }
   if (!appearsAsToken(name, page)) return { ok: false, reason: 'name not on page' }
-  if (!/\b(?:scholarship|grant|fellowship|award|bursary)s?\b/i.test(name + ' ' + c.summaryQuote)) {
+  // An award's name often leaves out the word ("Most Valuable Student"), so the kind of award may be
+  // stated in the name, in the quote, or in the page text right around the name.
+  const nameAt = tokenIndexes(name, page)[0] ?? 0
+  const nearName = page.slice(Math.max(0, nameAt - 300), nameAt + name.length + 700)
+  if (!/\b(?:scholarship|grant|fellowship|award|bursary)s?\b/i.test(`${name} ${c.summaryQuote} ${nearName}`)) {
     return { ok: false, reason: 'not described as a scholarship, grant, fellowship or award' }
   }
   if (!looksLikeProviderHost(pageUrl, name)) {

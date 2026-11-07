@@ -146,6 +146,15 @@ check('a throwaway .com host unrelated to the award is rejected', /host does not
 check('a .com host named for the award is accepted', run({}, 'https://riveranursing.com/apply').ok)
 check('a .edu host is accepted', run({}, 'https://financialaid.example.edu/rivera').ok)
 check('"Grantham" does not make a page a grant', reasonOf(run({ name: 'Grantham Nursing Prize' }, URL_OK, padded('<h1>Grantham Nursing Prize</h1><p>The Grantham Nursing Prize supports undergraduate nursing students who demonstrate financial need. Prize amount: $5,000 per year. Deadline March 1, 2027.</p>'))) === 'not described as a scholarship, grant, fellowship or award')
+check('a name without the word "scholarship" is accepted when the page says so beside it', (() => {
+  const page = padded('<h1>Most Valuable Student</h1><p>The Elks Most Valuable Student scholarship supports undergraduate nursing students who demonstrate financial need. Award amount: $5,000 per year. Applications close on March 1, 2027.</p>')
+  const v = run({ name: 'Most Valuable Student', summaryQuote: 'supports undergraduate nursing students who demonstrate financial need' }, URL_OK, page)
+  return v.ok
+})())
+check('a name without the word is rejected when nothing near it calls it an award', (() => {
+  const page = padded('<h1>Most Valuable Student</h1><p>The Most Valuable Student supports undergraduate nursing students who demonstrate financial need. Amount: $5,000 per year. Closes March 1, 2027.</p>')
+  return reasonOf(run({ name: 'Most Valuable Student', summaryQuote: 'supports undergraduate nursing students who demonstrate financial need' }, URL_OK, page)) === 'not described as a scholarship, grant, fellowship or award'
+})())
 check('text hidden with display:none does not count', (() => {
   const hidden = htmlToText('<html><body><h1>Some page</h1><div style="display:none">Rivera Nursing Scholarship $5,000 per year March 1, 2027 supports undergraduate nursing students who demonstrate financial need</div><p>' + 'Filler sentence about nothing at all. '.repeat(20) + '</p></body></html>')
   return !hidden.includes('Rivera') && reasonOf(run({}, URL_OK, hidden)) !== 'ACCEPTED'
