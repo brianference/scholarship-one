@@ -33,7 +33,7 @@ export const WORKERS_AI_MODELS = [
 const SYSTEM = `You read one web page and report facts about the single scholarship, grant, fellowship or award it describes.
 Rules:
 - Copy text EXACTLY as it appears on the page, character for character. Do not paraphrase, summarize, reword, convert currencies, or fix typos.
-- "amount" is the award value as written (for example "$5,000 per year" or "Full tuition"). "deadline" is the application deadline as written, including the year.
+- "amount" is ONE award value copied exactly as it appears (for example "$5,000 per year" or "Full tuition"). If the page lists several amounts, copy the largest single award, for example "$30,000", not a range, a sum or a description. "deadline" is ONE application deadline copied exactly as it appears, including the year (for example "November 12, 2026"); never rewrite it into another format.
 - "summaryQuote" is one sentence copied from the page that says who the award is for (30 to 300 characters).
 - "tags" are chosen ONLY from the allowed list you are given. Include one school-level tag (undergrad, grad, high-school, community-college, transfer) and any that clearly apply.
 - If the page is not about one specific award (a list of awards, a news article, a forum thread, an aggregator) or any field is not stated on the page, return {"isScholarship": false}.

@@ -27,7 +27,8 @@ export type FinderReport = {
   searched: number
   read: number
   added: (VerifiedAward & { id: string; url: string })[]
-  rejected: { url: string; reason: string }[]
+  /** `detail` is what the model claimed, for tuning; it is only returned by the secret-protected cron endpoint. */
+  rejected: { url: string; reason: string; detail?: string }[]
   errors: string[]
 }
 
@@ -113,7 +114,11 @@ export async function runFinder(
     }
     const verdict = verifyCandidate(read.candidate, text, pageUrl, today, TAG_VOCAB)
     if (!verdict.ok) {
-      report.rejected.push({ url: hit.url, reason: verdict.reason })
+      report.rejected.push({
+        url: hit.url,
+        reason: verdict.reason,
+        detail: JSON.stringify({ name: read.candidate.name, amount: read.candidate.amount, deadline: read.candidate.deadline, tags: read.candidate.tags }).slice(0, 300),
+      })
       continue
     }
     const nk = nameKey(verdict.award.name)
