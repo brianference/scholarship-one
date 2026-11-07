@@ -46,6 +46,21 @@ function safeUrlKey(url: string): string | null {
   }
 }
 
+/**
+ * True when `key` is the same award as one already listed. Exact match, or one name contained in the
+ * other when both are long enough to be distinctive ("Most Valuable Student" vs "Elks Most Valuable
+ * Student Scholarship" differ only by a prefix; a short key like "nursing" must match exactly).
+ */
+export function isDuplicateName(key: string, known: ReadonlySet<string>): boolean {
+  if (known.has(key)) return true
+  const MIN_CONTAINED = 10
+  for (const other of known) {
+    if (other.length < MIN_CONTAINED || key.length < MIN_CONTAINED) continue
+    if (other.includes(key) || key.includes(other)) return true
+  }
+  return false
+}
+
 /** Today as YYYY-MM-DD in UTC. */
 export function todayIso(now = Date.now()): string {
   return new Date(now).toISOString().slice(0, 10)
@@ -122,7 +137,7 @@ export async function runFinder(
       continue
     }
     const nk = nameKey(verdict.award.name)
-    if (nameKeys.has(nk)) {
+    if (isDuplicateName(nk, nameKeys)) {
       report.rejected.push({ url: hit.url, reason: 'same award name already listed' })
       continue
     }

@@ -7,7 +7,7 @@
  * written to the database for a rejected page. The pages are synthetic fixtures, not real awards.
  */
 import { CATALOG } from '../src/data/catalog'
-import { runFinder, todayIso } from '../functions/_lib/finder/run'
+import { isDuplicateName, runFinder, todayIso } from '../functions/_lib/finder/run'
 import { parseDuckDuckGo, searchWeb } from '../functions/_lib/finder/search'
 import type { Env } from '../functions/_lib/types'
 
@@ -330,6 +330,19 @@ const searchOnly = (hits: string[], pageFor: (url: string) => Response | undefin
   const garbage = { async run() { return { response: 'this is not json' } } }
   const bad = await runFinder({ DB: fakeDb(), AI: garbage } as unknown as Env, 'garbage query', fakeFetch, [GOOD_URL])
   check('unreadable fallback output lists nothing', bad.added.length === 0)
+}
+
+// near-duplicate names count as the same award
+check('exact name key is a duplicate', isDuplicateName('lopeznursing', new Set(['lopeznursing'])))
+check('a name that only adds a prefix is a duplicate (Elks case)', isDuplicateName('mostvaluablestudent', new Set(['elksmostvaluablestudent'])))
+check('a name that only adds a suffix is a duplicate', isDuplicateName('lopeznursinghonors', new Set(['lopeznursing', 'unrelatedname123'])))
+check('a short key must match exactly, not by containment', !isDuplicateName('nursing', new Set(['lopeznursingfund'])))
+check('a different long name is not a duplicate', !isDuplicateName('rivera-park-stem-prize'.replace(/-/g, ''), new Set(['lopeznursinghonors'])))
+{
+  const seeded = fakeDb()
+  seeded.rows.push({ id: 'web-seed', url: 'https://other.example.org/seed', name: 'Lopez Nursing Honors Award' })
+  const r = await runFinder({ DB: seeded, OPENAI_API_KEY: 'k' } as unknown as Env, 'near duplicate query', fakeFetch, [GOOD_URL])
+  check('the pipeline rejects a near-duplicate of a stored award', r.added.length === 0 && r.rejected.some((x) => x.reason === 'same award name already listed'), JSON.stringify(r.rejected))
 }
 
 // no model key: nothing can be listed
