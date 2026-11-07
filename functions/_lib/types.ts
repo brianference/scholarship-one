@@ -25,6 +25,8 @@ export interface Env {
   BRAVE_API_KEY?: string
   OPENAI_API_KEY?: string
   AI_MODEL?: string
+  /** Optional first-choice Workers AI model id for the finder's fallback reader. */
+  WORKERS_AI_MODEL?: string
   /** Shared secret for the daily finder job (X-Cron-Secret header). */
   CRON_SECRET?: string
   /** When '1', /api/auth/request returns the magic link in the response (LOCAL DEV ONLY). */

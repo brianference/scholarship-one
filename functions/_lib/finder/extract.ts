@@ -16,8 +16,19 @@ const OPENAI_URL = 'https://api.openai.com/v1/chat/completions'
 const EXTRACT_TIMEOUT_MS = 25_000
 /** Page text sent to the model. Award facts sit near the top of an award page. */
 const MAX_MODEL_CHARS = 12_000
-/** Workers AI model with JSON mode, from Cloudflare's JSON mode documentation. */
-export const WORKERS_AI_MODEL = '@cf/meta/llama-3.1-8b-instruct'
+/**
+ * Workers AI models, tried in order. Models are retired often (the first one used here,
+ * @cf/meta/llama-3.1-8b-instruct, was deprecated on 2026-05-30 although a docs page still listed it),
+ * so this is a list, and WORKERS_AI_MODEL in the environment goes first. The IDs come from
+ * Cloudflare's model catalog slugs (llama-3.3-70b-instruct-fp8-fast, llama-3.1-8b-instruct-fp8,
+ * qwen3-30b-a3b-fp8, gpt-oss-20b); the live run reports which ones answer.
+ */
+export const WORKERS_AI_MODELS = [
+  '@cf/meta/llama-3.3-70b-instruct-fp8-fast',
+  '@cf/meta/llama-3.1-8b-instruct-fp8',
+  '@cf/qwen/qwen3-30b-a3b-fp8',
+  '@cf/openai/gpt-oss-20b',
+]
 
 const SYSTEM = `You read one web page and report facts about the single scholarship, grant, fellowship or award it describes.
 Rules:
@@ -101,31 +112,65 @@ async function readWithOpenAI(
   }
 }
 
+/** The first {...} block in a model's text answer, parsed. Models sometimes wrap JSON in prose or fences. */
+function jsonFromText(text: string): Record<string, unknown> | null {
+  const start = text.indexOf('{')
+  const end = text.lastIndexOf('}')
+  if (start === -1 || end <= start) return null
+  try {
+    const value: unknown = JSON.parse(text.slice(start, end + 1))
+    return value && typeof value === 'object' ? (value as Record<string, unknown>) : null
+  } catch {
+    return null
+  }
+}
+
+/** One model, once. With `schema` it asks for JSON mode; without, it parses JSON out of the text. */
+async function runWorkersAiModel(
+  env: Env,
+  model: string,
+  pageText: string,
+  allowedTags: readonly string[],
+  schema: boolean,
+): Promise<Record<string, unknown>> {
+  const input: Record<string, unknown> = {
+    messages: [
+      { role: 'system', content: SYSTEM },
+      { role: 'user', content: `Allowed tags: ${allowedTags.join(', ')}\n\nPAGE TEXT:\n${pageText.slice(0, MAX_MODEL_CHARS)}` },
+    ],
+    max_tokens: 700,
+    temperature: 0,
+  }
+  if (schema) input.response_format = { type: 'json_schema', json_schema: WORKERS_AI_SCHEMA }
+  // The binding takes no abort signal, so a stuck call is cut off by a timer instead.
+  const out = await Promise.race([
+    (env.AI as NonNullable<Env['AI']>).run(model, input),
+    new Promise<never>((_, reject) => setTimeout(() => reject(new Error('timed out')), EXTRACT_TIMEOUT_MS)),
+  ])
+  // Docs: the answer sits under a top-level `response` key, as an object (JSON mode) or as text.
+  const raw = (out as { response?: unknown } | null)?.response
+  if (raw && typeof raw === 'object') return raw as Record<string, unknown>
+  const parsed = typeof raw === 'string' ? jsonFromText(raw) : null
+  if (!parsed) throw new Error('no JSON in the answer')
+  return parsed
+}
+
 async function readWithWorkersAi(env: Env, pageText: string, allowedTags: readonly string[]): Promise<ReaderOutcome> {
   if (!env.AI) return { kind: 'unavailable', reason: 'workers-ai: no AI binding' }
-  try {
-    const run = env.AI.run(WORKERS_AI_MODEL, {
-      messages: [
-        { role: 'system', content: SYSTEM },
-        { role: 'user', content: `Allowed tags: ${allowedTags.join(', ')}\n\nPAGE TEXT:\n${pageText.slice(0, MAX_MODEL_CHARS)}` },
-      ],
-      response_format: { type: 'json_schema', json_schema: WORKERS_AI_SCHEMA },
-      max_tokens: 700,
-      temperature: 0,
-    })
-    // The binding takes no abort signal, so a stuck call is cut off by a timer instead.
-    const out = await Promise.race([
-      run,
-      new Promise<never>((_, reject) => setTimeout(() => reject(new Error('timed out')), EXTRACT_TIMEOUT_MS)),
-    ])
-    // Docs: the JSON sits under a top-level `response` key, as an object (JSON mode) or a string.
-    const raw = (out as { response?: unknown } | null)?.response
-    const parsed = typeof raw === 'string' ? (JSON.parse(raw) as unknown) : raw
-    if (!parsed || typeof parsed !== 'object') return { kind: 'unavailable', reason: 'workers-ai returned no JSON' }
-    return { kind: 'answer', result: toResult(parsed as Record<string, unknown>, 'workers-ai') }
-  } catch (err) {
-    return { kind: 'unavailable', reason: `workers-ai failed: ${(err as Error).message}` }
+  const models = [...(env.WORKERS_AI_MODEL ? [env.WORKERS_AI_MODEL] : []), ...WORKERS_AI_MODELS]
+  const failures: string[] = []
+  for (const model of models) {
+    // JSON mode first; a model that rejects it (or ignores it) gets one more try as plain text.
+    for (const schema of [true, false]) {
+      try {
+        const parsed = await runWorkersAiModel(env, model, pageText, allowedTags, schema)
+        return { kind: 'answer', result: toResult(parsed, 'workers-ai') }
+      } catch (err) {
+        failures.push(`${model}${schema ? '' : ' (text)'}: ${(err as Error).message.slice(0, 90)}`)
+      }
+    }
   }
+  return { kind: 'unavailable', reason: `workers-ai failed: ${failures.join(' | ')}` }
 }
 
 /** Read one page's visible text with the first reader that is available. */

@@ -277,8 +277,10 @@ const searchOnly = (hits: string[], pageFor: (url: string) => Response | undefin
   let aiCalls = 0
   /** A stand-in for env.AI: answers per page, once as an object and once as a JSON string. */
   const fakeAi = (asString: boolean) => ({
-    async run(_model: string, input: Record<string, unknown>) {
+    async run(model: string, input: Record<string, unknown>) {
       aiCalls++
+      // The first model in the list is retired, like the one that failed in production.
+      if (model === '@cf/meta/llama-3.3-70b-instruct-fp8-fast') throw new Error('5028: model was deprecated')
       const messages = input.messages as { content: string }[]
       const text = messages[1].content
       let out: Record<string, unknown> = { isScholarship: false }
@@ -298,6 +300,23 @@ const searchOnly = (hits: string[], pageFor: (url: string) => Response | undefin
     check(`the fallback model's invented amount is still rejected (${asString ? 'string' : 'object'})`, r.rejected.some((x) => /liar/.test(x.url) && x.reason === 'amount not on page'), JSON.stringify(r.rejected))
   }
   check('the fallback was actually called', aiCalls >= 4, String(aiCalls))
+
+  // a model that rejects JSON mode gets a second try as plain text, and fenced or chatty JSON is read
+  {
+    const textOnly = {
+      async run(model: string, input: Record<string, unknown>) {
+        if (input.response_format) throw new Error('response_format is not supported by this model')
+        const text = (input.messages as { content: string }[])[1].content
+        const out = text.includes('Lopez Nursing Scholarship')
+          ? { isScholarship: true, name: 'Lopez Nursing Scholarship', amount: '$4,500 per year', deadline: `March 1, ${YEAR}`, summaryQuote: 'supports undergraduate nursing students who demonstrate financial need', tags: ['undergrad', 'nursing', 'need-based'] }
+          : { isScholarship: false }
+        const fence = '`'.repeat(3)
+        return { response: ['Here is the JSON you asked for:', fence + 'json', JSON.stringify(out), fence, 'Let me know if you need more.'].join('\n') }
+      },
+    }
+    const r = await runFinder({ DB: fakeDb(), OPENAI_API_KEY: 'k', AI: textOnly } as unknown as Env, 'text mode query', openAi429, [GOOD_URL])
+    check('a model without JSON mode is retried as text and fenced JSON is parsed', r.added.length === 1 && r.added[0].name === 'Lopez Nursing Scholarship', JSON.stringify(r.rejected))
+  }
 
   // an answer is not an outage: OpenAI saying "not an award" must not trigger the fallback
   const before = aiCalls
