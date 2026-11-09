@@ -180,6 +180,32 @@ export type VerifiedAward = {
 
 export type Verdict = { ok: true; award: VerifiedAward } | { ok: false; reason: string }
 
+/** An amount written in millions or billions is a program's total, never one student's award. */
+const HUGE_AMOUNT_RE = /\b(?:million|billion)s?\b|\d\s?(?:m|mm|bn)\b/i
+/** Wording that states what an organization gave out overall, not what one winner receives. */
+const TOTAL_FUNDING_RE =
+  /\b(?:totall?ing|in total|total (?:of|value|awards?|funding|scholarships?)|combined|altogether|to date|so far|alone|(?:has|have|had) (?:been )?(?:awarded|distributed|given|provided)|(?:in|of) (?:scholarships|scholarship (?:funds|dollars)|financial aid))\b/i
+/** Wording that states what one recipient gets. */
+const PER_AWARD_RE =
+  /\b(?:per (?:year|student|recipient|award|winner|semester|term|academic year)|each|up to|one-time|renewable|stipend|(?:will|may|can) (?:receive|be awarded|be given)|(?:receives?|receiving)|winners? (?:receive|get)|in the amount of|award amount|award of|scholarship amount)\b/i
+const TOTAL_WINDOW_BEFORE = 140
+const TOTAL_WINDOW_AFTER = 60
+
+/**
+ * True when the amount reads as money given out in total rather than one award: it is written in
+ * millions, or every place it appears on the page sits in total-funding wording with no
+ * per-recipient wording beside it. A page that states the figure both ways is not rejected.
+ */
+export function looksLikeTotalFunding(amount: string, normalizedPage: string): boolean {
+  if (HUGE_AMOUNT_RE.test(amount)) return true
+  const spots = tokenIndexes(amount, normalizedPage)
+  if (spots.length === 0) return false
+  return spots.every((at) => {
+    const window = normalizedPage.slice(Math.max(0, at - TOTAL_WINDOW_BEFORE), at + amount.length + TOTAL_WINDOW_AFTER)
+    return TOTAL_FUNDING_RE.test(window) && !PER_AWARD_RE.test(window)
+  })
+}
+
 const ROLLING_RE = /\b(?:rolling|varies|ongoing|year-round|open until filled)\b/i
 const ROLLING_LABEL = 'Rolling (check portal)'
 const MONTH_NAMES = ['jan', 'feb', 'mar', 'apr', 'may', 'jun', 'jul', 'aug', 'sep', 'oct', 'nov', 'dec']
@@ -257,6 +283,7 @@ export function verifyCandidate(
   if (!appearsAsToken(amount, page)) return { ok: false, reason: 'amount not on page' }
   if (!appearsNearName(amount, name, page)) return { ok: false, reason: 'amount not near the award name' }
   if (!/\d|full|tuition|varies/i.test(amount)) return { ok: false, reason: 'amount has no figure' }
+  if (looksLikeTotalFunding(amount, page)) return { ok: false, reason: 'amount reads as total funding, not one award' }
 
   const deadlineText = c.deadline.trim()
   if (deadlineText.length < 3 || deadlineText.length > 80) return { ok: false, reason: 'deadline length' }

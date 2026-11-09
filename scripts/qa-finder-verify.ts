@@ -160,6 +160,18 @@ check('text hidden with display:none does not count', (() => {
   return !hidden.includes('Rivera') && reasonOf(run({}, URL_OK, hidden)) !== 'ACCEPTED'
 })())
 check('aria-hidden text does not count', !htmlToText('<p aria-hidden="true">secret planted words</p><p>visible</p>').includes('planted'))
+// ---- total funding is not an award amount (found live: SWE "nearly $1.8 million in 2026 alone") ----
+const RIVERA = '<h1>Rivera Nursing Scholarship</h1><p>The Rivera Nursing Scholarship supports undergraduate nursing students who demonstrate financial need. Applications close on March 1, 2027.</p>'
+const totalMillions = padded(`${RIVERA}<p>Since 1959 the foundation has awarded millions of dollars in scholarships to students worldwide, including nearly $1.8 million in 2026 alone.</p>`)
+check('an amount written in millions is rejected as total funding', reasonOf(run({ amount: 'nearly $1.8 million' }, URL_OK, totalMillions)) === 'amount reads as total funding, not one award', reasonOf(run({ amount: 'nearly $1.8 million' }, URL_OK, totalMillions)))
+const totalPlain = padded(`${RIVERA}<p>Since 1959 the foundation has awarded $500,000 in scholarships to students, including $120,000 in 2026 alone.</p>`)
+check('a plain figure that only appears as a yearly total is rejected', reasonOf(run({ amount: '$120,000' }, URL_OK, totalPlain)) === 'amount reads as total funding, not one award', reasonOf(run({ amount: '$120,000' }, URL_OK, totalPlain)))
+const totalAndEach = padded(`${RIVERA}<p>The foundation has awarded $5,000 in scholarships to its first recipient in 1959.</p><p>Each winner receives $5,000.</p>`)
+check('the same figure stated per winner as well is not rejected', run({ amount: '$5,000' }, URL_OK, totalAndEach).ok, reasonOf(run({ amount: '$5,000' }, URL_OK, totalAndEach)))
+const inTheAmountOf = padded(`${RIVERA}<p>The Rivera Nursing Scholarship in the amount of $5,000 for the 2027-2028 academic year will be awarded to a student who begins nursing school this fall.</p>`)
+check('"in the amount of $5,000 ... will be awarded" is accepted', run({ amount: '$5,000' }, URL_OK, inTheAmountOf).ok, reasonOf(run({ amount: '$5,000' }, URL_OK, inTheAmountOf)))
+check('"$5,000 per year" on the standard fixture is still accepted', run({}).ok)
+
 check('nameKey ignores filler words and punctuation', nameKey('The Rivera Nursing Scholarship Program') === nameKey('rivera nursing'))
 
 console.log(`\n${failures === 0 ? 'ALL CLEAN' : failures + ' FAILURES'}`)
